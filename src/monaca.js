@@ -1,9 +1,7 @@
-var MonacaCordova = require('./cordova').MonacaCordova,
-    MonacaHelp = require('./help').MonacaHelp,
-    MonacaCreate = require('./create').MonacaCreate,
-    MonacaServe = require('./serve').MonacaServe,
-    argv = require('optimist').argv,
-    colors = require('colors');
+var argv = require('optimist').argv,
+    colors = require('colors'),
+    fs = require('fs'),
+    path = require('path');
 
 colors.setTheme({
     silly: 'rainbow',
@@ -18,60 +16,22 @@ colors.setTheme({
     error: ['red', 'bold']
 });
 
+var taskList = [
+    new (require('./cordova').CordovaTask)(),
+    new (require('./create').CreateTask)(),
+    new (require('./serve').ServeTask)(),
+];
+
 var Monaca = {
-    TASK_LIST: [
-        {
-            name: 'create',
-            target: MonacaCreate
-        },
-        {
-            name: 'serve',
-            target: MonacaServe
-        },
-        {
-            name: 'info',
-            target: MonacaCordova
-        },
-        {
-            name: 'platform',
-            target: MonacaCordova
-        },
-        {
-            name: 'plugin',
-            target: MonacaCordova
-        },
-        {
-            name: 'prepare',
-            target: MonacaCordova
-        },
-        {
-            name: 'compile',
-            target: MonacaCordova
-        },
-        {
-            name: 'run',
-            target: MonacaCordova
-        },
-        {
-            name: 'build',
-            target: MonacaCordova
-        },
-        {
-            name: 'emulate',
-            target: MonacaCordova
-        },
-    ],
     VERSION: '0.0.1',
-    _getTask: function(){
-        if (argv._.length) {
-            var name = argv._[0];
+    _getTask: function(taskName){
+        if (!taskName) return null;
 
-            for (var i = 0, l = this.TASK_LIST.length; i < l; i++) {
-                var task = this.TASK_LIST[i];
+        for (var i = 0, l = taskList.length; i < l; i++) {
+            var task = taskList[i];
 
-                if (task.name === name) {
-                    return task;
-                }
+            if (task.isMyTask(taskName)) {
+                return task;
             }
         }
     },
@@ -88,23 +48,26 @@ var Monaca = {
             return;
         }
 
-        var task = this._getTask();
+        var taskName = argv._.length ? argv._[0] : null;
+        var task = this._getTask(taskName);
 
         if (!task) {
             process.stderr.write(('Error: ' + argv._[0] + ' is not a valid task.\n').error);
             return;
         }
 
-        var target = new task.target();
-
-        target.run();
+        task.run(taskName);
     },
     printVersion: function(){
         console.log((this.VERSION).info.bold);
     },
     printHelp: function(){
-        var target = new MonacaHelp();
-        target.run();
+        var file = path.join(__dirname, '..', 'doc', 'monaca.txt');
+        var text = fs.readFile(file, function(err, data){
+            if (err) throw err;
+
+            process.stdout.write(data);
+        });
     }
 };
 

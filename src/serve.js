@@ -1,11 +1,13 @@
 var BaseTask = require('./task').BaseTask,
     spawn = require('child_process').spawn;
 
-var MonacaServe = function(){};
+var ServeTask = function(){};
 
-MonacaServe.prototype = new BaseTask();
+ServeTask.prototype = new BaseTask();
 
-MonacaServe.prototype.run = function(){
+ServeTask.prototype.taskList = ['serve'];
+
+ServeTask.prototype.run = function(){
     var args = process.argv.slice(2);
     var cordovaProcess = spawn('cordova', args);
     var gulpProcess = spawn('gulp', ['serve']);
@@ -57,4 +59,4 @@ MonacaServe.prototype.run = function(){
     });
 };
 
-exports.MonacaServe = MonacaServe;
+exports.ServeTask = ServeTask;

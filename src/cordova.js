@@ -1,11 +1,13 @@
 var BaseTask = require('./task').BaseTask,
     exec = require('child_process').exec;
 
-var MonacaCordova = function(){};
+var CordovaTask = function(){};
 
-MonacaCordova.prototype = new BaseTask();
+CordovaTask.prototype = new BaseTask();
 
-MonacaCordova.prototype.run = function(){
+CordovaTask.prototype.taskList = ['info','platform','plugin','prepare','compile','run','build','emulate'];
+
+CordovaTask.prototype.run = function(){
     var args = process.argv.length > 3 ? process.argv.slice(3).join(' ') : '';
     var cmd = 'cordova ' + process.argv[2] + ' ' + args;
 
@@ -22,4 +24,4 @@ MonacaCordova.prototype.run = function(){
     });
 };
 
-exports.MonacaCordova = MonacaCordova;
+exports.CordovaTask = CordovaTask;

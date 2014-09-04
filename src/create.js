@@ -7,26 +7,35 @@ var BaseTask = require('./task').BaseTask,
     rimraf = require('rimraf'),
     exec = require('child_process').exec;
 
-var MonacaCreate = function(){};
+var CreateTask = function(){};
 
-MonacaCreate.prototype = new BaseTask();
+CreateTask.prototype = new BaseTask();
 
-MonacaCreate.prototype.run = function(){
+CreateTask.prototype.taskList = ['create'];
+
+CreateTask.prototype.run = function(){
     if (argv._.length < 2) {
         console.log(('At least the dir must be provided to create new project. See `monaca help`.').error);
         return;
     }
 
-    var template = argv.template;
+    var templateName = argv.template;
 
-    if (!template) {
+    if (!templateName) {
         this.showTemplateQuestion();
     } else {
+        var template = this.getTemplateFromName(templateName);
+
+        if (!template) {
+            process.stderr.write(('Error: monaca does not have ' + templateName + ' template').error);
+            return;
+        }
+
         this.createApp(template);       
     }
 };
 
-MonacaCreate.prototype.createApp = function(template){
+CreateTask.prototype.createApp = function(template){
     var self = this;
     var args = argv._;
     var dirName = argv._[1];
@@ -48,7 +57,7 @@ MonacaCreate.prototype.createApp = function(template){
     });
 };
 
-MonacaCreate.prototype.showTemplateQuestion = function(){
+CreateTask.prototype.showTemplateQuestion = function(){
     var self = this;
     var templateList = this.getTemplateList();
 
@@ -78,7 +87,7 @@ MonacaCreate.prototype.showTemplateQuestion = function(){
     question();
 };
 
-MonacaCreate.prototype.getTemplateList = function(){
+CreateTask.prototype.getTemplateList = function(){
     var dir = path.join(__dirname, '..', 'templates'),
         list = [];
 
@@ -96,7 +105,26 @@ MonacaCreate.prototype.getTemplateList = function(){
     return list;
 };
 
-MonacaCreate.prototype.replaceTemplate = function(dirName, template){
+CreateTask.prototype.getTemplateFromName = function(name){
+    var filepath = null;
+
+    if (name !== 'Empty') {
+        filepath = path.join(__dirname, '..', 'templates', 'onsen_' + name.replace(' ', '_') + '.zip');
+
+        try {
+            fs.statSync(filepath);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    return {
+        name: name,
+        path: filepath
+    };
+};
+
+CreateTask.prototype.replaceTemplate = function(dirName, template){
     if (template.path) {
         var tmpPath = path.join('/tmp', 'ons' + new Date().getTime().toString());
         var wwwPath = path.join(dirName, 'www');
@@ -114,7 +142,19 @@ MonacaCreate.prototype.replaceTemplate = function(dirName, template){
 
                     rimraf.sync(tmpPath);
 
-                    console.log(('Set template: ' + template.name).info);
+                    // npm install
+                    npmProcess = exec('npm install --prefix ' + dirName);
+                    npmProcess.stdout.on('data', function(data){
+                        console.log(data.toString().info);
+                    });
+
+                    npmProcess.stderr.on('data', function(data){
+                        process.stderr.write(data.toString().error);
+                    });
+
+                    npmProcess.on('exit', function(code){
+                        console.log(('Set template: ' + template.name).info);
+                    });
                 })
                 .on('error', function(error){
                     console.log(('Error: ' + error).error);
@@ -125,4 +165,4 @@ MonacaCreate.prototype.replaceTemplate = function(dirName, template){
     }
 };
 
-exports.MonacaCreate = MonacaCreate;
+exports.CreateTask = CreateTask;
