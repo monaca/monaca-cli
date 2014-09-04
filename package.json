@@ -11,6 +11,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "colors": "^0.6.2",
     "npm": "^2.0.0-beta.0",
     "optimist": "^0.6.1",
     "rimraf": "^2.2.8",

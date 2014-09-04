@@ -2,7 +2,21 @@ var MonacaCordova = require('./cordova').MonacaCordova,
     MonacaHelp = require('./help').MonacaHelp,
     MonacaCreate = require('./create').MonacaCreate,
     MonacaServe = require('./serve').MonacaServe,
-    argv = require('optimist').argv;
+    argv = require('optimist').argv,
+    colors = require('colors');
+
+colors.setTheme({
+    silly: 'rainbow',
+    input: 'grey',
+    verbose: 'cyan',
+    prompt: 'grey',
+    info: 'green',
+    data: 'grey',
+    help: 'cyan',
+    warn: ['yellow', 'bold'],
+    debug: 'blue',
+    error: ['red', 'bold']
+});
 
 var Monaca = {
     TASK_LIST: [
@@ -77,7 +91,7 @@ var Monaca = {
         var task = this._getTask();
 
         if (!task) {
-            process.stderr.write('Error: ' + argv._[0] + ' is not a valid task.\n');
+            process.stderr.write(('Error: ' + argv._[0] + ' is not a valid task.\n').error);
             return;
         }
 
@@ -86,7 +100,7 @@ var Monaca = {
         target.run();
     },
     printVersion: function(){
-        console.log(this.VERSION);
+        console.log((this.VERSION).info.bold);
     },
     printHelp: function(){
         var target = new MonacaHelp();

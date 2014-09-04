@@ -12,12 +12,12 @@ MonacaCordova.prototype.run = function(){
     var childProcess = exec(cmd);
 
     childProcess.stdout.on('data', function(data){
-        console.log(data);
+        console.log(data.toString().info);
     });
 
     childProcess.stderr.on('data', function(data){
         if (data) {
-            process.stderr.write(data);
+            process.stderr.write(data.toString().error);
         }
     });
 };

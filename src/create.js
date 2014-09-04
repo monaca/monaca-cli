@@ -13,7 +13,7 @@ MonacaCreate.prototype = new BaseTask();
 
 MonacaCreate.prototype.run = function(){
     if (argv._.length < 2) {
-        console.log('At least the dir must be provided to create new project. See `monaca help`.');
+        console.log(('At least the dir must be provided to create new project. See `monaca help`.').error);
         return;
     }
 
@@ -34,13 +34,11 @@ MonacaCreate.prototype.createApp = function(template){
     var childProcess = exec(cmd);
 
     childProcess.stdout.on('data', function(data){
-        console.log(data);
+        console.log(data.toString().info);
     });
 
     childProcess.stderr.on('data', function(data){
-        if (data) {
-            process.stderr.write(data);
-        }
+        process.stderr.write(data.toString().error);
     });
 
     childProcess.on('exit', function(code){
@@ -60,7 +58,7 @@ MonacaCreate.prototype.showTemplateQuestion = function(){
         path: null
     });
 
-    console.log('Which project template do you use?');
+    console.log(('Which project template do you use?\n').prompt);
 
     templateList.forEach(function(item, index){
         console.log((index + 1) + ': ' + item.name);
@@ -68,7 +66,7 @@ MonacaCreate.prototype.showTemplateQuestion = function(){
 
     var question = function(){
         var i = rl.createInterface(process.stdin, process.stdout, null);
-        i.question('Type number>', function(answer){
+        i.question(('\nType number>').input, function(answer){
             i.close();
             if (answer.match(/\d+/) && templateList[parseInt(answer) - 1]) {
                 self.createApp(templateList[parseInt(answer) - 1]);
@@ -116,13 +114,13 @@ MonacaCreate.prototype.replaceTemplate = function(dirName, template){
 
                     rimraf.sync(tmpPath);
 
-                    console.log('Set template: ' + template.name);
+                    console.log(('Set template: ' + template.name).info);
                 })
                 .on('error', function(error){
-                    console.log('Error: ' + error);
+                    console.log(('Error: ' + error).error);
                 });           
         } catch (error) {
-            console.log('Error: ' + error);
+            console.log(('Error: ' + error).error);
         }
     }
 };
