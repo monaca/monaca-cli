@@ -1,0 +1,12 @@
+#!/usr/bin/env node
+'use strict';
+
+process.title = 'monaca';
+
+var Monaca = require('../src/monaca').Monaca;
+
+try {
+    Monaca.run();
+} catch(e) {
+    console.log(e);    
+}
