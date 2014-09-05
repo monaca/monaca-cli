@@ -36,23 +36,24 @@ var Monaca = {
         }
     },
     run: function(){
+        var taskName = argv._.length ? argv._[0] : null;
+
         // version
-        if (argv.version || argv.v || (argv._.length && argv._[0] === 'version')) {
+        if (taskName === 'version' || argv.version || argv.v) {
             this.printVersion();
             return;
         }
 
         // help
-        if (argv.h || argv.help || !argv._.length || argv._[0] === 'help') {
+        if (!taskName || taskName === 'help' || argv.h || argv.help) {
             this.printHelp();
             return;
         }
 
-        var taskName = argv._.length ? argv._[0] : null;
         var task = this._getTask(taskName);
 
         if (!task) {
-            process.stderr.write(('Error: ' + argv._[0] + ' is not a valid task.\n').error);
+            process.stderr.write(('Error: ' + taskName + ' is not a valid task.\n').error);
             return;
         }
 
@@ -63,7 +64,7 @@ var Monaca = {
     },
     printHelp: function(){
         var file = path.join(__dirname, '..', 'doc', 'monaca.txt');
-        var text = fs.readFile(file, function(err, data){
+        fs.readFile(file, function(err, data){
             if (err) throw err;
 
             process.stdout.write(data);
