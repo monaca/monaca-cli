@@ -13,7 +13,9 @@ CreateTask.prototype = new BaseTask();
 
 CreateTask.prototype.taskList = ['create'];
 
-CreateTask.prototype.run = function(){
+CreateTask.prototype.run = function(taskName){
+    if (!this.isMyTask(taskName)) return;
+
     if (argv._.length < 2) {
         console.log(('At least the dir must be provided to create new project. See `monaca help`.').error);
         return;
@@ -36,11 +38,11 @@ CreateTask.prototype.run = function(){
 };
 
 CreateTask.prototype.createApp = function(template){
-    var self = this;
-    var args = argv._;
-    var dirName = argv._[1];
-    var cmd = 'cordova ' + args.join(' ');
-    var childProcess = exec(cmd);
+    var self = this,
+        args = argv._,
+        dirName = args[1],
+        cmd = 'cordova ' + args.join(' '),
+        childProcess = exec(cmd);
 
     childProcess.stdout.on('data', function(data){
         console.log(data.toString().info);

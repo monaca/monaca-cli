@@ -7,55 +7,51 @@ ServeTask.prototype = new BaseTask();
 
 ServeTask.prototype.taskList = ['serve'];
 
-ServeTask.prototype.run = function(){
-    var args = process.argv.slice(2);
-    var cordovaProcess = spawn('cordova', args);
-    var gulpProcess = spawn('gulp', ['serve']);
+ServeTask.prototype.run = function(taskName){
+    if (!this.isMyTask(taskName)) return;
+
     var fixLog = function(data){
-        var ret = data.toString()
-            .split('\n')
-            .filter(function(item){ return item !== ''; })
-            .map(function(item){ return item + '\n'; });
+            var ret = data.toString()
+                .split('\n')
+                .filter(function(item){ return item !== ''; })
+                .map(function(item){ return item + '\n'; });
 
-        return ret;
-    };
+            return ret;
+        },
+        processes = [
+            {
+                name: 'Cordova',
+                process: spawn('cordova', process.argv.slice(2)),
+                color: 'yellow'
+            },
+            {
+                name: 'gulp',
+                process: spawn('gulp', ['serve']),
+                color: 'cyan'
+            }
+        ],
+        stopProcesses = function(){
+            processes.forEach(function(item){
+                item.process.kill();
+            });
+        };
 
-    // cordova serve
-    cordovaProcess.stdout.on('data', function(data){
-        var logs = fixLog(data);
-        logs.forEach(function(log){
-            process.stdout.write('Cordova: '.yellow.bold + log.info);
+    processes.forEach(function(item){
+        item.process.stdout.on('data', function(data){
+            fixLog(data).forEach(function(log){
+                process.stdout.write((item.name + ': ').bold[item.color] + log.info);
+            });
         });
-    });
 
-    cordovaProcess.stderr.on('data', function(data){
-        var logs = fixLog(data);
-        logs.forEach(function(log){
-            process.stderr.write('Cordova: '.yellow.bold + log.error);
+        item.process.stderr.on('data', function(data){
+            fixLog(data).forEach(function(log){
+                process.stderr.write((item.name + ': ').bold[item.color] + log.error);
+            });
         });
-    });
 
-    cordovaProcess.on('exit', function(){
-        gulpProcess.kill();
-    });
-
-    // gulp serve
-    gulpProcess.stdout.on('data', function(data){
-        var logs = fixLog(data);
-        logs.forEach(function(log){
-            process.stdout.write('gulp: '.cyan.bold + log.info);
+        item.process.on('exit', function(){
+            stopProcesses();
         });
-    });
-
-    gulpProcess.stderr.on('data', function(data){
-        var logs = fixLog(data);
-        logs.forEach(function(log){
-            process.stderr.write('gulp: '.cyan.bold + log.error);
-        });
-    });
-
-    gulpProcess.on('exit', function(){
-        cordovaProcess.kill();
     });
 };
 
