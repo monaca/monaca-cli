@@ -1,32 +1,51 @@
 #!/usr/bin/env node
 
 var exec = require("child_process").exec;
+var hasError = false;
 
 // check xcode
-var checkComponent = function(component, success, failure){
+var checkComponent = function(component, callback){
     console.log('\nChecking for ' + component.name + ' ...');
 
-    var cp = exec(component.cmd);
+    exec(component.cmd, function(err, stdout, stderr) {
+        if (err) {
+            hasError = true;
+            process.stderr.write('NG: Ensure you have installed ' + component.name + '.\n');
+        } else {
+            console.log('OK');
+        }
 
-    cp.stdout.setEncoding('utf8');
-    cp.on('error', function(error){
-        process.stderr.write('NG: Ensure you have installed ' + component.name + '.\n');
-        if (failure) failure();
-    });
-    cp.on('exit', function(code) {
-        console.log('OK');
-        if (success) success();
+        if (callback) callback();
     });
 };
 
-checkComponent({
-    name: 'XCode',
-    cmd: "pkgutil --pkgs='com\.apple\.pkg\.Xcode.*'"
-}, function(){
-    checkComponent({
+var components = [
+    {
+        name: 'XCode',
+        cmd: "pkgutil --pkgs='com\.apple\.pkg\.Xcode.*'"
+    },
+    {
         name: 'XCode Command Line Tools',
         cmd: 'xcode-select -p'
-    }, function(){
-        console.log('\nSuccess: Confirmed that the dependent components are installed.');
-    })   
-});
+    }
+];
+
+var i = 0;
+
+(function loop(){
+    if (i == components.length) {
+        if (hasError) {
+            process.stderr.write('\nWraning: Several dependent components is not installed. Please install that.\n');
+        } else {
+            console.log('\nSuccess: Confirmed that the dependent components are installed.');
+        }
+
+        return;
+    }
+
+    var component = components[i];
+    checkComponent(component, function(){
+        i++;
+        loop();
+    });
+})()
