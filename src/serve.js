@@ -1,5 +1,5 @@
 var BaseTask = require('./task').BaseTask,
-    spawn = require('child_process').spawn;
+    exec = require('child_process').exec;
 
 var ServeTask = function(){};
 
@@ -21,12 +21,12 @@ ServeTask.prototype.run = function(taskName){
         processes = [
             {
                 name: 'Cordova',
-                process: spawn('cordova', process.argv.slice(2)),
+                process: exec('cordova ' + process.argv.slice(2).join(' ')),
                 color: 'yellow'
             },
             {
                 name: 'gulp',
-                process: spawn('gulp', ['serve']),
+                process: exec('gulp serve'),
                 color: 'cyan'
             }
         ],
