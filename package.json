@@ -6,7 +6,7 @@
     "monaca": "bin/monaca"
   },
   "scripts": {
-    "preinstall": "bin/preinstall",
+    "preinstall": "node bin/preinstall",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
