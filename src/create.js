@@ -41,7 +41,7 @@ CreateTask.prototype.createApp = function(template){
     var self = this,
         args = argv._,
         dirName = args[1],
-        cmd = 'cordova ' + args.join(' '),
+        cmd = path.join(__dirname, '..', 'node_modules', '.bin', 'cordova') + ' '  + args.join(' '),
         childProcess = exec(cmd);
 
     childProcess.stdout.on('data', function(data){

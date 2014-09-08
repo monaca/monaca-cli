@@ -1,4 +1,5 @@
 var BaseTask = require('./task').BaseTask,
+    path = require('path'),
     exec = require('child_process').exec;
 
 var ServeTask = function(){};
@@ -21,12 +22,12 @@ ServeTask.prototype.run = function(taskName){
         processes = [
             {
                 name: 'Cordova',
-                process: exec('cordova ' + process.argv.slice(2).join(' ')),
+                process: exec(path.join(__dirname, '..', 'node_modules', '.bin', 'cordova') + ' '  + process.argv.slice(2).join(' ')),
                 color: 'yellow'
             },
             {
                 name: 'gulp',
-                process: exec('gulp serve'),
+                process: exec(path.join(__dirname, '..', 'node_modules', '.bin', 'gulp') + ' serve'),
                 color: 'cyan'
             }
         ],

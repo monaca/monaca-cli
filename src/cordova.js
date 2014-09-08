@@ -1,4 +1,5 @@
 var BaseTask = require('./task').BaseTask,
+    path = require('path'),
     exec = require('child_process').exec;
 
 var CordovaTask = function(){};
@@ -11,7 +12,7 @@ CordovaTask.prototype.run = function(taskName){
     if (!this.isMyTask(taskName)) return;
 
     var args = process.argv.length > 3 ? process.argv.slice(3).join(' ') : '';
-    var cmd = 'cordova ' + taskName + ' ' + args;
+    var cmd = path.join(__dirname, '..', 'node_modules', '.bin', 'cordova') + ' ' + taskName + ' ' + args;
 
     var childProcess = exec(cmd);
 
