@@ -43,7 +43,7 @@ var components = [
 (function loop(){
     if (!components.length) {
         if (hasError) {
-            process.stderr.write('\nWraning: Several dependent components is not installed. Please install that.\n');
+            process.stderr.write('\nWarning: Several dependent components is not installed. Please install that.\n');
         } else {
             console.log('\nSuccess: Confirmed that the dependent components are installed.');
         }
