@@ -11,6 +11,7 @@
   },
   "author": "",
   "license": "MIT",
+  "preferGlobal": true,
   "dependencies": {
     "colors": "^0.6.2",
     "cordova": "^3.5.0-0.2.7",
