@@ -18,7 +18,7 @@ CreateTask.prototype.run = function(taskName){
 
     if (argv._.length < 2) {
         console.log(('At least the dir must be provided to create new project. See `monaca help`.').error);
-        return;
+        process.exit(1);
     }
 
     var templateName = argv.template;
@@ -30,7 +30,7 @@ CreateTask.prototype.run = function(taskName){
 
         if (!template) {
             process.stderr.write(('Error: monaca does not have ' + templateName + ' template').error);
-            return;
+            process.exit(1);
         }
 
         this.createApp(template);       
@@ -55,6 +55,8 @@ CreateTask.prototype.createApp = function(template){
     childProcess.on('exit', function(code){
         if (code === 0) {
             self.replaceTemplate(dirName, template);
+        } else {
+            process.exit(code);
         }
     });
 };
@@ -151,11 +153,15 @@ CreateTask.prototype.replaceTemplate = function(dirName, template){
                     });
 
                     npmProcess.stderr.on('data', function(data){
-                        process.stderr.write(data.toString().error);
+                        console.log(data.toString().error);
                     });
 
                     npmProcess.on('exit', function(code){
-                        console.log(('Set template: ' + template.name).info);
+                        if (code === 0) {
+                            console.log(('Set template: ' + template.name).info);
+                        } else {
+                            process.exit(code);
+                        }
                     });
                 })
                 .on('error', function(error){

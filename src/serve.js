@@ -50,8 +50,11 @@ ServeTask.prototype.run = function(taskName){
             });
         });
 
-        item.process.on('exit', function(){
-            stopProcesses();
+        item.process.on('exit', function(code){
+            if (code !== 0) {
+                stopProcesses();
+                process.exit(code);
+            }
         });
     });
 };

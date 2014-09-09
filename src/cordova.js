@@ -25,6 +25,12 @@ CordovaTask.prototype.run = function(taskName){
             process.stderr.write(data.toString().error);
         }
     });
+
+    childProcess.on('exit', function(code){
+        if (code !== 0) {
+            process.exit(code);
+        }
+    });
 };
 
 exports.CordovaTask = CordovaTask;

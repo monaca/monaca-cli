@@ -23,7 +23,6 @@ var taskList = [
 ];
 
 var Monaca = {
-    VERSION: '0.0.1',
     _getTask: function(taskName){
         if (!taskName) return null;
 
@@ -54,18 +53,22 @@ var Monaca = {
 
         if (!task) {
             process.stderr.write(('Error: ' + taskName + ' is not a valid task.\n').error);
-            return;
+            process.exit(1);
         }
 
         task.run(taskName);
     },
     printVersion: function(){
-        console.log((this.VERSION).info.bold);
+        var pack = require(path.join(__dirname, '..', 'package.json'));
+        console.log(pack.version.info.bold);
     },
     printHelp: function(){
         var file = path.join(__dirname, '..', 'doc', 'monaca.txt');
         fs.readFile(file, function(err, data){
-            if (err) throw err;
+            if (err) {
+                process.stderr.write(('Error: ' + err.message).error);
+                process.exit(1);
+            }
 
             process.stdout.write(data);
         });
