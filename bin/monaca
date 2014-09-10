@@ -9,4 +9,5 @@ try {
     Monaca.run();
 } catch(e) {
     console.log(e);    
+    process.exit(1);
 }
