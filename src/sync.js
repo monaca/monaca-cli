@@ -178,7 +178,7 @@
 
   SyncTask.prototype.livesync = function() {
     try {
-      var localkit = new Localkit(monaca, process.cwd());
+      var localkit = new Localkit(monaca, process.cwd(), true);
     }
     catch(error) {
       util.err('Unable to start livesync: ' + error);
