@@ -68,7 +68,7 @@
         function(progress) {
           var per = 100 * (progress.index + 1) / progress.total;
           per = per.toString().substr(0, 5) + '%';
-          console.log(('[' + per + '] ').verbose + progress.path);
+          util.print(('[' + per + '] ').verbose + progress.path);
 
           nbrOfFiles++;
         }
@@ -101,7 +101,7 @@
         function(progress) {
           var per = 100 * (progress.index + 1) / progress.total;
           per = per.toString().substr(0, 5) + '%';
-          console.log(('[' + per + '] ').verbose + progress.path);
+          util.print(('[' + per + '] ').verbose + progress.path);
 
           nbrOfFiles++;
         }
@@ -139,9 +139,13 @@
                   util.error('Unable to read destination directory.');
                 }
                 else {
+                  var absolutePath = path.resolve(destPath);
+
+                  util.print('Cloning "' + project.name + '" to ' + absolutePath); 
+
                   monaca.cloneProject(project.projectId, destPath).then(
                     function() {
-                      util.print('Project successfully clone from Monaca Cloud!');
+                      util.print('Project successfully cloned from Monaca Cloud!');
                     },
                     function(error) {
                       util.err('Clone failed: ' + error);
@@ -149,7 +153,7 @@
                     function(progress) {
                       var per = 100 * (progress.index + 1) / progress.total;
                       per = per.toString().substr(0, 5) + '%';
-                      console.log(('[' + per + '] ').verbose + progress.path);
+                      util.print(('[' + per + '] ').verbose + progress.path);
                     }
                   );
                 }
