@@ -33,7 +33,7 @@
   AuthTask.prototype.getEmail = function() {
     var deferred = Q.defer();
 
-    read({ prompt: 'Email: ' }, function(error, email) {
+    read({ prompt: 'Email address: ' }, function(error, email) {
       if (error) {
         deferred.reject(error);
       }
@@ -98,7 +98,7 @@
           function(credentials) {
             monaca.login(credentials.email, credentials.password).then(
               function() {
-                util.print('Successfully signed in!');
+                util.print('Successfully signed in as ' + credentials.email + '.');
               },
               function(error) {
                 util.err('Unable to sign in: ' + error);
@@ -119,10 +119,10 @@
 
     monaca.logout().then(
       function() {
-        process.stdout.write('Successfully signed out.\n');
+        process.stdout.write('You have been signed out.\n');
       },
       function(error) {
-        process.stderr.write('Failed: ' + error);
+        process.stderr.write('Unable to sign out: ' + error);
       }
     );
   };
