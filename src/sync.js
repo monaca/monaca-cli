@@ -4,7 +4,8 @@
   var read = require('read'),
     path = require('path'),
     Q = require('q'),
-    Monaca = require('monaca-lib').Monaca;
+    Monaca = require('monaca-lib').Monaca,
+    Localkit = require('monaca-lib').Localkit;
 
   var util = require(path.join(__dirname, 'util'));
     
@@ -16,7 +17,7 @@
 
   SyncTask.prototype = new BaseTask();
 
-  SyncTask.prototype.taskList = ['upload', 'download', 'clone'];
+  SyncTask.prototype.taskList = ['upload', 'download', 'clone', 'livesync'];
 
   SyncTask.prototype.run = function(taskName){
     var self = this;
@@ -26,14 +27,17 @@
 
     monaca.relogin().then(
       function() {
-        if (taskName == 'upload') {
+        if (taskName === 'upload') {
           self.upload();
         }
-        else if (taskName == 'download') {
+        else if (taskName === 'download') {
           self.download();
         }
-        else {
+        else if (taskName === 'clone') {
           self.clone();
+        }
+        else {
+          self.livesync();
         }
       },
       function() {
@@ -171,6 +175,38 @@
       }
     );
   };
-    
+
+  SyncTask.prototype.livesync = function() {
+    try {
+      var localkit = new Localkit(monaca, process.cwd());
+    }
+    catch(error) {
+      util.err('Unable to start livesync: ' + error);
+      process.exit(1);
+    }
+  
+    util.print('Starting HTTP server...');
+    localkit.startHttpServer().then(
+      function() {
+        util.print('HTTP server started.');
+        util.print('Starting beacon transmitter...');
+        localkit.startBeaconTransmitter().then(
+          function() {
+            util.print('Beacon transmitter started.');
+            util.print('Waiting for connections from Monaca debugger...'.help);
+          },
+          function(error) {
+            util.err('Unable to start beacon transmitter: ' + error);
+            process.exit(1);
+          }
+        );
+      },
+      function(error) {
+        util.err('Unable to start HTTP server: ' + error); 
+        process.exit(1);
+      }
+    );
+  };
+
   exports.SyncTask = SyncTask;
 })();
