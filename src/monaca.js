@@ -21,7 +21,8 @@ var taskList = [
     new (require('./create').CreateTask)(),
     new (require('./serve').ServeTask)(),
     new (require('./auth').AuthTask)(),
-    new (require('./sync').SyncTask)()
+    new (require('./sync').SyncTask)(),
+    new (require('./remote').RemoteTask)()
 ];
 
 var Monaca = {
