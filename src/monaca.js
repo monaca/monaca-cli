@@ -20,6 +20,7 @@ var taskList = [
     new (require('./cordova').CordovaTask)(),
     new (require('./create').CreateTask)(),
     new (require('./serve').ServeTask)(),
+    new (require('./auth').AuthTask)()
 ];
 
 var Monaca = {
