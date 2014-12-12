@@ -183,7 +183,7 @@
 
         read( { prompt: 'Project number: ' }, function(error, idx) {
           if (error) {
-            util.error('Unable to read project number.');
+            util.err('Unable to read project number.');
           }
           else {
             var projectId = parseInt(idx);  
@@ -193,7 +193,7 @@
 
               read( { prompt: 'Destination directory: ' }, function(error, destPath) {
                 if (error) {
-                  util.error('Unable to read destination directory.');
+                  util.err('Unable to read destination directory.');
                 }
                 else {
                   var absolutePath = path.resolve(destPath);
