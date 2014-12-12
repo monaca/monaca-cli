@@ -41,7 +41,7 @@ ServeTask.prototype.assureCordovaProject = function(projectPath) {
   var assureFile = function(fn) {
     var deferred = Q.defer(),
       loc = path.join(projectPath, fn),
-      template = path.join(__dirname, '..', 'templates', fn);
+      template = path.join(__dirname, 'serve', fn);
 
     fs.exists(loc, function(exists) {
       if (exists) {
