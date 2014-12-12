@@ -20,7 +20,7 @@
   RemoteTask.prototype = new BaseTask();
 
   RemoteTask.prototype.taskList = {
-    remote: {
+    'remote build': {
       description: 'remote tasks'
     }
   };

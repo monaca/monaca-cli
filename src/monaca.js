@@ -31,14 +31,20 @@ var VERSION = require(path.join(__dirname, '..', 'package.json')).version;
 
 var Monaca = {
     _getTask: function(taskName) {
-        if (!taskName) return null;
+        var taskName = '';
 
-        for (var i = 0, l = taskList.length; i < l; i++) {
-            var task = taskList[i];
+        for (var i = 0, l = argv._.length; i < l; i ++) {
+          var v = argv._[i];
+
+          taskName = [taskName, v].join(' ').trim();
+
+          for (var j = 0, l = taskList.length; j < l; j ++) {
+            var task = taskList[j];
 
             if (task.isMyTask(taskName)) {
-                return task;
+              return [task, taskName];
             }
+          }
         }
     },
     run: function() {
@@ -56,14 +62,19 @@ var Monaca = {
             return;
         }
 
-        var task = this._getTask(taskName);
+        var ret = this._getTask(taskName);
 
-        if (!task) {
+        if (!ret) {
             process.stderr.write(('Error: ' + taskName + ' is not a valid task.\n').error);
             process.exit(1);
         }
 
-        if (argv._[1] === 'help') {
+        var task = ret[0];
+        taskName = ret[1];
+
+        var taskNameParts = taskName.split(' ').length;
+
+        if (argv._[taskNameParts] === 'help') {
           task.displayHelp(taskName);
         }
         else {

@@ -12,6 +12,7 @@ BaseTask.prototype = {
 
         for (var i = 0, l = taskNames.length; i < l; i++) {
             var task = taskNames[i];
+
             if (task === taskName) return true;
         }
 
