@@ -21,7 +21,20 @@
 
   RemoteTask.prototype.taskList = {
     'remote build': {
-      description: 'remote tasks'
+      description: 'build project on Monaca Cloud',
+      longDescription: [
+        'Upload project and build it on the Monaca Cloud',
+        'build server',
+        '',
+        'When the build has completed a QR code containing',
+        'a link to the built project will be displayed in the',
+        'terminal.'
+      ],
+      usage: ['monaca build <platform>'],
+      examples: [
+        'monaca remote build android',
+        'monaca remote build ios'
+      ]
     }
   };
 
@@ -53,36 +66,44 @@
   };
 
   RemoteTask.prototype.build = function() {
-    if (argv.debugger) {
-      util.print('Redirecting to debugger build page...');
-      monaca.getProjects().then(
-        function(projects) {
-          var projectId = projects[0].projectId;
+    var self = this,
+      platform = argv._[2],
+      availablePlatforms = ['ios', 'android', 'winrt'];
 
-          open('https://ide.monaca.mobi/project/' + projectId + '/debugger');
-        },
-        function(error) {
-          util.err('An error has occurred.');
-        }
-      );
+    if (availablePlatforms.indexOf(platform) < 0) {
+      util.err('Invalid platform. Must be one of: ' + availablePlatforms.join(', '));
+      process.exit(1);
     }
-    else {
-      util.print('Uploading project to the Monaca Cloud.');
-      monaca.uploadProject(process.cwd()).then(
-        function(projectId) {
-          util.print('Project successfully uploaded. Redirecting to build page...');
-          open('https://ide.monaca.mobi/project/' + projectId + '/build');
-        },
-        function(error) {
-          util.err('Upload failed: ' + error);
-        },
-        function(progress) {
-          var per = 100 * (progress.index + 1) / progress.total;
-          per = per.toString().substr(0, 5) + '%';
-          util.print(('[' + per + '] ').verbose + progress.path);
-        }
-      );
-    }
+
+    util.print('Uploading project to the Monaca Cloud.');
+    monaca.uploadProject(process.cwd()).then(
+      function(projectId) {
+        util.print('Project successfully uploaded. Building project.');
+        
+        monaca.buildProject(projectId, { platform: platform }).then(
+          function(result) {
+            util.print('Build successful!');
+            util.print(self._createQrCode(result.binary_url));
+            util.print('Download link: ' + result.binary_url + '\n');
+          },
+          function(error) {
+            util.err('Build failed: ' + error);
+            process.exit(1);
+          },
+          function(progress) {
+            util.print(progress);
+          }
+        );
+      },
+      function(error) {
+        util.err('Upload failed: ' + error);
+      },
+      function(progress) {
+        var per = 100 * (progress.index + 1) / progress.total;
+        per = per.toString().substr(0, 5) + '%';
+        util.print(('[' + per + '] ').verbose + progress.path);
+      }
+    );
   };
 
   RemoteTask.prototype._createQrCode = function(url) {
