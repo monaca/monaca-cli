@@ -21,10 +21,11 @@ BaseTask.prototype = {
 };
 
 BaseTask.prototype.displayHelp = function(taskName) {
+  var task = this.taskList[taskName],
+    i, desc;
+
   util.print('');
-
-  var task = this.taskList[taskName];
-
+  
   if (!task) {
     util.err('No such task.');
     process.exit(1);
@@ -33,9 +34,9 @@ BaseTask.prototype.displayHelp = function(taskName) {
   util.print('Usage: ' + task.usage + '\n');
 
   if (task.longDescription) {
-    var desc = task.longDescription,
-      lines = [];
+    var lines = [];
 
+    desc = task.longDescription;
     util.print('Description:\n');
 
     if (desc instanceof Array) {
@@ -45,7 +46,7 @@ BaseTask.prototype.displayHelp = function(taskName) {
       lines = task.longDescription.split('\n');
     }
 
-    for (var i = 0, l = lines.length; i < l; i ++) {
+    for (i = 0, l = lines.length; i < l; i ++) {
       var line = lines[i];
 
       util.print('  ' + line);
@@ -56,13 +57,11 @@ BaseTask.prototype.displayHelp = function(taskName) {
 
   if (task.options) {
     util.print('Options:\n');
-
-    for (var i = 0, l = task.options.length; i < l; i ++) {
+    for (i = 0; i < task.options.length; i++) {
       var option = task.options[i],
         param = option[0],
-        desc = option[1];
-      
-      var blank = Array(30 - param.length).join(' ');
+        blank = Array(30 - param.length).join(' ');
+      desc = option[1];
 
       util.print('  ' + param + blank + desc);
     }
@@ -73,7 +72,7 @@ BaseTask.prototype.displayHelp = function(taskName) {
   if (task.examples) {
     util.print('Examples:\n');
 
-    for (var i = 0, l = task.examples.length; i < l; i ++) {
+    for (i = 0; i < task.examples.length; i++) {
       var example = task.examples[i];
 
       util.print('  $ ' + example);

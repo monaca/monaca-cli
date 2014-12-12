@@ -7,11 +7,11 @@
 
   var printerr = function(msg) {
     process.stderr.write(msg.error + '\n');
-  }
+  };
 
   var printwarn = function(msg) {
     process.stderr.write(msg.warn + '\n');
-  }
+  };
 
   module.exports = {
     print: println,

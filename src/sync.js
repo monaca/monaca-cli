@@ -69,7 +69,7 @@
       usage: 'monaca livesync',
       examples: ['monaca livesync']
     }
-  }
+  };
 
   SyncTask.prototype.run = function(taskName){
     var self = this;
@@ -93,7 +93,7 @@
         }
       },
       function() {
-        util.err('Must be signed in to use this command.')
+        util.err('Must be signed in to use this command.');
         util.print('Please sign in with \'monaca login\'.');
         util.print('If you don\'t have an account yet you can create one at https://monaca.mobi/en/register/start');
       }
@@ -130,7 +130,7 @@
           nbrOfFiles++;
         }
       );
-    })
+    });
   };
 
   SyncTask.prototype.download = function() {
@@ -230,8 +230,10 @@
   };
 
   SyncTask.prototype.livesync = function() {
+    var localkit;
+
     try {
-      var localkit = new Localkit(monaca, process.cwd(), true);
+      localkit = new Localkit(monaca, process.cwd(), true);
     }
     catch(error) {
       util.err('Unable to start livesync: ' + error);

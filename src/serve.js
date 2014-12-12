@@ -54,7 +54,7 @@ ServeTask.prototype.assureCordovaProject = function(projectPath) {
     });
 
     return deferred.promise;
-  }
+  };
 
   fs.exists(path.join(projectPath, 'www'), function(exists) {
     if (!exists) {
@@ -67,8 +67,8 @@ ServeTask.prototype.assureCordovaProject = function(projectPath) {
 
           var process = exec('npm install');
           process.on('exit', function(code) {
-            if (code == 0) {
-              deferred.resolve()
+            if (code === 0) {
+              deferred.resolve();
             }
             else {
               deferred.reject('Failed installing packages.');
@@ -88,7 +88,7 @@ ServeTask.prototype.assureCordovaProject = function(projectPath) {
   });
 
   return deferred.promise;
-}
+};
 
 ServeTask.prototype.run = function(taskName){
     if (!this.isMyTask(taskName)) 

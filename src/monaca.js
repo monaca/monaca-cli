@@ -30,15 +30,15 @@ var taskList = [
 var VERSION = require(path.join(__dirname, '..', 'package.json')).version;
 
 var Monaca = {
-    _getTask: function(taskName) {
-        var taskName = '';
+    _getTask: function() {
+        var taskName = '',
+          i, j;
 
-        for (var i = 0, l = argv._.length; i < l; i ++) {
+        for (i = 0; i < argv._.length; i++) {
           var v = argv._[i];
-
           taskName = [taskName, v].join(' ').trim();
 
-          for (var j = 0, l = taskList.length; j < l; j ++) {
+          for (j = 0; j < taskList.length; j++) {
             var task = taskList[j];
 
             if (task.isMyTask(taskName)) {
@@ -62,7 +62,7 @@ var Monaca = {
             return;
         }
 
-        var ret = this._getTask(taskName);
+        var ret = this._getTask();
 
         if (!ret) {
             process.stderr.write(('Error: ' + taskName + ' is not a valid task.\n').error);
