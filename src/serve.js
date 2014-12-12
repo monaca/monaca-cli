@@ -6,7 +6,24 @@ var ServeTask = function(){};
 
 ServeTask.prototype = new BaseTask();
 
-ServeTask.prototype.taskList = ['serve'];
+ServeTask.prototype.taskList = {
+  serve: {
+    description: 'runs a local web server for assets',
+    longDescription: [
+      'Starts a local web server that serves the www assets.',
+      '',
+      'Will watch the file-system for changes and reload the',
+      'browser when a change occurs.',
+      '',
+      'Port defaults to 8000'
+    ],
+    usage: 'monaca serve [port]',
+    examples: [
+      'monaca serve',
+      'monaca serve 8001'
+    ]
+  }
+};
 
 ServeTask.prototype.run = function(taskName){
     if (!this.isMyTask(taskName)) return;

@@ -11,14 +11,32 @@ var CreateTask = function(){};
 
 CreateTask.prototype = new BaseTask();
 
-CreateTask.prototype.taskList = ['create'];
+CreateTask.prototype.taskList = {
+  create: {
+    description: 'create a new Monaca project',
+    usage: 'monaca create path [id] [name] [config]',
+    longDescription: [
+      'Creates a new application at a provided path.',
+      '',
+      'Both application ID and name are customizable.'
+    ],
+    options: [
+      ['--copy-from|src=path', 'use custom www assets'],
+      ['--link-to=path', 'create a symbolic link to www assets'],
+      ['--template', 'chose a template']
+    ],
+    examples: [
+      'monaca create myproject'
+    ]
+  }
+};
 
 CreateTask.prototype.run = function(taskName){
     if (!this.isMyTask(taskName)) return;
 
     if (argv._.length < 2) {
-        console.log(('At least the dir must be provided to create new project. See `monaca help`.').error);
-        process.exit(1);
+      this.displayHelp(taskName);
+      process.exit(1);
     }
 
     var templateName = argv.template;

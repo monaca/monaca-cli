@@ -16,7 +16,20 @@
 
   AuthTask.prototype = new BaseTask();
 
-  AuthTask.prototype.taskList = ['login', 'logout'];
+  AuthTask.prototype.taskList = {
+    login: {
+      description: 'sign in to Monaca Cloud',
+      usage: 'monaca login',
+      longDescription: 'Sign in to the Monaca Cloud. Will display a prompt that asks for user credentials.',
+      examples: ['monaca login']
+    },
+    logout: {
+      description: 'sign out from Monaca Cloud',
+      usage: 'monaca logout',
+      longDescription: 'Sign out from Monaca Cloud. Will remote stored login token.',
+      examples: ['monaca logout']
+    }
+  };
 
   AuthTask.prototype.run = function(taskName){
     if (!this.isMyTask(taskName)) 

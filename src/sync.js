@@ -17,7 +17,59 @@
 
   SyncTask.prototype = new BaseTask();
 
-  SyncTask.prototype.taskList = ['upload', 'download', 'clone', 'livesync'];
+  SyncTask.prototype.taskList = {
+    clone: {
+      description: 'clone project from the Monaca Cloud',
+      longDescription: [
+        'Clones a project from the Monaca Cloud.',
+        '',
+        'The command downloads a list of available projects',
+        'and then displays a list for the user to choose from.',
+        '',
+        'The project will be downloaded to a directory',
+        'specified by the user.'
+      ],
+      usage: 'monaca clone',
+      examples: ['monaca clone']
+    },
+    upload: {
+      description: 'upload project to Monaca Cloud',
+      longDescription: [
+        'Uploads the current project to the Monaca Cloud.',
+        '',
+        'This command requires you to be logged in. The project',
+        'files will be compared with the remote files so only',
+        'changed and new files will be uploaded.'
+      ],
+      usage: 'monaca upload',
+      examples: ['monaca upload']
+    },
+    download: {
+      description: 'download project from Monaca Cloud',
+      longDescription: [
+        'Download project from the Monaca Cloud.',
+        '',
+        'This command will connect to the Monaca Cloud and',
+        'download all the file changes that\'s been made.'
+      ],
+      usage: 'monaca download',
+      examples: ['monaca download']
+    },
+    livesync: {
+      description: 'starts a serve that waits for connections from Monaca Debugger',
+      longDescription: [
+        'Debug the application on a device and receive code changes instantly.',
+        '',
+        'This command starts a web server for the Monaca Debugger to connect to.',
+        'It also starts broadcasting messages to tell debuggers in the local network',
+        'to connect to it.',
+        '',
+        'When a debugger has connected it will send file system changes to it.'
+      ],
+      usage: 'monaca livesync',
+      examples: ['monaca livesync']
+    }
+  }
 
   SyncTask.prototype.run = function(taskName){
     var self = this;

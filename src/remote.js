@@ -19,7 +19,11 @@
 
   RemoteTask.prototype = new BaseTask();
 
-  RemoteTask.prototype.taskList = ['remote'];
+  RemoteTask.prototype.taskList = {
+    remote: {
+      description: 'remote tasks'
+    }
+  };
 
   RemoteTask.prototype.run = function(taskName){
     var self = this;
