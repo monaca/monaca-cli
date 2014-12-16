@@ -1,11 +1,12 @@
-var BaseTask = require('./task').BaseTask,
-    path = require('path'),
+var path = require('path'),
     exec = require('child_process').exec,
     fs = require('fs'),
     shell = require('shelljs'),
     Q = require('q');
 
 var util = require(path.join(__dirname, 'util'));
+  
+var BaseTask = require(path.join(__dirname, 'task')).BaseTask;
 
 var ServeTask = function(){};
 

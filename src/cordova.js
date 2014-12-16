@@ -1,6 +1,7 @@
-var BaseTask = require('./task').BaseTask,
-    path = require('path'),
+var path = require('path'),
     exec = require('child_process').exec;
+
+var BaseTask = require(path.join(__dirname, 'task')).BaseTask;
 
 var CordovaTask = function(){};
 

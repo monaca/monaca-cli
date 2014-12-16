@@ -1,11 +1,12 @@
-var BaseTask = require('./task').BaseTask,
-    fs = require('fs'),
+var fs = require('fs'),
     rl = require('readline'),
     argv = require('optimist').argv,
     path = require('path'),
     unzip = require('unzip'),
     rimraf = require('rimraf'),
     exec = require('child_process').exec;
+
+var BaseTask = require(path.join(__dirname, 'task')).BaseTask;
 
 var CreateTask = function(){};
 

@@ -11,8 +11,8 @@
     
   var monaca = new Monaca();
 
-  var BaseTask = require('./task').BaseTask;
-
+  var BaseTask = require(path.join(__dirname, 'task')).BaseTask;
+  
   var SyncTask = function(){};
 
   SyncTask.prototype = new BaseTask();

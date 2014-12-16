@@ -7,13 +7,12 @@
     Q = require('q'),
     qrcode = require('qrcode-npm'),
     argv = require('optimist').argv,
-    Monaca = require('monaca-lib').Monaca;
-
-  var util = require(path.join(__dirname, 'util'));
+    Monaca = require('monaca-lib').Monaca,
+    util = require(path.join(__dirname, 'util'));
     
   var monaca = new Monaca();
 
-  var BaseTask = require('./task').BaseTask;
+  var BaseTask = require(path.join(__dirname, 'task')).BaseTask;
 
   var RemoteTask = function(){};
 
