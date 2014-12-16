@@ -19,12 +19,12 @@ colors.setTheme({
 });
 
 var taskList = [
-    new (require('./create').CreateTask)(),
-    new (require('./cordova').CordovaTask)(),
-    new (require('./serve').ServeTask)(),
-    new (require('./auth').AuthTask)(),
-    new (require('./sync').SyncTask)(),
-    new (require('./remote').RemoteTask)()
+    new (require(path.join(__dirname, 'create')).CreateTask)(),
+    new (require(path.join(__dirname, 'cordova')).CordovaTask)(),
+    new (require(path.join(__dirname, 'serve')).ServeTask)(),
+    new (require(path.join(__dirname, 'auth')).AuthTask)(),
+    new (require(path.join(__dirname, 'sync')).SyncTask)(),
+    new (require(path.join(__dirname, 'remote')).RemoteTask)()
 ];
 
 var VERSION = require(path.join(__dirname, '..', 'package.json')).version;
