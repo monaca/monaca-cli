@@ -2,6 +2,7 @@
   'use strict';
 
   var read = require('read'),
+    argv = require('optimist').argv,
     path = require('path'),
     Q = require('q'),
     Monaca = require('monaca-lib').Monaca,
@@ -65,6 +66,9 @@
         'to connect to it.',
         '',
         'When a debugger has connected it will send file system changes to it.'
+      ],
+      options: [
+        ['--port', 'http port to listen on. default is 8080.']
       ],
       usage: 'monaca livesync',
       examples: ['monaca livesync']
@@ -240,8 +244,10 @@
       process.exit(1);
     }
   
+    console.log(argv.port);
+
     util.print('Starting HTTP server...');
-    localkit.startHttpServer().then(
+    localkit.startHttpServer({ httpPort: argv.port }).then(
       function() {
         util.print('HTTP server started.');
         util.print('Starting beacon transmitter...');
