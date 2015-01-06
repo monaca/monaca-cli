@@ -264,6 +264,7 @@
       },
       function(error) {
         util.err('Unable to start HTTP server: ' + error); 
+        util.print('This is probably due to the port already being in use. Please use --port option to change port.');
         process.exit(1);
       }
     );
