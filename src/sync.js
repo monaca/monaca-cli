@@ -244,8 +244,6 @@
       process.exit(1);
     }
   
-    console.log(argv.port);
-
     util.print('Starting HTTP server...');
     localkit.startHttpServer({ httpPort: argv.port }).then(
       function() {
