@@ -1,4 +1,4 @@
-monaca-cli
+Monaca CLI
 ==========
 
 Command line version of Monaca. It can be used to download projects from the [Monaca](http://monaca.io) cloud service, livesyncing Cordova projects to a local device using the Monaca Debugger among a lot of other things.
@@ -6,7 +6,9 @@ Command line version of Monaca. It can be used to download projects from the [Mo
 Installation instructions
 ----
 
-If you have node.js installed you can install it by using:
+If you don't have have Node.js installed, please download it [from here](http://nodejs.org/) or install it with your favorite package manager.
+
+When that's done you can install the Monaca CLI by using:
 
 ```bash
 $ npm install -g monaca
