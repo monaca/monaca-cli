@@ -57,7 +57,7 @@
       examples: ['monaca download']
     },
     livesync: {
-      description: 'starts a serve that waits for connections from Monaca Debugger',
+      description: 'starts a server that waits for connections from Monaca Debugger',
       longDescription: [
         'Debug the application on a device and receive code changes instantly.',
         '',
@@ -237,7 +237,8 @@
     var localkit;
 
     try {
-      localkit = new Localkit(monaca, process.cwd(), true);
+      localkit = new Localkit(monaca, undefined, true);
+      localkit.setProject(process.cwd());
     }
     catch(error) {
       util.err('Unable to start livesync: ' + error);
