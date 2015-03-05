@@ -47,7 +47,7 @@ to see a list of available commands:
   clone  .........  clone project from the Monaca Cloud
   upload  ........  upload project to Monaca Cloud
   download  ......  download project from Monaca Cloud
-  livesync  ......  starts a serve that waits for connections from Monaca Debugger
+  livesync  ......  starts a server that waits for connections from Monaca Debugger
   remote build  ..  build project on Monaca Cloud
 ```
 
