@@ -9,14 +9,14 @@
     Localkit = require('monaca-lib').Localkit;
 
   var util = require(path.join(__dirname, 'util'));
-    
+
   var monaca = new Monaca();
 
   var BaseTask = require(path.join(__dirname, 'task')).BaseTask;
-  
+
   var SyncTask = function(){};
 
-  SyncTask.prototype = new BaseTask();
+SyncTask.prototype = new BaseTask();
 
   SyncTask.prototype.taskList = {
     clone: {
@@ -237,14 +237,14 @@
     var localkit;
 
     try {
-      localkit = new Localkit(monaca, undefined, true);
-      localkit.setProject(process.cwd());
+      localkit = new Localkit(monaca, true);
+
     }
     catch(error) {
       util.err('Unable to start livesync: ' + error);
       process.exit(1);
     }
-  
+
     util.print('Starting HTTP server...');
     localkit.startHttpServer({ httpPort: argv.port }).then(
       function() {
@@ -254,6 +254,29 @@
           function() {
             util.print('Beacon transmitter started.');
             util.print('Waiting for connections from Monaca debugger...'.help);
+
+            var projectPath = process.cwd();
+
+            localkit.addProject(projectPath).then(
+              function() {
+                return localkit.startWatch();
+              },
+              function(error) {
+                util.err('Unable to add project: ' + error);
+                process.exit(1);
+              }
+            )
+            .then(
+              function() {
+                util.print('Started file watching.');
+                return localkit.startProject(projectPath);
+              },
+              function(error) {
+                util.err('Unable to start file watching: ' + error);
+                process.exit(1);
+              }
+            );
+
           },
           function(error) {
             util.err('Unable to start beacon transmitter: ' + error);
