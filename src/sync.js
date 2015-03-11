@@ -72,6 +72,17 @@ SyncTask.prototype = new BaseTask();
       ],
       usage: 'monaca livesync',
       examples: ['monaca livesync']
+    },
+    multiserve: {
+      description: 'Serves several projects',
+      longDescription: [
+        'Serve a list of projects.'
+      ],
+      options: [
+        ['paths', 'list of directories']
+      ],
+      usage: 'monaca multiserve <paths>',
+      examples: ['monaca multiserver /a/b/c /b/c/a']
     }
   };
 
@@ -91,6 +102,9 @@ SyncTask.prototype = new BaseTask();
         }
         else if (taskName === 'clone') {
           self.clone();
+        }
+        else if (taskName === 'multiserve') {
+          self.multiserve();
         }
         else {
           self.livesync();
@@ -229,6 +243,48 @@ SyncTask.prototype = new BaseTask();
       },
       function(error) {
         util.err('Unable to fetch project list: ' + error);
+      }
+    );
+  };
+
+  SyncTask.prototype.multiserve = function() {
+    var localkit;
+
+    try {
+      localkit = new Localkit(monaca, true);
+    }
+    catch (error) {
+      util.err('Unable to start livesync: ' + error);
+    }
+
+    localkit.setProjects(argv._.slice(1))
+    .then(
+      function() {
+        util.print('Starting HTTP server.');
+        return localkit.startHttpServer({ httPort: argv.port });
+      },
+      function(error) {
+        util.err('Unable to add projects: ' + error);
+        process.exit(1);
+      }
+    )
+    .then(
+      function() {
+        util.print('Starting beacon transmitter.');
+        return localkit.startBeaconTransmitter();
+      },
+      function(error) {
+        util.err('Unable to start HTTP server: ' + error);
+        process.exit(1);
+      }
+    )
+    .then(
+      function() {
+        util.print('Waiting for connections from Monaca debugger...'.help);
+      },
+      function(error) {
+        util.err('Unable to start beacon transmitter: ' + error);
+        process.exit(1);
       }
     );
   };
