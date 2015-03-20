@@ -260,11 +260,21 @@ SyncTask.prototype = new BaseTask();
     localkit.setProjects(argv._.slice(1))
     .then(
       function() {
+        util.print('Starting file listening.');
+        return localkit.startWatch();
+      },
+      function(error) {
+        util.err('Unable to add projects: ' + error);
+        process.exit(1);
+      }
+    )
+    .then(
+      function() {
         util.print('Starting HTTP server.');
         return localkit.startHttpServer({ httPort: argv.port });
       },
       function(error) {
-        util.err('Unable to add projects: ' + error);
+        util.error('Unable to start file watching: ' + error);
         process.exit(1);
       }
     )
