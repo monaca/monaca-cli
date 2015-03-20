@@ -29,7 +29,7 @@
         'a link to the built project will be displayed in the',
         'terminal.'
       ],
-      usage: ['monaca build <platform>'],
+      usage: ['monaca remote build <platform>'],
       examples: [
         'monaca remote build android',
         'monaca remote build ios'
