@@ -16,7 +16,7 @@
 
   var SyncTask = function(){};
 
-SyncTask.prototype = new BaseTask();
+  SyncTask.prototype = new BaseTask();
 
   SyncTask.prototype.taskList = {
     clone: {
@@ -114,24 +114,75 @@ SyncTask.prototype = new BaseTask();
 
       var nbrOfFiles = 0;
 
-      monaca.uploadProject(process.cwd()).then(
+      var assureMonacaProject = function() {
+        var deferred = Q.defer();
+
+        monaca.getProjectId(process.cwd()).then(
+          function(projectId) {
+            deferred.resolve(projectId);
+          },
+          function(error) {
+            monaca.getProjectInfo(process.cwd()).then(
+              function(info) {
+                return monaca.createProject({
+                  name: info.name,
+                  description: info.description,
+                  templateId: 'minimum'
+                });
+              },
+              function(error) {
+                deferred.reject(error);
+              }
+            )
+            .then(
+              function(info) {
+                monaca.setProjectId(process.cwd(), info.projectId).then(
+                  function(projectId) {
+                    deferred.resolve(projectId);
+                  },
+                  function(error) {
+                    deferred.reject(error);
+                  }
+                );
+              },
+              function(error) {
+                deferred.reject(error);
+              }
+            );
+          }
+        )
+
+        return deferred.promise;
+      };
+
+      assureMonacaProject().then(
         function() {
-          if (nbrOfFiles === 0) {
-            util.print('No files uploaded since project is already in sync.');
-          }
-          else {
-            util.print('Project successfully uploaded to Monaca Cloud!');
-          }
+          var nbrOfFiles = 0;
+
+          monaca.uploadProject(process.cwd()).then(
+            function() {
+              if (nbrOfFiles === 0) {
+                util.print('No files uploaded since project is already in sync.');
+              }
+              else {
+                util.print('Project successfully uploaded to Monaca Cloud!');
+              }
+            },
+            function(error) {
+              util.err('Upload failed: ' + error);
+            },
+            function(progress) {
+              var per = 100 * (progress.index + 1) / progress.total;
+              per = per.toString().substr(0, 5) + '%';
+              util.print(('[' + per + '] ').verbose + progress.path);
+
+              nbrOfFiles++;
+            }
+
+          );
         },
         function(error) {
-          util.err('Upload failed: ' + error);
-        },
-        function(progress) {
-          var per = 100 * (progress.index + 1) / progress.total;
-          per = per.toString().substr(0, 5) + '%';
-          util.print(('[' + per + '] ').verbose + progress.path);
-
-          nbrOfFiles++;
+          util.err('Unable to create monaca project: ' + error);
         }
       );
     });
