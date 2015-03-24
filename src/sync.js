@@ -247,6 +247,10 @@
               var project = projects[projectId-1];
 
               read( { prompt: 'Destination directory: ' }, function(error, destPath) {
+                if (destPath.trim() === '') {
+                  destPath = process.cwd();
+                }
+
                 if (error) {
                   util.err('Unable to read destination directory.');
                 }
