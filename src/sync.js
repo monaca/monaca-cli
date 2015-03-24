@@ -300,11 +300,20 @@
       process.exit(1);
     }
 
+
     util.print('Starting HTTP server...');
     localkit.startHttpServer({ httpPort: argv.port }).then(
       function() {
         util.print('HTTP server started.');
         util.print('Starting beacon transmitter...');
+
+        // Send "exit" event when program is terminated.
+        process.on('SIGINT', function() {
+          util.print('Stopping livesync...');
+          this.sendExitEvent();
+          process.exit(0);
+        }.bind(localkit.projectEvents));
+
         localkit.startBeaconTransmitter().then(
           function() {
             util.print('Beacon transmitter started.');
