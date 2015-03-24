@@ -293,13 +293,11 @@
 
     try {
       localkit = new Localkit(monaca, true);
-
     }
     catch(error) {
       util.err('Unable to start livesync: ' + error);
       process.exit(1);
     }
-
 
     util.print('Starting HTTP server...');
     localkit.startHttpServer({ httpPort: argv.port }).then(
@@ -323,11 +321,26 @@
 
             localkit.addProject(projectPath).then(
               function() {
-                return localkit.startWatch();
+                return monaca.getProjectId(projectPath);
               },
               function(error) {
                 util.err('Unable to add project: ' + error);
                 process.exit(1);
+              }
+            )
+            .then(
+              function(projectId) {
+                localkit.projectEvents.sse.on('connection', function(client) {
+                  localkit.projectEvents.sendMessage({
+                    action: 'start',
+                    projectId: projectId
+                  }, client);
+                });
+
+                return localkit.startWatch();
+              },
+              function(error) {
+                util.err('Unable to get project id: ' + error);
               }
             )
             .then(
