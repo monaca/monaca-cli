@@ -321,7 +321,7 @@
 
             localkit.addProject(projectPath).then(
               function() {
-                return monaca.getProjectId(projectPath);
+                return monaca.getLocalProjectId(projectPath);
               },
               function(error) {
                 util.err('Unable to add project: ' + error);
