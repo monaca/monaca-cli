@@ -4,10 +4,11 @@
   var read = require('read'),
     path = require('path'),
     Q = require('q'),
-    Monaca = require('monaca-lib').Monaca;
+    Monaca = require('monaca-lib').Monaca,
+    Localkit = require('monaca-lib').Localkit;
 
   var util = require(path.join(__dirname, 'util'));
-    
+
   var monaca = new Monaca();
 
   var BaseTask = require(path.join(__dirname, 'task')).BaseTask;
@@ -130,12 +131,24 @@
   AuthTask.prototype.logout = function() {
     process.stdout.write('Signing out from Monaca Cloud...\n');
 
+    var localkit = new Localkit(monaca);
+
     monaca.logout().then(
       function() {
         process.stdout.write('You have been signed out.\n');
+
+        return localkit.clearPairing();
       },
       function(error) {
         process.stderr.write('Unable to sign out: ' + error);
+      }
+    )
+    .then(
+      function() {
+        util.print('Removed Monaca Debugger pairing information.');
+      },
+      function(error) {
+        util.err('Unable to remove Monaca Debugger pairing information: ' + error);
       }
     );
   };
