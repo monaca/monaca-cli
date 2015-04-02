@@ -74,15 +74,15 @@
       examples: ['monaca livesync']
     },
     multiserve: {
-      description: 'Serves several projects',
+      description: 'serves several projects to the Monaca Debugger',
       longDescription: [
-        'Serve a list of projects.'
+        'Serve a list of projects to the Monaca Debugger.'
       ],
       options: [
         ['paths', 'list of directories']
       ],
       usage: 'monaca multiserve <paths>',
-      examples: ['monaca multiserver /a/b/c /b/c/a']
+      examples: ['monaca multiserve /path/to/project /path/to/another/project']
     }
   };
 
