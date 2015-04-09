@@ -334,7 +334,8 @@
       }
     )
     .then(
-      function() {
+      function(server) {
+        util.print(('Listening on ' + server.address + ':' + server.port).help);
         util.print('Starting beacon transmitter.');
         return localkit.startBeaconTransmitter();
       },
@@ -367,8 +368,9 @@
 
     util.print('Starting HTTP server...');
     localkit.startHttpServer({ httpPort: argv.port }).then(
-      function() {
+      function(server) {
         util.print('HTTP server started.');
+        util.print(('Listening on ' + server.address + ':' + server.port).help);
         util.print('Starting beacon transmitter...');
 
         // Send "exit" event when program is terminated.
