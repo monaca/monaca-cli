@@ -123,7 +123,7 @@ CordovaTask.prototype.run = function(taskName){
     var childProcess = exec(cmd);
 
     childProcess.stdout.on('data', function(data){
-        console.log(data.toString().info);
+        process.stdout.write(data.toString());
     });
 
     childProcess.stderr.on('data', function(data){

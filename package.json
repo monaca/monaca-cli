@@ -1,7 +1,7 @@
 {
-  "name": "monaca-cli",
-  "version": "0.0.1",
-  "description": "",
+  "name": "monaca",
+  "version": "1.0.0-rc.1",
+  "description": "Monaca Command Line Tool",
   "bin": {
     "monaca": "bin/monaca"
   },
@@ -9,8 +9,22 @@
     "preinstall": "node bin/preinstall",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/monaca/monaca-cli"
+  },
+  "keywords": [
+    "monaca"
+  ],
+  "author": "Andreas Argelius <andreas@asial.co.jp>",
+  "licenses": [{
+    "type": "Apache-2.0",
+    "url": "http://www.apache.org/licenses/LICENSE-2.0"
+  }],
+  "bugs": {
+    "url": "https://github.com/monaca/monaca-cli/issues"
+  },
+  "homepage": "https://github.com/monaca/monaca-cli",
   "preferGlobal": true,
   "dependencies": {
     "colors": "^0.6.2",
@@ -25,6 +39,7 @@
     "rimraf": "^2.2.8",
     "shelljs": "^0.3.0",
     "unzip": "^0.1.9",
-    "xml2js": "^0.4.4"
+    "xml2js": "^0.4.4",
+    "monaca-lib": "^1.0.0-rc.2"
   }
 }
