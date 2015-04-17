@@ -20,8 +20,6 @@ On some systems you may have to prefix the command with `sudo` because of permis
 $ sudo npm install -g monaca
 ```
 
-NOTE: Since it's not currently released on npm this will not work now.
-
 Available commands
 ----
 
