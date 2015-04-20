@@ -1,4 +1,4 @@
-var fs = require('fs'),
+var fs = require('fs-extra'),
     rl = require('readline'),
     argv = require('optimist').argv,
     path = require('path'),
@@ -156,12 +156,12 @@ CreateTask.prototype.replaceTemplate = function(dirName, template){
             fs.createReadStream(template.path).pipe(unzip.Extract({path: tmpPath}))
                 .on('close', function(){
                     ['.jshintrc', 'gulpfile.js', 'package.json', 'README.md'].forEach(function(name){
-                        fs.renameSync(path.join(tmpPath, name), path.join(dirName, name));
+                        fs.copySync(path.join(tmpPath, name), path.join(dirName, name));
                     });
 
-                    rimraf.sync(wwwPath);           
+                    rimraf.sync(wwwPath);
 
-                    fs.renameSync(path.join(tmpPath, 'www'), wwwPath);
+                    fs.copySync(path.join(tmpPath, 'www'), wwwPath);
 
                     rimraf.sync(tmpPath);
 
