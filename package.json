@@ -1,6 +1,6 @@
 {
   "name": "monaca",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "description": "Monaca Command Line Tool",
   "bin": {
     "monaca": "bin/monaca"
@@ -17,10 +17,12 @@
     "monaca"
   ],
   "author": "Andreas Argelius <andreas@asial.co.jp>",
-  "licenses": [{
-    "type": "Apache-2.0",
-    "url": "http://www.apache.org/licenses/LICENSE-2.0"
-  }],
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
   "bugs": {
     "url": "https://github.com/monaca/monaca-cli/issues"
   },
@@ -28,8 +30,9 @@
   "preferGlobal": true,
   "dependencies": {
     "colors": "^0.6.2",
-    "cordova": "^3.5.0-0.2.7",
+    "cordova": "^4.3.0",
     "gulp": "^3.8.8",
+    "monaca-lib": "^1.0.0-rc.3",
     "npm": "^2.0.0-beta.0",
     "open": "0.0.5",
     "optimist": "^0.6.1",
@@ -39,7 +42,6 @@
     "rimraf": "^2.2.8",
     "shelljs": "^0.3.0",
     "unzip": "^0.1.9",
-    "xml2js": "^0.4.4",
-    "monaca-lib": "^1.0.0-rc.2"
+    "xml2js": "^0.4.4"
   }
 }

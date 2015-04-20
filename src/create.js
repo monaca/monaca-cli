@@ -24,7 +24,7 @@ CreateTask.prototype.taskList = {
     options: [
       ['--copy-from|src=path', 'use custom www assets'],
       ['--link-to=path', 'create a symbolic link to www assets'],
-      ['--template', 'chose a template']
+      ['--template', 'choose a template']
     ],
     examples: [
       'monaca create myproject'
