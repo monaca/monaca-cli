@@ -311,7 +311,14 @@
       util.err('Unable to start livesync: ' + error);
     }
 
-    localkit.setProjects(argv._.slice(1))
+    var projects = argv._.slice(1);
+
+    if (projects.length === 0) {
+      util.err('You must supply a list of project directories.');
+      process.exit(1);
+    }
+
+    localkit.setProjects(projects)
     .then(
       function() {
         util.print('Starting file listening.');
