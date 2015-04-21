@@ -33,8 +33,9 @@
   };
 
   AuthTask.prototype.run = function(taskName){
-    if (!this.isMyTask(taskName)) 
+    if (!this.isMyTask(taskName)) {
       return;
+    }
 
     if (taskName == 'login') {
       this.login();

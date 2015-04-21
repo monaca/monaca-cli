@@ -115,7 +115,9 @@ CordovaTask.prototype.taskList = {
 };
 
 CordovaTask.prototype.run = function(taskName){
-    if (!this.isMyTask(taskName)) return;
+    if (!this.isMyTask(taskName)) {
+      return;
+    }
 
     var args = process.argv.length > 3 ? process.argv.slice(3).join(' ') : '';
     var cmd = path.join(__dirname, '..', 'node_modules', '.bin', 'cordova') + ' ' + taskName + ' ' + args;

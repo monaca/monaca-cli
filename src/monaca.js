@@ -87,7 +87,7 @@ var Monaca = {
     printLogo: function() {
       var logoFile = path.join(__dirname, '..', 'doc', 'logo.txt'),
         logo = fs.readFileSync(logoFile).toString();
-      
+
       util.print(logo.bold.blue);
       util.print(' Version ' + VERSION + '\n');
     },
@@ -109,7 +109,7 @@ var Monaca = {
       tasks.forEach(function(task) {
         var cmd = task[0],
           desc = task[1],
-          dots = Array(15 - cmd.length).join('.');
+          dots = new Array(15 - cmd.length).join('.');
         util.print('  ' + cmd.bold.info + '  ' + dots.grey + '  ' + desc.bold);
       });
 

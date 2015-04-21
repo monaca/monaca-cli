@@ -89,8 +89,9 @@
   SyncTask.prototype.run = function(taskName){
     var self = this;
 
-    if (!this.isMyTask(taskName)) 
+    if (!this.isMyTask(taskName)) {
       return;
+    }
 
     monaca.relogin().then(
       function() {
@@ -125,8 +126,6 @@
         util.print('Aborting operation.');
         process.exit(1);
       }
-
-      var nbrOfFiles = 0;
 
       var assureMonacaProject = function() {
         var deferred = Q.defer();
@@ -164,7 +163,7 @@
               }
             );
           }
-        )
+        );
 
         return deferred.promise;
       };

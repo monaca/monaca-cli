@@ -92,8 +92,9 @@ ServeTask.prototype.assureCordovaProject = function(projectPath) {
 };
 
 ServeTask.prototype.run = function(taskName){
-    if (!this.isMyTask(taskName)) 
+    if (!this.isMyTask(taskName)) {
       return;
+    }
 
     this.assureCordovaProject(process.cwd()).then(
       function() {

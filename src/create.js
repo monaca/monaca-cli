@@ -33,7 +33,9 @@ CreateTask.prototype.taskList = {
 };
 
 CreateTask.prototype.run = function(taskName){
-    if (!this.isMyTask(taskName)) return;
+    if (!this.isMyTask(taskName)) {
+      return;
+    }
 
     if (argv._.length < 2) {
       this.displayHelp(taskName);

@@ -1,11 +1,8 @@
 (function() {
   'use strict';
 
-  var read = require('read'),
-    path = require('path'),
+  var path = require('path'),
     open = require('open'),
-    Q = require('q'),
-    qrcode = require('qrcode-npm'),
     argv = require('optimist').argv,
     Monaca = require('monaca-lib').Monaca,
     util = require(path.join(__dirname, 'util'));
@@ -41,8 +38,9 @@
   RemoteTask.prototype.run = function(taskName){
     var self = this;
 
-    if (!this.isMyTask(taskName)) 
+    if (!this.isMyTask(taskName)) {
       return;
+    }
 
     monaca.relogin().then(
       function() {

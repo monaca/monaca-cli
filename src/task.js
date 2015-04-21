@@ -11,9 +11,9 @@ BaseTask.prototype = {
         var taskNames = Object.keys(this.taskList);
 
         for (var i = 0, l = taskNames.length; i < l; i++) {
-            var task = taskNames[i];
-
-            if (task === taskName) return true;
+            if (taskNames[i] === taskName) {
+              return true;
+            }
         }
 
         return false;
@@ -60,9 +60,9 @@ BaseTask.prototype.displayHelp = function(taskName) {
     for (i = 0; i < task.options.length; i++) {
       var option = task.options[i],
         param = option[0],
-        blank = Array(30 - param.length).join(' ');
-      desc = option[1];
+        blank = new Array(30 - param.length).join(' ');
 
+      desc = option[1];
       util.print('  ' + param + blank + desc);
     }
 
