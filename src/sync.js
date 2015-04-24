@@ -246,7 +246,7 @@
 
           util.print('\t' + (i + 1) + '. ' + project.name);
         }
-  
+
         util.print('');
 
         read( { prompt: 'Project number: ' }, function(error, idx) {
@@ -254,12 +254,12 @@
             util.err('Unable to read project number.');
           }
           else {
-            var projectId = parseInt(idx);  
+            var projectId = parseInt(idx);
 
             if (projectId > 0 && projectId <= projects.length) {
               var project = projects[projectId-1];
 
-              read( { prompt: 'Destination directory: ' }, function(error, destPath) {
+              read( { prompt: 'Destination directory: ', default: project.name, edit: true }, function(error, destPath) {
                 if (destPath.trim() === '') {
                   destPath = process.cwd();
                 }
