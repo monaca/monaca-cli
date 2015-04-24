@@ -15,14 +15,19 @@ CreateTask.prototype = new BaseTask();
 CreateTask.prototype.taskList = {
   create: {
     description: 'create a new Monaca project',
-    usage: 'monaca create path [id] [name] [config]',
+    usage: 'monaca create path [id] [name]',
     longDescription: [
       'Creates a new application at a provided path.',
       '',
-      'Both application ID and name are customizable.'
+      'Both application ID and name are customizable. You can select a template which should be one of:',
+      '',
+      ' * master_detail',
+      ' * sliding_menu',
+      ' * split_view',
+      ' * tab_bar'
     ],
     options: [
-      ['--template', 'choose a template']
+      ['--template', 'choose a template.']
     ],
     examples: [
       'monaca create myproject'
