@@ -22,8 +22,6 @@ CreateTask.prototype.taskList = {
       'Both application ID and name are customizable.'
     ],
     options: [
-      ['--copy-from|src=path', 'use custom www assets'],
-      ['--link-to=path', 'create a symbolic link to www assets'],
       ['--template', 'choose a template']
     ],
     examples: [
