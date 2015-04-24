@@ -2,7 +2,7 @@
 CHANGELOG
 ====
 
-v1.0.1-dev
+v1.0.1
 ----
  * monaca-create: Improved docs.
  * monaca-clone: Use the project name as default destination directory.
