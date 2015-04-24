@@ -89,6 +89,10 @@ CreateTask.prototype.showTemplateQuestion = function(){
     var self = this;
     var templateList = this.getTemplateList();
 
+    var capitalize = function(s) {
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
     // Add Empty
     templateList.unshift({
         name: 'Empty',
@@ -98,7 +102,7 @@ CreateTask.prototype.showTemplateQuestion = function(){
     console.log(('Which project template do you use?\n').prompt);
 
     templateList.forEach(function(item, index){
-        console.log((index + 1) + ': ' + item.name);
+        console.log((index + 1) + ': ' + capitalize(item.name));
     });
 
     var question = function(){
