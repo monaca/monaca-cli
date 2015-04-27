@@ -50,11 +50,11 @@ CordovaTask.prototype.taskList = {
     options: [
       ['add|rm <plugin>', 'add or remove a plugin'],
       ['ls|list', 'list currently installed plugins'],
-      ['search <query>', 'search the plugin directory']
+      ['search <query>', 'search the plugin registry']
     ],
     examples: [
-      'monaca plugin add some.nice.plugin',
-      'monaca plugin rm unused.plugin',
+      'monaca plugin add org.apache.cordova.camera',
+      'monaca plugin rm org.apache.cordova.camera',
       'monaca plugin search keyboard',
       'monaca plugin ls'
     ]
