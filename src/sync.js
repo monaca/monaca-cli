@@ -128,8 +128,8 @@
 
   SyncTask.prototype.upload = function() {
     util.print('This operation will overwrite all remote changes that has been made.'.warn);
-    read({ prompt: 'Do you want to continue? (y/N) ' }, function(error, answer) {
-      if (error || answer !== 'y') {
+    read({ prompt: 'Do you want to continue? [y/N] ' }, function(error, answer) {
+      if (error || answer.toLowerCase().charAt(0) !== 'y') {
         util.print('Aborting operation.');
         process.exit(1);
       }
@@ -210,8 +210,8 @@
 
   SyncTask.prototype.download = function() {
     util.print('This operation will overwrite all local changes you have made.'.warn);
-    read({ prompt: 'Do you want to continue? (y/N) ' }, function(error, answer) {
-      if (error || answer !== 'y') {
+    read({ prompt: 'Do you want to continue? [y/N] ' }, function(error, answer) {
+      if (error || answer.toLowerCase().charAt(0) !== 'y') {
         util.print('Aborting operation.');
         process.exit(1);
       }
