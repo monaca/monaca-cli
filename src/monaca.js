@@ -24,7 +24,8 @@ var taskList = [
     new (require(path.join(__dirname, 'serve')).ServeTask)(),
     new (require(path.join(__dirname, 'auth')).AuthTask)(),
     new (require(path.join(__dirname, 'sync')).SyncTask)(),
-    new (require(path.join(__dirname, 'remote')).RemoteTask)()
+    new (require(path.join(__dirname, 'remote')).RemoteTask)(),
+    new (require(path.join(__dirname, 'config')).ConfigTask)()
 ];
 
 var VERSION = require(path.join(__dirname, '..', 'package.json')).version;

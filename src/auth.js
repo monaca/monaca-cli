@@ -116,8 +116,14 @@
                 util.print('Successfully signed in as ' + credentials.email + '.');
               },
               function(error) {
-                util.err('Unable to sign in: ' + error);
-                util.print('If you don\'t yet have a Monaca account, please sign up at https://monaca.mobi/en/register/start .');
+                if (error === 'ECONNRESET') {
+                  util.err('Unable to connect to Monaca Cloud. Are you connected to the internet?');
+                  util.print('If you need to use a proxy, please configure it with "monaca proxy".');
+                }
+                else {
+                  util.err('Unable to sign in: ' + error);
+                  util.print('If you don\'t yet have a Monaca account, please sign up at https://monaca.mobi/en/register/start .');
+                }
               }
             );
           },

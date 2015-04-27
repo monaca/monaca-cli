@@ -111,10 +111,17 @@
           self.livesync();
         }
       },
-      function() {
-        util.err('Must be signed in to use this command.');
-        util.print('Please sign in with \'monaca login\'.');
-        util.print('If you don\'t have an account yet you can create one at https://monaca.mobi/en/register/start');
+      function(error) {
+        if (error === 'ECONNRESET') {
+          util.err('Unable to connect to Monaca Cloud.');
+          util.print('Are you connected to the Internet?');
+          util.print('If you need to use a proxy, please configure it with "monaca proxy".');
+        }
+        else {
+          util.err('Must be signed in to use this command.');
+          util.print('Please sign in with \'monaca login\'.');
+          util.print('If you don\'t have an account yet you can create one at https://monaca.mobi/en/register/start');
+        }
       }
     );
   };
