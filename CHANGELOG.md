@@ -2,6 +2,12 @@
 CHANGELOG
 ====
 
+v1.0.3
+----
+ * monaca-plugin: Improved docs.
+ * monaca-upload: Made prompt case-insensitive.
+ * monaca-download: Made prompt case-insensitive.
+
 v1.0.2
 ----
  * monaca-proxy: Added proxy support.
