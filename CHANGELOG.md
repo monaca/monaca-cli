@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v1.0.4
+----
+ * core: Updated dependencies.
+
 v1.0.3
 ----
  * monaca-plugin: Improved docs.
