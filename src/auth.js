@@ -113,7 +113,7 @@
           function(credentials) {
             var pkg = require(path.join(__dirname, '..', 'package.json'));
 
-            monaca.login(credentials.email, credentials.password, {version: pkg.name + ' ' + pkg.version}).then(
+            monaca.login(credentials.email, credentials.password, {version: 'monaca-cli ' + pkg.version}).then(
               function() {
                 util.print('Successfully signed in as ' + credentials.email + '.');
               },
