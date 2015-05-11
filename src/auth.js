@@ -111,7 +111,9 @@
       function() {
         self.getCredentials().then(
           function(credentials) {
-            monaca.login(credentials.email, credentials.password).then(
+            var pkg = require(path.join(__dirname, '..', 'package.json'));
+
+            monaca.login(credentials.email, credentials.password, {version: pkg.name + ' ' + pkg.version}).then(
               function() {
                 util.print('Successfully signed in as ' + credentials.email + '.');
               },

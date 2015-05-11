@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v1.0.5
+----
+ * Added version parameter when signing in.
+
 v1.0.4
 ----
  * core: Updated dependencies.
