@@ -126,83 +126,150 @@
     );
   };
 
-  SyncTask.prototype.upload = function() {
-    util.print('This operation will overwrite all remote changes that has been made.'.warn);
-    read({ prompt: 'Do you want to continue? [y/N] ' }, function(error, answer) {
-      if (error || answer.toLowerCase().charAt(0) !== 'y') {
-        util.print('Aborting operation.');
-        process.exit(1);
+  var findProjectDir = function(cwd) {
+    return monaca.isCordovaProject(cwd).then(
+      function(data) {
+        return cwd
+      },
+      function(error) {
+        var newPath = path.join(cwd, '..');
+
+        if (newPath === cwd) {
+          return Q.reject('Directory is not a Cordova project.');
+        }
+        else {
+          return findProjectDir(newPath);
+        }
       }
+    );
+  };
 
-      var assureMonacaProject = function() {
-        var deferred = Q.defer();
+  SyncTask.prototype.upload = function() {
+    findProjectDir(process.cwd()).then(
+      function(cwd) {
+        util.print('This operation will overwrite all remote changes that has been made.'.warn);
+        read({ prompt: 'Do you want to continue? [y/N] ' }, function(error, answer) {
+          if (error || answer.toLowerCase().charAt(0) !== 'y') {
+            util.print('Aborting operation.');
+            process.exit(1);
+          }
 
-        var getProjectId = function(projectDir) {
-          return monaca.getProjectId(process.cwd()).then(
-            function(projectId) {
-              if (typeof projectId === 'undefined') {
-                return Q.reject();
-              }
-              else {
-                return projectId;
-              }
-            }
-          );
-        };
+          var assureMonacaProject = function() {
+            var deferred = Q.defer();
 
-        getProjectId(process.cwd()).then(
-          function(projectId) {
-            deferred.resolve(projectId);
-          },
-          function(error) {
-            monaca.getProjectInfo(process.cwd()).then(
-              function(info) {
-                return monaca.createProject({
-                  name: info.name,
-                  description: info.description,
-                  templateId: 'minimum'
-                });
+            var getProjectId = function(projectDir) {
+              return monaca.getProjectId(cwd).then(
+                function(projectId) {
+                  if (typeof projectId === 'undefined') {
+                    return Q.reject();
+                  }
+                  else {
+                    return projectId;
+                  }
+                }
+              );
+            };
+
+            getProjectId(cwd).then(
+              function(projectId) {
+                deferred.resolve(projectId);
               },
               function(error) {
-                deferred.reject(error);
-              }
-            )
-            .then(
-              function(info) {
-                monaca.setProjectId(process.cwd(), info.projectId).then(
-                  function(projectId) {
-                    deferred.resolve(projectId);
+                monaca.getProjectInfo(cwd).then(
+                  function(info) {
+                    return monaca.createProject({
+                      name: info.name,
+                      description: info.description,
+                      templateId: 'minimum'
+                    });
+                  },
+                  function(error) {
+                    deferred.reject(error);
+                  }
+                )
+                .then(
+                  function(info) {
+                    monaca.setProjectId(cwd, info.projectId).then(
+                      function(projectId) {
+                        deferred.resolve(projectId);
+                      },
+                      function(error) {
+                        deferred.reject(error);
+                      }
+                    );
                   },
                   function(error) {
                     deferred.reject(error);
                   }
                 );
-              },
-              function(error) {
-                deferred.reject(error);
               }
             );
+
+            return deferred.promise;
+          };
+
+          assureMonacaProject().then(
+            function() {
+              var nbrOfFiles = 0;
+
+              monaca.uploadProject(cwd).then(
+                function() {
+                  if (nbrOfFiles === 0) {
+                    util.print('No files uploaded since project is already in sync.');
+                  }
+                  else {
+                    util.print('Project successfully uploaded to Monaca Cloud!');
+                  }
+                },
+                function(error) {
+                  util.err('Upload failed: ' + error);
+                },
+                function(progress) {
+                  var per = 100 * (progress.index + 1) / progress.total;
+                  per = per.toString().substr(0, 5) + '%';
+                  util.print(('[' + per + '] ').verbose + progress.path);
+
+                  nbrOfFiles++;
+                }
+
+              );
+            },
+            function(error) {
+              util.err('Unable to create monaca project: ' + error);
+            }
+          );
+        });
+
+      },
+      function(error) {
+        util.err('Unable to upload project: ' + error);
+      }
+    )
+  };
+
+  SyncTask.prototype.download = function() {
+    findProjectDir(process.cwd()).then(
+      function(cwd) {
+        util.print('This operation will overwrite all local changes you have made.'.warn);
+        read({ prompt: 'Do you want to continue? [y/N] ' }, function(error, answer) {
+          if (error || answer.toLowerCase().charAt(0) !== 'y') {
+            util.print('Aborting operation.');
+            process.exit(1);
           }
-        );
 
-        return deferred.promise;
-      };
-
-      assureMonacaProject().then(
-        function() {
           var nbrOfFiles = 0;
 
-          monaca.uploadProject(process.cwd()).then(
+          monaca.downloadProject(cwd).then(
             function() {
               if (nbrOfFiles === 0) {
-                util.print('No files uploaded since project is already in sync.');
+                util.print('No files downloaded since project is already in sync.');
               }
               else {
-                util.print('Project successfully uploaded to Monaca Cloud!');
+                util.print('Project successfully downloaded from Monaca Cloud!');
               }
             },
             function(error) {
-              util.err('Upload failed: ' + error);
+              util.err('Download failed: ' + error);
             },
             function(progress) {
               var per = 100 * (progress.index + 1) / progress.total;
@@ -211,47 +278,13 @@
 
               nbrOfFiles++;
             }
-
           );
-        },
-        function(error) {
-          util.err('Unable to create monaca project: ' + error);
-        }
-      );
-    });
-  };
-
-  SyncTask.prototype.download = function() {
-    util.print('This operation will overwrite all local changes you have made.'.warn);
-    read({ prompt: 'Do you want to continue? [y/N] ' }, function(error, answer) {
-      if (error || answer.toLowerCase().charAt(0) !== 'y') {
-        util.print('Aborting operation.');
-        process.exit(1);
+        });
+      },
+      function(error) {
+        util.err('Unable to download project: ' + error);
       }
-
-      var nbrOfFiles = 0;
-
-      monaca.downloadProject(process.cwd()).then(
-        function() {
-          if (nbrOfFiles === 0) {
-            util.print('No files downloaded since project is already in sync.');
-          }
-          else {
-            util.print('Project successfully downloaded from Monaca Cloud!');
-          }
-        },
-        function(error) {
-          util.err('Download failed: ' + error);
-        },
-        function(progress) {
-          var per = 100 * (progress.index + 1) / progress.total;
-          per = per.toString().substr(0, 5) + '%';
-          util.print(('[' + per + '] ').verbose + progress.path);
-
-          nbrOfFiles++;
-        }
-      );
-    });
+    );
   };
 
   SyncTask.prototype.clone = function() {
