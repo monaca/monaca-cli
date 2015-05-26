@@ -137,7 +137,20 @@
       var assureMonacaProject = function() {
         var deferred = Q.defer();
 
-        monaca.getProjectId(process.cwd()).then(
+        var getProjectId = function(projectDir) {
+          return monaca.getProjectId(process.cwd()).then(
+            function(projectId) {
+              if (typeof projectId === 'undefined') {
+                return Q.reject();
+              }
+              else {
+                return projectId;
+              }
+            }
+          );
+        };
+
+        getProjectId(process.cwd()).then(
           function(projectId) {
             deferred.resolve(projectId);
           },

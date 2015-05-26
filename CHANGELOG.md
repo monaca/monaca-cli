@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v1.0.7
+----
+ * monaca-upload: Fixed bug where it didn't upload if .monaca was empty.
+
 v1.0.5
 ----
  * Added version parameter when signing in.
