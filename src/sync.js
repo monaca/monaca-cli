@@ -129,7 +129,7 @@
   var findProjectDir = function(cwd) {
     return monaca.isCordovaProject(cwd).then(
       function(data) {
-        return cwd
+        return cwd;
       },
       function(error) {
         var newPath = path.join(cwd, '..');
@@ -244,7 +244,7 @@
       function(error) {
         util.err('Unable to upload project: ' + error);
       }
-    )
+    );
   };
 
   SyncTask.prototype.download = function() {
