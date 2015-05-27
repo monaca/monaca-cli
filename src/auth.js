@@ -149,7 +149,7 @@
         return localkit.clearPairing();
       },
       function(error) {
-        process.stderr.write('Unable to sign out: ' + error);
+        util.err('Unable to sign out: ' + error);
       }
     )
     .then(
@@ -159,7 +159,12 @@
       function(error) {
         util.err('Unable to remove Monaca Debugger pairing information: ' + error);
       }
-    );
+    )
+    .finally(
+      function() {
+        process.exit(0);
+      }
+    )
   };
 
   exports.AuthTask = AuthTask;
