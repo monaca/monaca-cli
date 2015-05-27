@@ -127,7 +127,7 @@
   };
 
   var findProjectDir = function(cwd) {
-    return monaca.isCordovaProject(cwd).then(
+    return monaca.isMonacaProject(cwd).then(
       function(data) {
         return cwd;
       },
@@ -135,7 +135,7 @@
         var newPath = path.join(cwd, '..');
 
         if (newPath === cwd) {
-          return Q.reject('Directory is not a Cordova project.');
+          return Q.reject('Directory is not a Monaca project.');
         }
         else {
           return findProjectDir(newPath);

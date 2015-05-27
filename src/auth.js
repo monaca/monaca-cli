@@ -164,7 +164,7 @@
       function() {
         process.exit(0);
       }
-    )
+    );
   };
 
   exports.AuthTask = AuthTask;
