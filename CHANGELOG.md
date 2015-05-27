@@ -2,10 +2,10 @@
 CHANGELOG
 ====
 
-v1.0.8
+v1.0.9
 ----
- * monaca-upload: This command will now only work for Cordova projects and it will search parent directories until it finds one.
- * monaca-download: This command will now only work for Cordova projects and it will search parent directories until it finds one.
+ * monaca-upload: This command will now only work for Monaca projects and it will search parent directories until it finds one.
+ * monaca-download: This command will now only work for Monaca projects and it will search parent directories until it finds one.
 
 v1.0.7
 ----
