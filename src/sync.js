@@ -5,6 +5,8 @@
     argv = require('optimist').argv,
     path = require('path'),
     Q = require('q'),
+    child_process = require('child_process'),
+    nwBin = require('nw').findpath(),
     Monaca = require('monaca-lib').Monaca,
     Localkit = require('monaca-lib').Localkit;
 
@@ -354,6 +356,10 @@
     );
   };
 
+  var inspectorCallback = function(result) {
+    child_process.spawn(nwBin, [result.app, result.webSocketUrl]);
+  };
+
   SyncTask.prototype.multiserve = function() {
     var localkit;
 
@@ -363,6 +369,8 @@
     catch (error) {
       util.err('Unable to start livesync: ' + error);
     }
+
+    localkit.initInspector({inspectorCallback: inspectorCallback});
 
     var projects = argv._.slice(1);
 
@@ -424,6 +432,8 @@
       util.err('Unable to start livesync: ' + error);
       process.exit(1);
     }
+
+    localkit.initInspector({inspectorCallback: inspectorCallback});
 
     util.print('Starting HTTP server...');
     localkit.startHttpServer({ httpPort: argv.port }).then(
