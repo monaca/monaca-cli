@@ -2,6 +2,14 @@
 CHANGELOG
 ====
 
+v1.1.1
+----
+ * monaca-sync: Fixed bug where it cannot clone the project.  
+
+v1.1.0
+----
+ * monaca-login: Support authentication parameters.
+
 v1.0.10
 ----
  * monaca-livesync: Support new `Localkit.initInspector` method.
