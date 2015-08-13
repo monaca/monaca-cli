@@ -58,7 +58,7 @@ var Monaca = {
         }
 
         // help
-        if (!taskName || taskName === 'help' || argv.h || argv.help) {
+        if (!taskName || taskName === 'help') {
             this.printHelp();
             return;
         }
@@ -75,7 +75,7 @@ var Monaca = {
 
         var taskNameParts = taskName.split(' ').length;
 
-        if (argv._[taskNameParts] === 'help') {
+        if (argv._[taskNameParts] === 'help' || argv.help || argv.h) {
           task.displayHelp(taskName);
         }
         else {
