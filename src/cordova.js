@@ -37,7 +37,8 @@ CordovaTask.prototype.taskList = {
       'monaca platform add android',
       'monaca platform rm ios',
       'monaca platform check'
-    ]
+    ],
+    showInHelp : false
   },
   plugin: {
     description: 'manage installed plugins',
@@ -66,7 +67,8 @@ CordovaTask.prototype.taskList = {
     examples: [
       'monaca prepare',
       'monaca prepare android'
-    ]
+    ],
+    showInHelp : false
   },
   compile: {
     description: 'build the project',
@@ -75,7 +77,8 @@ CordovaTask.prototype.taskList = {
     examples: [
       'monaca compile',
       'monaca compile android'
-    ]
+    ],
+    showInHelp : false
   },
   run: {
     description: 'deploys project on a device / emulator',
@@ -92,7 +95,8 @@ CordovaTask.prototype.taskList = {
       'monaca run',
       'monaca run android',
       'monaca run ios --emulator'
-    ]
+    ],
+    showInHelp : false
   },
   build: {
     description: 'shortcut for compile, then prepare',
@@ -101,7 +105,8 @@ CordovaTask.prototype.taskList = {
     examples: [
       'monaca build ios',
       'monaca build'
-    ]
+    ],
+    showInHelp : false
   },
   emulate: {
     description: 'run project in emulator',
@@ -110,7 +115,8 @@ CordovaTask.prototype.taskList = {
     examples: [
       'monaca emulate android',
       'monaca emulate'
-    ]
+    ],
+    showInHelp : false
   }
 };
 

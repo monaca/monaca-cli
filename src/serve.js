@@ -27,7 +27,8 @@ ServeTask.prototype.taskList = {
     examples: [
       'monaca serve',
       'monaca serve 8001'
-    ]
+    ],
+    showInHelp : false
   }
 };
 

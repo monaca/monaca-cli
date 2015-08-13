@@ -98,14 +98,23 @@ var Monaca = {
     printCommands: function() {
       util.print('Commands:\n');
 
-      var tasks = taskList.map(function(task) {
-        return Object.keys(task.taskList).map(function(key) {
-          return [key, task.taskList[key].description];
-        });
-      })
+      var tasks = taskList.map(function(task) {        
+        return Object.keys(task.taskList).map(function(key) {          
+          if(task.taskList[key].showInHelp !== false) {
+            return [key, task.taskList[key].description];
+          }
+          else {
+            return ["",""];
+          }
+        });        
+      })      
       .reduce(function(a, b) {
         return a.concat(b);
+      })
+      .filter(function(a) {
+        return a.join("") !== "";
       });
+
 
       tasks.forEach(function(task) {
         var cmd = task[0],
