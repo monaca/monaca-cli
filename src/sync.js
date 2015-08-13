@@ -29,11 +29,26 @@
         'The command downloads a list of available projects',
         'and then displays a list for the user to choose from.',
         '',
-        'The project will be downloaded to a directory',
-        'specified by the user.'
+        'The project will be downloaded to a directory specified by the user.',
+        'Also a link is created with corresponding monaca cloud project.',
+        'User can later sync this project with monaca cloud.'
       ],
       usage: 'monaca clone',
       examples: ['monaca clone']
+    },
+    import: {
+      description: 'import project from the Monaca Cloud',
+      longDescription: [
+        'Imports a project from the Monaca Cloud.',
+        '',
+        'The command downloads a list of available projects',
+        'and then displays a list for the user to choose from.',
+        '',
+        'The project will be downloaded to a directory',
+        'specified by the user.'
+      ],
+      usage: 'monaca import',
+      examples: ['monaca import']
     },
     upload: {
       description: 'upload project to Monaca Cloud',
@@ -104,7 +119,11 @@
           self.download();
         }
         else if (taskName === 'clone') {
-          self.clone();
+          // true flag ensures that cloud project id is saved locally.
+          self.clone(true);
+        }
+        else if (taskName === 'import') {
+          self.clone(false);
         }
         else if (taskName === 'multiserve') {
           self.multiserve();
@@ -289,7 +308,7 @@
     );
   };
 
-  SyncTask.prototype.clone = function() {
+  SyncTask.prototype.clone = function(saveCloudProjectID) {
     util.print('Fetching project list...');
 
     monaca.getProjects().then(
@@ -330,6 +349,16 @@
                   monaca.cloneProject(project.projectId, destPath).then(
                     function() {
                       util.print('Project successfully cloned from Monaca Cloud!');
+                      if (saveCloudProjectID) {                                                     
+                          monaca.setProjectId(absolutePath, project.projectId).then(
+                            function() {
+                              // project id is saved in local .json file
+                            },
+                            function(error) {
+                              util.err("Project is cloned to given location but Cloud project ID for this project could not be saved. \nThis project is not linked with corresponding project on Monaca Cloud.");
+                            }
+                          )                      
+                      }
                     },
                     function(error) {
                       util.err('Clone failed: ' + error);
