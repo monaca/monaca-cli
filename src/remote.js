@@ -5,6 +5,7 @@
     open = require('open'),
     argv = require('optimist').argv,
     Monaca = require('monaca-lib').Monaca,
+    Q = require('q'),
     util = require(path.join(__dirname, 'util'));
 
   var monaca = new Monaca();
@@ -67,7 +68,7 @@
 
   RemoteTask.prototype.build = function() {
 
-    if (!argv.platform || argv['build-type']) {
+    if (!argv.platform || !argv['build-type']) {
       util.err('"platform" and "build-type" are mandatory parameters.');      
       process.exit(1);
     }
@@ -85,22 +86,114 @@
       params.android_arch = argv.android_arch;
     }
 
-    // using hardcoded project_id until a method is written to get project ids.
-    monaca.buildProject("5461dd0a7e2193d95ed41537", params).
-    then(function(result) {
-      if(result.binary_url) {
-        util.print("Url to download your package is " +  result.binary_url);
+    var projectInfo = {};
+    var assureMonacaProject = function() {
+      var deferred = Q.defer();
+      var getProjectId = function(projectDir) {        
+        return monaca.getProjectId(projectDir).then(
+          function(projectId) {
+            if (typeof projectId === 'undefined') {              
+              return Q.reject();
+            }
+            else {              
+              return projectId;
+            }
+          }
+        );
+      };
+      
+      getProjectId(process.cwd()).then(
+        function(projectId) {
+          projectInfo.projectId = projectId;
+          deferred.resolve(projectId);
+        },
+        function(error) {          
+          monaca.getProjectInfo(process.cwd()).then(
+            function(info) {              
+              return monaca.createProject({
+                name: info.name,
+                description: info.description,
+                templateId: 'minimum'
+              });
+            },
+            function(error) {              
+              deferred.reject(error);
+            }
+          )
+          .then(
+            function(info) {              
+              projectInfo = info;              
+              monaca.setProjectId(process.cwd(), info.projectId).then(
+                function(projectId) {                  
+                  deferred.resolve(projectId);
+                },
+                function(error) {                  
+                  deferred.reject(error);
+                }
+              );
+            },
+            function(error) {
+              deferred.reject(error);
+            }
+          );
+        }
+      );
+      return deferred.promise;
+    };
+    util.print("Uploading project to Monaca Cloud. . .");
+    assureMonacaProject().then(
+      function() {        
+        var nbrOfFiles = 0;
+        return monaca.uploadProject(process.cwd()).then(
+          function() {
+            if (nbrOfFiles === 0) {
+              util.print('No files uploaded since project is already in sync.');
+            }
+            else {
+              util.print('Project successfully uploaded to Monaca Cloud!');
+            }            
+            return true;
+          },
+          function(error) {
+            util.err('Upload failed: ' + error);
+            return false;
+          },
+          function(progress) {
+            var per = 100 * (progress.index + 1) / progress.total;
+            per = per.toString().substr(0, 5) + '%';
+            util.print(('[' + per + '] ').verbose + progress.path);
+            nbrOfFiles++;
+          }
+        );
+      },
+      function(error) {
+        util.err('Unable to create monaca project: ' + error);
+        Q.reject(error);
       }
-      else {
-        util.err(result.error_message);
-      }      
-    },
-    function(err) {
-      util.err(err);
-    },
-    function (progress) {
-      util.print(progress);
-    });
+    )
+    .then(
+      function() {
+        util.print("Building project on Monaca Cloud . . .");
+        monaca.buildProject(projectInfo.projectId, params).
+        then(function(result) {
+          if(result.binary_url) {
+            util.print("Url to download your package is " +  result.binary_url);
+          }
+          else {
+            util.err(result.error_message);
+          }      
+        },
+        function(err) {
+          util.err(err);
+        },
+        function (progress) {
+          util.print(progress);
+        });
+      },
+      function(err) {
+        util.err("Unable to build this project " + err);
+      }
+    )
   };
 
   exports.RemoteTask = RemoteTask;

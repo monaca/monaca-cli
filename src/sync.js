@@ -343,8 +343,8 @@
                 }
                 else {
                   var absolutePath = path.resolve(destPath);
-
-                  util.print('Cloning "' + project.name + '" to ' + absolutePath); 
+                  var action = saveCloudProjectID ? "Cloning" : "Importing";
+                  util.print(action + ' "' + project.name + '" to ' + absolutePath); 
 
                   monaca.cloneProject(project.projectId, destPath).then(
                     function() {
@@ -361,7 +361,7 @@
                       }
                     },
                     function(error) {
-                      util.err('Clone failed: ' + error);
+                      util.err('Clone failed: ' + JSON.stringify(error));
                     },
                     function(progress) {
                       var per = 100 * (progress.index + 1) / progress.total;
