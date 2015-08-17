@@ -6,8 +6,7 @@ var fs = require('fs-extra'),
     rimraf = require('rimraf'),    
     exec = require('child_process').exec,
     Q = require('q'),
-    Monaca = require('monaca-lib').Monaca,
-    Localkit = require('monaca-lib').Localkit;
+    Monaca = require('monaca-lib').Monaca;    
 
 var util = require(path.join(__dirname, 'util'));
 var monaca = new Monaca();
