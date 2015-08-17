@@ -17,7 +17,8 @@ CordovaTask.prototype.taskList = {
       'Prints out information about the Cordova environment.',
       'Also creates a file, info.txt, at the base of the project.'
     ],
-    examples: ['monaca info']
+    examples: ['monaca info'],
+    showInHelp : false
   },
   platform: {
     description: 'add, update and remove platforms',
