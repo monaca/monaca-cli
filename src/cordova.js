@@ -99,8 +99,8 @@ CordovaTask.prototype.taskList = {
     showInHelp : false
   },
   build: {
-    description: 'shortcut for compile, then prepare',
-    longDescription: 'Shortcut for `monaca compile` then `monaca prepare`.',
+    description: 'shortcut for prepare, then compile',
+    longDescription: 'Shortcut for `monaca prepare` then `monaca compile`.',
     usage: 'monaca build [platform]',
     examples: [
       'monaca build ios',
