@@ -317,66 +317,71 @@
 
         for (var i = 0, l = projects.length; i < l; i ++) {
           var project = projects[i];
-
           util.print('\t' + (i + 1) + '. ' + project.name);
         }
-
         util.print('');
 
-        read( { prompt: 'Project number: ' }, function(error, idx) {
-          if (error) {
-            util.err('Unable to read project number.');
-          }
-          else {
-            var projectId = parseInt(idx);
-
-            if (projectId > 0 && projectId <= projects.length) {
-              var project = projects[projectId-1];
-
-              read( { prompt: 'Destination directory: ', default: project.name, edit: true }, function(error, destPath) {
-                if (destPath.trim() === '') {
-                  destPath = process.cwd();
-                }
-
-                if (error) {
-                  util.err('Unable to read destination directory.');
-                }
-                else {
-                  var absolutePath = path.resolve(destPath);
-                  var action = saveCloudProjectID ? "Cloning" : "Importing";
-                  util.print(action + ' "' + project.name + '" to ' + absolutePath); 
-
-                  monaca.cloneProject(project.projectId, destPath).then(
-                    function() {
-                      util.print('Project successfully cloned from Monaca Cloud!');
-                      if (saveCloudProjectID) {                                                     
-                          monaca.setProjectId(absolutePath, project.projectId).then(
-                            function() {
-                              // project id is saved in local .json file
-                            },
-                            function(error) {
-                              util.err("Project is cloned to given location but Cloud project ID for this project could not be saved. \nThis project is not linked with corresponding project on Monaca Cloud.");
-                            }
-                          )                      
-                      }
-                    },
-                    function(error) {
-                      util.err('Clone failed: ' + JSON.stringify(error));
-                    },
-                    function(progress) {
-                      var per = 100 * (progress.index + 1) / progress.total;
-                      per = per.toString().substr(0, 5) + '%';
-                      util.print(('[' + per + '] ').verbose + progress.path);
-                    }
-                  );
-                }
-              });
+        var question = function() {
+          read( { prompt: 'Project number: ' }, function(error, idx) {
+            if (error) {
+              util.err('Unable to read project number.');
             }
             else {
-              util.err('Invalid project number.');
+              var projectId = parseInt(idx);
+              if (projectId > 0 && projectId <= projects.length) {
+                var project = projects[projectId-1];        
+                clone();      
+              }
+              else {
+                question();
+              }
             }
-          }
-        });
+          });
+        }
+
+        question();
+
+        var clone = function() {
+          read( { prompt: 'Destination directory: ', default: project.name, edit: true }, function(error, destPath) {
+            if (destPath.trim() === '') {
+              destPath = process.cwd();
+            }
+
+            if (error) {
+              util.err('Unable to read destination directory.');
+            }
+            else {
+              var absolutePath = path.resolve(destPath);
+              var action = saveCloudProjectID ? "Cloning" : "Importing";
+              util.print(action + ' "' + project.name + '" to ' + absolutePath); 
+
+              monaca.cloneProject(project.projectId, destPath).then(
+                function() {
+                  var action = saveCloudProjectID ? "cloned" : "imported";
+                  util.print('Project successfully ' + action + ' from Monaca Cloud!');
+                  if (saveCloudProjectID) {                                                     
+                      monaca.setProjectId(absolutePath, project.projectId).then(
+                        function() {
+                          // project id is saved in local .json file
+                        },
+                        function(error) {
+                          util.err("Project is cloned to given location but Cloud project ID for this project could not be saved. \nThis project is not linked with corresponding project on Monaca Cloud.");
+                        }
+                      )                      
+                  }
+                },
+                function(error) {
+                  util.err('Clone failed: ' + JSON.stringify(error));
+                },
+                function(progress) {
+                  var per = 100 * (progress.index + 1) / progress.total;
+                  per = per.toString().substr(0, 5) + '%';
+                  util.print(('[' + per + '] ').verbose + progress.path);
+                }
+              );
+            }
+          });
+        }
 
       },
       function(error) {
