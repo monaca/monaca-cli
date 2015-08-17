@@ -66,17 +66,16 @@
     );
   };
 
-  RemoteTask.prototype.build = function() {
+  RemoteTask.prototype.build = function() {    
+    var params = {};
 
-    if (!argv.platform || !argv['build-type']) {
-      util.err('"platform" and "build-type" are mandatory parameters.');      
-      process.exit(1);
+    if(argv.platform) {
+      params.platform = argv.platform;
     }
 
-    var params = {
-      platform: argv.platform,
-      purpose: argv['build-type']
-    }
+    if(argv['build-type']) {
+      params.purpose = argv['build-type'];
+    }   
 
     if(argv.android_webview) {
       params.android_webview = argv.android_webview;
@@ -86,7 +85,7 @@
       params.android_arch = argv.android_arch;
     }
 
-    var findProjectDir = function(cwd) {
+    var findProjectDir = function(cwd) {      
       return monaca.isMonacaProject(cwd).then(
         function(data) {
           return cwd;
@@ -158,7 +157,7 @@
       );
       return deferred.promise;
     };
-
+    
     findProjectDir(process.cwd())    
     .then(
       function() {
@@ -195,22 +194,37 @@
         )
         .then(
           function() {
-            util.print("Building project on Monaca Cloud . . .");
-            monaca.buildProject(projectInfo.projectId, params).
-            then(function(result) {
-              if(result.binary_url) {
-                util.print("Url to download your package is " +  result.binary_url);
-              }
-              else {
-                util.err(result.error_message);
-              }      
-            },
-            function(err) {
-              util.err(err);
-            },
-            function (progress) {
-              util.print(progress);
-            });
+            if (!argv.platform) {
+              var url = 'https://ide.monaca.mobi/project/' + projectInfo.projectId + '/' + (argv['build-type'] ? 'debugger' : 'build');              
+              monaca.getSessionUrl(url)
+              .then(
+                function(url) {
+                  open(url);
+                },
+                function(error) {
+                  util.err('Unable to open build page.');
+                  process.exit(1);
+                }
+              );              
+            }
+            else {
+              util.print("Building project on Monaca Cloud . . .");
+              monaca.buildProject(projectInfo.projectId, params).
+              then(function(result) {
+                if(result.binary_url) {
+                  util.print("Url to download your package is " +  result.binary_url);
+                }
+                else {
+                  util.err(result.error_message);
+                }      
+              },
+              function(err) {
+                util.err(err);
+              },
+              function (progress) {
+                util.print(progress);
+              });
+            }
           },
           function(err) {
             util.err("Unable to build this project " + err);
