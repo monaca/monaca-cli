@@ -2,6 +2,14 @@
 CHANGELOG
 ====
 
+v1.2.0
+----
+ * monaca-remote-build: Added non-interactive build for CI purpose.
+ * monaca-create: Now it will create an app from Cloud templates.
+ * monaca-help: Removed local build options, and supported `--help` parameter.
+ * monaca-clone: Rename to monaca-import. New monaca-clone will save local project.
+ * Updated monaca-lib to fix binary upload error.
+
 v1.1.1
 ----
  * monaca-sync: Fixed bug where it cannot clone the project.  
