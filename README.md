@@ -23,7 +23,7 @@ $ sudo npm install -g monaca
 Available commands
 ----
 
-Just run 
+Just run
 
 ```bash
 $ monaca
@@ -33,29 +33,23 @@ to see a list of available commands:
 
 ```
 create  ........  create a new Monaca project
-info  ..........  show info about Cordova environment
-platform  ......  add, update and remove platforms
-plugin  ........  manage installed plugins
-prepare  .......  prepare project for build
-compile  .......  build the project
-run  ...........  deploys project on a device / emulator
-build  .........  shortcut for compile, then prepare
-emulate  .......  run project in emulator
-serve  .........  runs a local web server for assets
 login  .........  sign in to Monaca Cloud
 logout  ........  sign out from Monaca Cloud
 clone  .........  clone project from the Monaca Cloud
+import  ........  import project from the Monaca Cloud
 upload  ........  upload project to Monaca Cloud
 download  ......  download project from Monaca Cloud
+plugin  ........  manage installed plugins
 livesync  ......  starts a server that waits for connections from Monaca Debugger
 multiserve  ....  serves several projects to the Monaca Debugger
 remote build  ..  build project on Monaca Cloud
+proxy  .........  configure proxy to use when connecting to Monaca Cloud
 ```
 
-You can run `monaca <command_name> help` to get in-depth information about a single command:
+You can run `monaca <command_name> --help` to get in-depth information about a single command:
 
 ```
-$ monaca upload help
+$ monaca upload --help
 
 Usage: monaca upload
 
@@ -70,4 +64,17 @@ Description:
 Examples:
 
   $ monaca upload
+```
+
+It also supports the command line options from Cordova CLI. The following options exactly follows the same behavior to Cordova, and Monaca Cloud is not used in this case.
+
+```
+info  ..........  show info about Cordova environment
+platform  ......  add, update and remove platforms
+prepare  .......  prepare project for build
+compile  .......  build the project
+run  ...........  deploys project on a device / emulator
+build  .........  shortcut for compile, then prepare
+emulate  .......  run project in emulator
+serve  .........  runs a local web server for assets
 ```
