@@ -131,7 +131,7 @@ var Monaca = {
       util.print('  Monaca command-line interface.\n');
 
       util.print('  To learn about a specific command type:\n');
-      util.print('  $ monaca <command> help\n');
+      util.print('  $ monaca <command> --help\n');
     },
     printExamples: function() {
       util.print('Examples:\n');

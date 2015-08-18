@@ -25,7 +25,7 @@
       usage: ['monaca remote build'],
       options: [
         ['--platform', 'Should be one of - ios, android, windows'],
-        ['--buid-type', 'Should be one of - debug (for iOS, Android and Windows. It is default option.),'],
+        ['--build-type', 'Should be one of - debug (for iOS, Android and Windows. It is default option.),'],
         ['', 'test (for iOS only),'],
         ['', 'release (for iOS, Android and Chrome Apps)'],
         ['--android_webview', 'If platform is android. Should be one of - default, crosswalk'],
@@ -161,7 +161,7 @@
     findProjectDir(process.cwd())    
     .then(
       function() {
-        util.print("Uploading project to Monaca Cloud. . .");
+        util.print("Uploading project to Monaca Cloud...");
         assureMonacaProject().then(
           function() {        
             var nbrOfFiles = 0;
