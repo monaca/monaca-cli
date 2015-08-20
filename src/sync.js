@@ -436,6 +436,14 @@
     )
     .then(
       function(server) {
+        
+        // Send "exit" event when program is terminated.
+        process.on('SIGINT', function() {
+          util.print('Stopping multiserve...');
+          this.sendExitEvent();
+          process.exit(0);
+        }.bind(localkit.projectEvents));
+
         util.print(('Listening on ' + server.address + ':' + server.port).help);
         util.print('Starting beacon transmitter.');
         return localkit.startBeaconTransmitter();
