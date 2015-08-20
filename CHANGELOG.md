@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v1.2.1
+----
+ * monaca: Fixed line encoding for bin/monaca.
+
 v1.2.0
 ----
  * monaca-remote-build: Added non-interactive build for CI purpose.
