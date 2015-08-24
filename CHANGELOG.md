@@ -2,6 +2,13 @@
 CHANGELOG
 ====
 
+v1.2.2
+----
+ * monaca-upload: Fixed file uploading error.
+ * monaca-remote-build: Removed timeout error.
+ * monaca-multiserve: Fixed issue when calling Ctrl-C in multiserve.
+ * monaca-create: Fixed monaca create to include project name.
+
 v1.2.1
 ----
  * monaca: Fixed line encoding for bin/monaca.

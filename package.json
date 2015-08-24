@@ -1,6 +1,6 @@
 {
   "name": "monaca",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Monaca Command Line Tool",
   "bin": {
     "monaca": "bin/monaca"
@@ -32,7 +32,7 @@
     "colors": "^0.6.2",
     "cordova": "^5.0.0",
     "fs-extra": "^0.18.2",
-    "monaca-lib": "^1.1.5-rc.3",
+    "monaca-lib": "^1.1.5",
     "nw": "^0.12.2",
     "open": "0.0.5",
     "optimist": "^0.6.1",
