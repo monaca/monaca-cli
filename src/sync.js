@@ -310,7 +310,7 @@
 
   SyncTask.prototype.clone = function(saveCloudProjectID) {
     util.print('Fetching project list...');
-
+    var project;
     monaca.getProjects().then(
       function(projects) {
         util.print('Please choose one of the following projects:\n');
@@ -329,7 +329,7 @@
             else {
               var projectId = parseInt(idx);
               if (projectId > 0 && projectId <= projects.length) {
-                var project = projects[projectId-1];        
+                project = projects[projectId-1];
                 clone();      
               }
               else {
