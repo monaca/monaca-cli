@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v1.2.3
+----
+ * monaca-clone: Fixed project import bug.
+
 v1.2.2
 ----
  * monaca-upload: Fixed file uploading error.
