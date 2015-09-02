@@ -60,7 +60,12 @@
         'changed and new files will be uploaded.'
       ],
       usage: 'monaca upload',
-      examples: ['monaca upload']
+      examples: ['monaca upload'],
+      options: [
+        ['--delete', 'deletes those files on Monaca cloud which are not present locally.'],
+        ['--dry-run', 'simulates the upload operation, provides details of which files will be uploaded'],
+        ['', 'and deleted in case --delete option is also used. no actual i/o is done.']
+      ]
     },
     download: {
       description: 'download project from Monaca Cloud',
@@ -71,7 +76,12 @@
         'download all the file changes that\'s been made.'
       ],
       usage: 'monaca download',
-      examples: ['monaca download']
+      examples: ['monaca download'],
+      options: [
+        ['--delete', 'deletes those files locally which are not present on Monaca Cloud.'],
+        ['--dry-run', 'simulates the download operation, provides details of which files will be downloaded'],
+        ['', 'and deleted in case --delete option is also used. no actual i/o is done.']
+      ]
     },
     livesync: {
       description: 'starts a server that waits for connections from Monaca Debugger',
@@ -170,6 +180,9 @@
     if (argv["dry-run"]) {
       options.dryrun = true;
     }
+    if (argv.delete) {
+      options.delete = true;
+    }
     findProjectDir(process.cwd()).then(
       function(cwd) {
         var assureMonacaProject = function() {
@@ -234,9 +247,9 @@
             monaca.uploadProject(cwd, options).then(
               function(files) {
                 if (options.dryrun) {
-                  if (files && Object.keys(files).length > 0) {
+                  if (files && Object.keys(files.uploaded).length > 0) {
                     util.print("Following files will be uploaded.")
-                    util.print(Object.keys(files).map(
+                    util.print(Object.keys(files.uploaded).map(
                       function(file,index) {
                         return (index+1) + ". " + file;
                       })
@@ -245,6 +258,19 @@
                   } else {
                     util.print('No files will be uploaded since project is already in sync.');
                   }
+                  if (options.delete) {
+                    if (files && Object.keys(files.deleted).length > 0) {
+                      util.print("\nFollowing files will be deleted on Monaca Cloud.")
+                      util.print(Object.keys(files.deleted).map(
+                        function(file,index) {
+                          return (index+1) + ". " + file;
+                        })
+                        .join("\n")
+                      );
+                    } else {
+                      util.print('\nNo files will be deleted on Monaca Cloud.');
+                    }
+                  }      
                 } else {
                   if (nbrOfFiles === 0) {
                     util.print('No files uploaded since project is already in sync.');
@@ -299,6 +325,9 @@
     if (argv["dry-run"]) {
       options.dryrun = true;
     }
+    if (argv.delete) {
+      options.delete = true;
+    }
     findProjectDir(process.cwd()).then(
       function(cwd) {
         var download = function(cwd) {
@@ -306,9 +335,9 @@
           monaca.downloadProject(cwd, options).then(
             function(files) {
               if (options.dryrun) {
-                if (files && Object.keys(files).length > 0) {
+                if (files && Object.keys(files.remoteFiles).length > 0) {
                   util.print("Following files will be downloaded.");
-                  util.print(Object.keys(files).map(
+                  util.print(Object.keys(files.remoteFiles).map(
                     function(file,index) {
                       return (index+1) + ". " + file;
                     })
@@ -316,6 +345,19 @@
                   );
                 } else {
                   util.print('No files will be downloaded since project is already in sync.');
+                }
+                if(options.delete) {
+                  if (files && Object.keys(files.deleted).length > 0) {
+                    util.print("\nFollowing files will be deleted locally.");
+                    util.print(Object.keys(files.deleted).map(
+                      function(file,index) {
+                        return (index+1) + ". " + file;
+                      })
+                      .join("\n")
+                    );
+                  } else {
+                    util.print('\nNo files will be deleted locally.');
+                  }
                 }
               } else {
                 if (nbrOfFiles === 0) {
