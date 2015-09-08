@@ -1,7 +1,13 @@
 var argv = require('optimist').argv,
     colors = require('colors'),
     fs = require('fs'),
-    path = require('path');
+    path = require('path'),
+    read = require('read'),
+    semver = require('semver'),
+    Monaca = require('monaca-lib').Monaca,
+    Q = require('q');
+
+var monaca = new Monaca();
 
 var util = require(path.join(__dirname, 'util'));
 
@@ -51,36 +57,45 @@ var Monaca = {
     run: function() {
         var taskName = argv._.length ? argv._[0] : null;
 
-        // version
-        if (taskName === 'version' || argv.version || argv.v) {
-            this.printVersion();
-            return;
-        }
+        this.checkVersion()
+        .then(
+          function() {
 
-        // help
-        if (!taskName || taskName === 'help') {
-            this.printHelp();
-            return;
-        }
+            // version
+            if (taskName === 'version' || argv.version || argv.v) {
+                this.printVersion();
+                return;
+            }
 
-        var ret = this._getTask();
+            // help
+            if (!taskName || taskName === 'help') {
+                this.printHelp();
+                return;
+            }
 
-        if (!ret) {
-            process.stderr.write(('Error: ' + taskName + ' is not a valid task.\n').error);
-            process.exit(1);
-        }
+            var ret = this._getTask();
 
-        var task = ret[0];
-        taskName = ret[1];
+            if (!ret) {
+                process.stderr.write(('Error: ' + taskName + ' is not a valid task.\n').error);
+                process.exit(1);
+            }
 
-        var taskNameParts = taskName.split(' ').length;
+            var task = ret[0];
+            taskName = ret[1];
 
-        if (argv._[taskNameParts] === 'help' || argv.help || argv.h) {
-          task.displayHelp(taskName);
-        }
-        else {
-          task.run(taskName);
-        }
+            var taskNameParts = taskName.split(' ').length;
+
+            if (argv._[taskNameParts] === 'help' || argv.help || argv.h) {
+              task.displayHelp(taskName);
+            }
+            else {
+              task.run(taskName);
+            }
+          }.bind(this),
+          function(err) {
+            util.err(err);
+          }
+        )
     },
     printVersion: function() {
         console.log(VERSION.info.bold);
@@ -98,16 +113,16 @@ var Monaca = {
     printCommands: function() {
       util.print('Commands:\n');
 
-      var tasks = taskList.map(function(task) {        
-        return Object.keys(task.taskList).map(function(key) {          
-          if(task.taskList[key].showInHelp !== false) {
+      var tasks = taskList.map(function(task) {
+        return Object.keys(task.taskList).map(function(key) {
+          if (task.taskList[key].showInHelp !== false) {
             return [key, task.taskList[key].description];
           }
           else {
             return ["",""];
           }
-        });        
-      })      
+        });
+      })
       .reduce(function(a, b) {
         return a.concat(b);
       })
@@ -149,6 +164,65 @@ var Monaca = {
       this.printExamples();
 
       util.print('');
+    },
+    checkVersion: function() {
+      var deferred = Q.defer();
+
+      var keys = {}
+        , filePath = path.join(__dirname, '..', 'keys.json')
+        , timestamp;
+
+      // Check if version check was performed in last 8 hours.
+      if (fs.existsSync(filePath)) {
+        keys = JSON.parse(fs.readFileSync(filePath).toString());
+        if (keys['timestamp']) {
+          var d1 = new Date(keys['timestamp']);
+          d1.setHours(d1.getHours() + 8);
+          if (d1 > new Date()) {
+            // Check was performed within last 8 hours, abort version check.
+            deferred.resolve();
+          }
+        }
+      }
+      // Set current timestamp.
+      keys['timestamp'] = new Date();
+
+      // Write latest timestamp to file.
+      var writeToFile = function(keys) {
+        fs.writeFileSync(filePath, JSON.stringify(keys));
+      }
+
+      var performCheck = function() {
+        monaca.getLatestVersionInfo().then(
+          function(data) {
+            if (data.status === 'ok') {
+              if (data.result && data.result.monacaCli) {
+                  if (semver.gt(data.result.monacaCli, VERSION)) {
+                      read({ prompt: 'The latest version ' + data.result.monacaCli + ' is released. Do you want to update? [y/N] ' }, function(error, answer) {
+                        writeToFile(keys);
+                        if (!error && answer.toLowerCase().charAt(0) == 'y') {
+                          util.print("Please use npm -g install monaca to update me.".bold)
+                          process.exit(1);
+                        } else {
+                          deferred.resolve();
+                        }
+                    });
+                  } else {
+                    writeToFile(keys);
+                    deferred.resolve();
+                  }
+              }
+            } else {
+              deferred.resolve();
+            }
+          }.bind(this),
+          function(err) {
+            deferred.reject(err);
+          }
+        );
+      }
+      performCheck();
+      return deferred.promise;
     }
 };
 
