@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v1.2.4
+----
+ * monaca-upload: Added --force, --delete, and --dry-run options.
+ * monaca-download: Added --force, --delete, and --dry-run options
+
 v1.2.3
 ----
  * monaca-clone: Fixed project import bug.
