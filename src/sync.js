@@ -60,7 +60,13 @@
         'changed and new files will be uploaded.'
       ],
       usage: 'monaca upload',
-      examples: ['monaca upload']
+      examples: ['monaca upload'],
+      options: [
+        ['--delete', 'deletes those files on Monaca cloud which are not present locally.'],
+        ['--force', 'doesn\'t ask user for permission to continue.'],
+        ['--dry-run', 'simulates the upload operation, provides details of which files will be uploaded'],
+        ['', 'and deleted in case --delete option is also used. no actual i/o is done.']
+      ]
     },
     download: {
       description: 'download project from Monaca Cloud',
@@ -71,7 +77,13 @@
         'download all the file changes that\'s been made.'
       ],
       usage: 'monaca download',
-      examples: ['monaca download']
+      examples: ['monaca download'],
+      options: [
+        ['--delete', 'deletes those files locally which are not present on Monaca Cloud.'],
+        ['--force', 'doesn\'t ask user for permission to continue.'],
+        ['--dry-run', 'simulates the download operation, provides details of which files will be downloaded'],
+        ['', 'and deleted in case --delete option is also used. no actual i/o is done.']
+      ]
     },
     livesync: {
       description: 'starts a server that waits for connections from Monaca Debugger',
@@ -166,101 +178,146 @@
   };
 
   SyncTask.prototype.upload = function() {
+    var options = {};
+    if (argv["dry-run"]) {
+      options.dryrun = true;
+    }
+    if (argv.delete) {
+      options.delete = true;
+    }
+    if (argv.force) {
+      options.force = true;
+    }
     findProjectDir(process.cwd()).then(
       function(cwd) {
-        util.print('This operation will overwrite all remote changes that has been made.'.warn);
-        read({ prompt: 'Do you want to continue? [y/N] ' }, function(error, answer) {
-          if (error || answer.toLowerCase().charAt(0) !== 'y') {
-            util.print('Aborting operation.');
-            process.exit(1);
-          }
+        var assureMonacaProject = function() {
+        var deferred = Q.defer();
 
-          var assureMonacaProject = function() {
-            var deferred = Q.defer();
+        var getProjectId = function(projectDir) {
+          return monaca.getProjectId(cwd).then(
+            function(projectId) {
+              if (typeof projectId === 'undefined') {
+                return Q.reject();
+              }
+              else {
+                return projectId;
+              }
+            }
+          );
+        };
 
-            var getProjectId = function(projectDir) {
-              return monaca.getProjectId(cwd).then(
-                function(projectId) {
-                  if (typeof projectId === 'undefined') {
-                    return Q.reject();
-                  }
-                  else {
-                    return projectId;
-                  }
-                }
-              );
-            };
-
-            getProjectId(cwd).then(
-              function(projectId) {
-                deferred.resolve(projectId);
+        getProjectId(cwd).then(
+          function(projectId) {
+            deferred.resolve(projectId);
+          },
+          function(error) {
+            monaca.getProjectInfo(cwd).then(
+              function(info) {
+                return monaca.createProject({
+                  name: info.name,
+                  description: info.description,
+                  templateId: 'minimum'
+                });
               },
               function(error) {
-                monaca.getProjectInfo(cwd).then(
-                  function(info) {
-                    return monaca.createProject({
-                      name: info.name,
-                      description: info.description,
-                      templateId: 'minimum'
-                    });
-                  },
-                  function(error) {
-                    deferred.reject(error);
-                  }
-                )
-                .then(
-                  function(info) {
-                    monaca.setProjectId(cwd, info.projectId).then(
-                      function(projectId) {
-                        deferred.resolve(projectId);
-                      },
-                      function(error) {
-                        deferred.reject(error);
-                      }
-                    );
+                deferred.reject(error);
+              }
+            )
+            .then(
+              function(info) {
+                monaca.setProjectId(cwd, info.projectId).then(
+                  function(projectId) {
+                    deferred.resolve(projectId);
                   },
                   function(error) {
                     deferred.reject(error);
                   }
                 );
+              },
+              function(error) {
+                deferred.reject(error);
               }
             );
+          }
+        );
 
-            return deferred.promise;
-          };
+        return deferred.promise;
+      };
 
-          assureMonacaProject().then(
-            function() {
-              var nbrOfFiles = 0;
+      var upload = function(cwd) {
+        assureMonacaProject().then(
+          function() {
+            var nbrOfFiles = 0;
 
-              monaca.uploadProject(cwd).then(
-                function() {
+            monaca.uploadProject(cwd, options).then(
+              function(files) {
+                if (options.dryrun && !options.force) {
+                  if (files && Object.keys(files.uploaded).length > 0) {
+                    util.print("Following files will be uploaded.")
+                    util.print(Object.keys(files.uploaded).map(
+                      function(file,index) {
+                        return (index+1) + ". " + file;
+                      })
+                      .join("\n")
+                    );
+                  } else {
+                    util.print('No files will be uploaded since project is already in sync.');
+                  }
+                  if (options.delete) {
+                    if (files && Object.keys(files.deleted).length > 0) {
+                      util.print("\nFollowing files will be deleted on Monaca Cloud.")
+                      util.print(Object.keys(files.deleted).map(
+                        function(file,index) {
+                          return (index+1) + ". " + file;
+                        })
+                        .join("\n")
+                      );
+                    } else {
+                      util.print('\nNo files will be deleted on Monaca Cloud.');
+                    }
+                  }
+                } else {
                   if (nbrOfFiles === 0) {
                     util.print('No files uploaded since project is already in sync.');
                   }
                   else {
                     util.print('Project successfully uploaded to Monaca Cloud!');
                   }
-                },
-                function(error) {
-                  util.err('Upload failed: ' + error);
-                },
-                function(progress) {
-                  var per = 100 * (progress.index + 1) / progress.total;
-                  per = per.toString().substr(0, 5) + '%';
-                  util.print(('[' + per + '] ').verbose + progress.path);
-
-                  nbrOfFiles++;
                 }
+              },
+              function(error) {
+                util.err('Upload failed: ' + error);
+              },
+              function(progress) {
+                var per = 100 * (progress.index + 1) / progress.total;
+                per = per.toString().substr(0, 5) + '%';
+                util.print(('[' + per + '] ').verbose + progress.path);
 
-              );
-            },
-            function(error) {
-              util.err('Unable to create monaca project: ' + error);
-            }
-          );
+                nbrOfFiles++;
+              }
+
+            );
+          },
+          function(error) {
+            util.err('Unable to create monaca project: ' + error);
+          }
+        );
+      }
+
+      // If --dry-run or --force option is used then no need to show warning message to user.
+      if (options.dryrun || options.force) {
+        upload(cwd);
+      } else {
+        util.print('This operation will overwrite all remote changes that has been made.'.warn);
+        read({ prompt: 'Do you want to continue? [y/N] ' }, function(error, answer) {
+          if (error || answer.toLowerCase().charAt(0) !== 'y') {
+            util.print('Aborting operation.');
+            process.exit(1);
+          } else {
+            upload(cwd);
+          }
         });
-
+      }
       },
       function(error) {
         util.err('Unable to upload project: ' + error);
@@ -269,24 +326,54 @@
   };
 
   SyncTask.prototype.download = function() {
+    var options = {};
+    if (argv["dry-run"]) {
+      options.dryrun = true;
+    }
+    if (argv.delete) {
+      options.delete = true;
+    }
+    if (argv.force) {
+      options.force = true;
+    }
     findProjectDir(process.cwd()).then(
       function(cwd) {
-        util.print('This operation will overwrite all local changes you have made.'.warn);
-        read({ prompt: 'Do you want to continue? [y/N] ' }, function(error, answer) {
-          if (error || answer.toLowerCase().charAt(0) !== 'y') {
-            util.print('Aborting operation.');
-            process.exit(1);
-          }
-
+        var download = function(cwd) {
           var nbrOfFiles = 0;
-
-          monaca.downloadProject(cwd).then(
-            function() {
-              if (nbrOfFiles === 0) {
-                util.print('No files downloaded since project is already in sync.');
-              }
-              else {
-                util.print('Project successfully downloaded from Monaca Cloud!');
+          monaca.downloadProject(cwd, options).then(
+            function(files) {
+              if (options.dryrun && !options.force) {
+                if (files && Object.keys(files.remoteFiles).length > 0) {
+                  util.print("Following files will be downloaded.");
+                  util.print(Object.keys(files.remoteFiles).map(
+                    function(file,index) {
+                      return (index+1) + ". " + file;
+                    })
+                    .join("\n")
+                  );
+                } else {
+                  util.print('No files will be downloaded since project is already in sync.');
+                }
+                if(options.delete) {
+                  if (files && Object.keys(files.deleted).length > 0) {
+                    util.print("\nFollowing files will be deleted locally.");
+                    util.print(Object.keys(files.deleted).map(
+                      function(file,index) {
+                        return (index+1) + ". " + file;
+                      })
+                      .join("\n")
+                    );
+                  } else {
+                    util.print('\nNo files will be deleted locally.');
+                  }
+                }
+              } else {
+                if (nbrOfFiles === 0) {
+                  util.print('No files downloaded since project is already in sync.');
+                }
+                else {
+                  util.print('Project successfully downloaded from Monaca Cloud!');
+                }
               }
             },
             function(error) {
@@ -300,7 +387,23 @@
               nbrOfFiles++;
             }
           );
-        });
+        }
+
+        // If user is dry running 'monaca download' or forcing it then no need to show warning message.
+        if (options.dryrun || options.force) {
+          download(cwd);
+        } else {
+          util.print('This operation will overwrite all local changes you have made.'.warn);
+          read({ prompt: 'Do you want to continue? [y/N] ' }, function(error, answer) {
+            if (error || answer.toLowerCase().charAt(0) !== 'y') {
+              util.print('Aborting operation.');
+              process.exit(1);
+            } else {
+              download(cwd);
+            }
+          });
+        }
+
       },
       function(error) {
         util.err('Unable to download project: ' + error);
@@ -330,7 +433,7 @@
               var projectId = parseInt(idx);
               if (projectId > 0 && projectId <= projects.length) {
                 project = projects[projectId-1];
-                clone();      
+                clone();
               }
               else {
                 question();
@@ -359,7 +462,7 @@
                 function() {
                   var action = saveCloudProjectID ? "cloned" : "imported";
                   util.print('Project successfully ' + action + ' from Monaca Cloud!');
-                  if (saveCloudProjectID) {                                                     
+                  if (saveCloudProjectID) {
                       monaca.setProjectId(absolutePath, project.projectId).then(
                         function() {
                           // project id is saved in local .json file
@@ -367,7 +470,7 @@
                         function(error) {
                           util.err("Project is cloned to given location but Cloud project ID for this project could not be saved. \nThis project is not linked with corresponding project on Monaca Cloud.");
                         }
-                      )                      
+                      )
                   }
                 },
                 function(error) {
@@ -436,7 +539,7 @@
     )
     .then(
       function(server) {
-        
+
         // Send "exit" event when program is terminated.
         process.on('SIGINT', function() {
           util.print('Stopping multiserve...');
