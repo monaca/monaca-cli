@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v1.2.5
+----
+ * monaca-download: Fixed to download some files that were exempted.
+
 v1.2.4
 ----
  * monaca-upload: Added --force, --delete, and --dry-run options.
