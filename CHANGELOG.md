@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v1.2.6
+----
+ * monaca-remote-build: Added missing `options` parameter.
+
 v1.2.5
 ----
  * monaca-download: Fixed to download some files that were exempted.
@@ -36,7 +40,7 @@ v1.2.0
 
 v1.1.1
 ----
- * monaca-sync: Fixed bug where it cannot clone the project.  
+ * monaca-sync: Fixed bug where it cannot clone the project.
 
 v1.1.0
 ----
