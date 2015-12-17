@@ -2,7 +2,7 @@
 CHANGELOG
 ====
 
-v1.2.8.1
+v1.2.9
 ----
 * monaca-upload: Fixed delete parameter.
 
