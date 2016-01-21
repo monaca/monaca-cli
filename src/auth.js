@@ -23,6 +23,9 @@
       description: 'sign in to Monaca Cloud',
       usage: 'monaca login',
       longDescription: 'Sign in to the Monaca Cloud. Will display a prompt that asks for user credentials.',
+      options: [
+        ['email', 'Email address used to login Monaca']
+      ],
       examples: ['monaca login']
     },
     logout: {
@@ -49,14 +52,18 @@
   AuthTask.prototype.getEmail = function() {
     var deferred = Q.defer();
 
-    read({ prompt: 'Email address: ' }, function(error, email) {
-      if (error) {
-        deferred.reject(error);
-      }
-      else {
-        deferred.resolve(email);
-      }
-    });
+    if (process.argv[3]) {
+      deferred.resolve(process.argv[3]);
+    } else {
+      read({ prompt: 'Email address: ' }, function(error, email) {
+        if (error) {
+          deferred.reject(error);
+        }
+        else {
+          deferred.resolve(email);
+        }
+      });
+    }
 
     return deferred.promise;
   };
