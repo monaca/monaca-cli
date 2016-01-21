@@ -2,12 +2,17 @@
 CHANGELOG
 ====
 
-v1.2.8
+v1.2.9
+----
+* monaca-login: Added optional email parameter.
+* monaca-remote-build: Added optional email parameter.
 
+v1.2.8
+----
 * monaca-download/upload: Allowed upload/download for config files inside the root directory.
 
 v1.2.7
-
+----
  * monaca-download: Fixed wrong files deletion in `downloadProject()`.
 
 v1.2.6
