@@ -2,7 +2,7 @@
 CHANGELOG
 ====
 
-v1.2.9
+v1.2.10
 ----
 * monaca-login: Added optional email parameter.
 * monaca-remote-build: Added optional email parameter.
