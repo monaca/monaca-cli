@@ -27,9 +27,9 @@
       usage: ['monaca remote build'],
       options: [
         ['--platform', 'Should be one of - ios, android, windows'],
-        ['--build-type', 'Should be one of - debug (for iOS, Android and Windows. It is default option.),'],
-        ['', 'test (for iOS only),'],
-        ['', 'release (for iOS, Android and Chrome Apps)'],
+        ['--build-type', 'Should be one of - debug (for iOS, Android and Windows. It is default option.)'],
+        ['', '  - release (for iOS and Android)'],
+        ['--output', 'The path in which the built file will be stored (specify also the filename)'],
         ['--android_webview', 'If platform is android. Should be one of - default, crosswalk'],
         ['--android_arch', 'Required if --android_webview is crosswalk. Should be one of - x86, arm']
       ],
@@ -40,21 +40,21 @@
     }
   };
 
-  RemoteTask.prototype.run = function(taskName){
+  RemoteTask.prototype.run = function(taskName) {
     var self = this;
 
     if (!this.isMyTask(taskName)) {
       return;
     }
 
-    monaca.relogin().then(
+    monaca.relogin()
+    .then(
       function() {
         var task = argv._[1];
 
         if (task === 'build') {
           self.build();
-        }
-        else {
+        } else {
           util.err('No such command.');
           process.exit(1);
         }
@@ -71,28 +71,33 @@
   RemoteTask.prototype.build = function() {
     var params = {};
 
-    if(argv.platform) {
+    if (argv.platform) {
       params.platform = argv.platform;
     }
 
-    if(argv['build-type']) {
+    if (argv['build-type']) {
       params.purpose = argv['build-type'];
     }
 
-    if(argv.android_webview) {
+    if (argv.android_webview) {
       params.android_webview = argv.android_webview;
     }
 
-    if(argv.android_arch) {
+    if (argv.android_arch) {
       params.android_arch = argv.android_arch;
     }
 
-    if(argv.email) {
+    if (argv.email) {
       params.email = argv.email;
     }
 
+    if (argv.output) {
+      params.output = argv.output;
+    }
+
     var findProjectDir = function(cwd) {
-      return monaca.isMonacaProject(cwd).then(
+      return monaca.isMonacaProject(cwd)
+      .then(
         function(data) {
           return cwd;
         },
@@ -101,8 +106,7 @@
 
           if (newPath === cwd) {
             return Q.reject('Directory is not a Monaca project.');
-          }
-          else {
+          } else {
             return findProjectDir(newPath);
           }
         }
@@ -113,25 +117,27 @@
     var assureMonacaProject = function(cwd) {
       var deferred = Q.defer();
       var getProjectId = function(projectDir) {
-        return monaca.getProjectId(projectDir).then(
+        return monaca.getProjectId(projectDir)
+        .then(
           function(projectId) {
             if (typeof projectId === 'undefined') {
               return Q.reject();
-            }
-            else {
+            } else {
               return projectId;
             }
           }
         );
       };
 
-      getProjectId(cwd).then(
+      getProjectId(cwd)
+      .then(
         function(projectId) {
           projectInfo.projectId = projectId;
           deferred.resolve(projectId);
         },
         function(error) {
-          monaca.getProjectInfo(cwd).then(
+          monaca.getProjectInfo(cwd)
+          .then(
             function(info) {
               return monaca.createProject({
                 name: info.name,
@@ -146,7 +152,8 @@
           .then(
             function(info) {
               projectInfo = info;
-              monaca.setProjectId(cwd, info.projectId).then(
+              monaca.setProjectId(cwd, info.projectId)
+              .then(
                 function(projectId) {
                   deferred.resolve(projectId);
                 },
@@ -168,15 +175,16 @@
     .then(
       function(cwd) {
         util.print("Uploading project to Monaca Cloud...");
-        assureMonacaProject(cwd).then(
+        assureMonacaProject(cwd)
+        .then(
           function() {
             var nbrOfFiles = 0;
-            return monaca.uploadProject(cwd).then(
+            return monaca.uploadProject(cwd)
+            .then(
               function() {
                 if (nbrOfFiles === 0) {
                   util.print('No files uploaded since project is already in sync.');
-                }
-                else {
+                } else {
                   util.print('Project successfully uploaded to Monaca Cloud!');
                 }
                 return true;
@@ -200,58 +208,69 @@
         )
         .then(
           function() {
-            // open the browser if no platform parameter is provided.
-            if (!argv.platform) {
-              var url = 'https://ide.monaca.mobi/project/' + projectInfo.projectId + '/' + (argv['build-type'] ? 'debugger' : 'build');
-              monaca.getSessionUrl(url)
-              .then(
-                function(url) {
-                  open(url);
-                },
-                function(error) {
-                  util.err('Unable to open build page.');
-                  process.exit(1);
-                }
-              );
-            }
-            else {
-              // Build project on Monaca Cloud and download it into ./build folder.
-              util.print("Building project on Monaca Cloud...");
-              monaca.buildProject(projectInfo.projectId, params).
-              then(function(result) {
-                if(result.binary_url) {
-                  return result.binary_url;
-                }
-                else {
-                  return Q.reject(result.error_message);
-                }
-              },
-              function(err) {
-                return Q.reject(err);
-              },
-              function (progress) {
-                util.print(progress);
-              })
-              .then(
-                function(url) {
-                  monaca.getSessionUrl(url).then(
-                    function(sessionUrl) {
-                      var buildDir = "";
-                      shell.mkdir('-p', path.join(cwd, 'build'));
-                      monaca.download(sessionUrl, {}, function(response) {
-                        var filename = "";
-                        if (typeof response.headers['content-disposition'] === 'string') {
-                          filename = response.headers['content-disposition'].match(/filename="?([^"]+)"?/)[1];
-                        }
-                        buildDir = path.join(cwd, "build", filename);
-                        return buildDir;
-                      }
-                      ).then(
-                        function(name) {
-                          util.print("Your package is stored at " + buildDir);
+            return monaca.checkBuildAvailability(projectInfo.projectId, params.platform, params.purpose)
+            .then(
+              function() {
+                // Open the browser if no platform parameter is provided.
+                if (!argv.platform) {
+                  var url = 'https://ide.monaca.mobi/project/' + projectInfo.projectId + '/' + (argv['build-type'] ? 'debugger' : 'build');
+                  monaca.getSessionUrl(url)
+                  .then(
+                    function(url) {
+                      open(url);
+                    },
+                    function(error) {
+                      util.err('Unable to open build page.');
+                      process.exit(1);
+                    }
+                  );
+                } else {
+                  // Build project on Monaca Cloud and download it into ./build folder.
+                  util.print("Building project on Monaca Cloud...");
+                  monaca.buildProject(projectInfo.projectId, params)
+                  .then(function(result) {
+                    if (result.binary_url) {
+                      return result.binary_url;
+                    } else {
+                      return Q.reject(result.error_message);
+                    }
+                  },
+                  function(err) {
+                    return Q.reject(err);
+                  },
+                  function(progress) {
+                    process.stdout.write(".");
+                  })
+                  .then(
+                    function(url) {
+                      monaca.getSessionUrl(url)
+                      .then(
+                        function(sessionUrl) {
+                          var buildPath = "";
+                          monaca.download(sessionUrl, {}, function(response) {
+                            var filename = "";
+                            if (params.output) {
+                              buildPath = params.output;
+                            } else {
+                              if (typeof response.headers['content-disposition'] === 'string') {
+                                filename = response.headers['content-disposition'].match(/filename="?([^"]+)"?/)[1];
+                              }
+                              buildPath = path.join(cwd, "build", filename);
+                              shell.mkdir('-p', buildPath.replace(/[^\/]*$/, ''));
+                            }
+                            return buildPath;
+                          })
+                          .then(
+                            function() {
+                              util.print("\nYour package is stored at " + buildPath);
+                            },
+                            function(err) {
+                              util.err("\n" + err);
+                            }
+                          )
                         },
-                        function(err) {
-                          util.err(err);
+                        function(error) {
+                          util.err(error);
                         }
                       )
                     },
@@ -259,20 +278,20 @@
                       util.err(error);
                     }
                   )
-                },
-                function(error) {
-                  util.err(error);
                 }
-              )
+              },
+              function(error) {
+                util.err("Unable to build this project. " + error);
+              }
+            ),
+            function(error) {
+              util.err('Unable to create monaca project: ' + error);
             }
-          },
-          function(err) {
-            util.err("Unable to build this project " + err);
           }
-        )
-      },
-      function(err) {
-        util.err(err);
+        ),
+        function(err) {
+          util.err(err);
+        }
       }
     );
   };
