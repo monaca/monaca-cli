@@ -26,7 +26,11 @@
       options: [
         ['email', 'Email address used to login Monaca']
       ],
-      examples: ['monaca login']
+      examples: [
+        ['monaca login'],
+        ['monaca login me@monaca.io'],
+        ['echo "mypass" | monaca login me@monaca.io']
+      ]
     },
     logout: {
       description: 'sign out from Monaca Cloud',
