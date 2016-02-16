@@ -31,16 +31,13 @@
   "dependencies": {
     "colors": "^0.6.2",
     "cordova": "^5.0.0",
-    "fs-extra": "^0.18.2",
     "monaca-lib": "^1.1.13",
     "nw": "^0.12.2",
     "open": "0.0.5",
     "optimist": "^0.6.1",
     "q": "^1.1.2",
     "read": "^1.0.5",
-    "rimraf": "^2.2.8",
     "shelljs": "^0.3.0",
-    "unzip": "^0.1.9",
     "xmldom": "^0.1.19"
   }
 }

@@ -4,7 +4,6 @@
   var path = require('path'),
     open = require('open'),
     argv = require('optimist').argv,
-    fs = require('fs'),
     shell = require('shelljs'),
     Monaca = require('monaca-lib').Monaca,
     Q = require('q'),
