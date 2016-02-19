@@ -1,0 +1,41 @@
+{
+  "remote build": {
+    "description": "build project on Monaca Cloud",
+    "longDescription": [
+      "Build the project on Monaca Cloud."
+    ],
+    "usage": [
+      "monaca remote build"
+    ],
+    "options": [
+      [
+        "--platform",
+        "Should be one of - ios, android, windows"
+      ],
+      [
+        "--build-type",
+        "Should be one of - debug (for iOS, Android and Windows. It is default option.),"
+      ],
+      [
+        "",
+        "test (for iOS only),"
+      ],
+      [
+        "",
+        "release (for iOS, Android and Chrome Apps)"
+      ],
+      [
+        "--android_webview",
+        "If platform is android. Should be one of - default, crosswalk"
+      ],
+      [
+        "--android_arch",
+        "Required if --android_webview is crosswalk. Should be one of - x86, arm"
+      ]
+    ],
+    "examples": [
+      "monaca remote build --platform=ios --build-type=test",
+      "monaca remote build --platform=android --build-type=debug --android_webview=crosswalk --android_arch=arm"
+    ]
+  }
+}

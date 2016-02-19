@@ -1,11 +1,13 @@
-var argv = require('optimist').argv,
+(function() {
+  'use strict';
+
+  var argv = require('optimist').argv,
     colors = require('colors'),
     fs = require('fs'),
-    path = require('path');
+    path = require('path'),
+    util = require(path.join(__dirname, 'util'));
 
-var util = require(path.join(__dirname, 'util'));
-
-colors.setTheme({
+  colors.setTheme({
     silly: 'rainbow',
     input: 'grey',
     verbose: 'cyan',
@@ -16,74 +18,69 @@ colors.setTheme({
     warn: ['yellow', 'bold'],
     debug: 'blue',
     error: ['red', 'bold']
-});
+  });
 
-var taskList = [
-    new (require(path.join(__dirname, 'create')).CreateTask)(),
-    new (require(path.join(__dirname, 'cordova')).CordovaTask)(),
-    new (require(path.join(__dirname, 'serve')).ServeTask)(),
-    new (require(path.join(__dirname, 'auth')).AuthTask)(),
-    new (require(path.join(__dirname, 'sync')).SyncTask)(),
-    new (require(path.join(__dirname, 'remote')).RemoteTask)(),
-    new (require(path.join(__dirname, 'config')).ConfigTask)()
-];
+  var taskList = {};
 
-var VERSION = require(path.join(__dirname, '..', 'package.json')).version;
+  var docsPath = '../doc/tasks/';
+  fs.readdirSync(path.join(__dirname, docsPath)).forEach(function(filename) {
+    taskList[filename.split('.')[0]] = JSON.parse(fs.readFileSync(path.join(__dirname, docsPath, filename), 'utf-8'));
+  });
 
-var Monaca = {
+  var VERSION = require(path.join(__dirname, '..', 'package.json')).version;
+
+  var Monaca = {
     _getTask: function() {
-        var taskName = '',
-          i, j;
+      var taskName = '';
 
-        for (i = 0; i < argv._.length; i++) {
-          var v = argv._[i];
-          taskName = [taskName, v].join(' ').trim();
+      for (var i = 0; i < argv._.length; i++) {
+        var v = argv._[i];
+        taskName = [taskName, v].join(' ').trim();
 
-          for (j = 0; j < taskList.length; j++) {
-            var task = taskList[j];
-
-            if (task.isMyTask(taskName)) {
-              return [task, taskName];
+        for (var taskSet in taskList) {
+          if (taskList.hasOwnProperty(taskSet)) {
+            for (var task in taskList[taskSet]) {
+              if (task === taskName && taskList[taskSet].hasOwnProperty(task)) {
+                return taskSet;
+              }
             }
           }
         }
+      }
     },
     run: function() {
-        var taskName = argv._.length ? argv._[0] : null;
+      var taskName = argv._.length ? argv._[0] : null;
 
-        // version
-        if (taskName === 'version' || argv.version || argv.v) {
-            this.printVersion();
-            return;
-        }
+      // version
+      if (taskName === 'version' || argv.version || argv.v) {
+        this.printVersion();
+        return;
+      }
 
-        // help
-        if (!taskName || taskName === 'help') {
-            this.printHelp();
-            return;
-        }
+      // help
+      if (!taskName || taskName === 'help') {
+        this.printHelp();
+        return;
+      }
 
-        var ret = this._getTask();
+      var taskSet = this._getTask();
 
-        if (!ret) {
-            process.stderr.write(('Error: ' + taskName + ' is not a valid task.\n').error);
-            process.exit(1);
-        }
+      if (!taskSet) {
+        process.stderr.write(('Error: ' + taskName + ' is not a valid task.\n').error);
+        process.exit(1);
+      }
 
-        var task = ret[0];
-        taskName = ret[1];
+      var taskNameParts = taskName.split(' ').length;
 
-        var taskNameParts = taskName.split(' ').length;
-
-        if (argv._[taskNameParts] === 'help' || argv.help || argv.h) {
-          task.displayHelp(taskName);
-        }
-        else {
-          task.run(taskName);
-        }
+      if (argv._[taskNameParts] === 'help' || argv.help || argv.h || (taskName === 'create' && argv._.length < 2)) {
+        util.displayHelp(taskName, taskList[taskSet]);
+        process.exit(0);
+      } else {
+        (require(path.join(__dirname, taskSet))).run(taskName);
+      }
     },
     printVersion: function() {
-        console.log(VERSION.info.bold);
+      console.log(VERSION.info.bold);
     },
     printLogo: function() {
       var logoFile = path.join(__dirname, '..', 'doc', 'logo.txt'),
@@ -98,23 +95,22 @@ var Monaca = {
     printCommands: function() {
       util.print('Commands:\n');
 
-      var tasks = taskList.map(function(task) {        
-        return Object.keys(task.taskList).map(function(key) {          
-          if(task.taskList[key].showInHelp !== false) {
-            return [key, task.taskList[key].description];
-          }
-          else {
-            return ["",""];
-          }
-        });        
-      })      
-      .reduce(function(a, b) {
-        return a.concat(b);
-      })
-      .filter(function(a) {
-        return a.join("") !== "";
-      });
-
+      var tasks = Object.keys(taskList).map(function(taskSet) {
+          return Object.keys(taskList[taskSet]).map(function(taskName) {
+            var task = taskList[taskSet][taskName]
+            if (task.showInHelp !== false) {
+              return [taskName, task.description];
+            } else {
+              return ["", ""];
+            }
+          });
+        })
+        .reduce(function(a, b) {
+          return a.concat(b);
+        })
+        .filter(function(a) {
+          return a.join("") !== "";
+        });
 
       tasks.forEach(function(task) {
         var cmd = task[0],
@@ -150,6 +146,7 @@ var Monaca = {
 
       util.print('');
     }
-};
+  };
 
-exports.Monaca = Monaca;
+  exports.Monaca = Monaca;
+})();

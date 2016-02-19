@@ -1,0 +1,19 @@
+{
+  "create": {
+    "description": "create a new Monaca project",
+    "usage": "monaca create path",
+    "longDescription": [
+      "Creates a new application at a provided path.",
+      "",
+      "The command downloads a list of available templates",
+      "and then displays a list for the user to choose from.",
+      "",
+      "The specified project will be created in a directory",
+      "given by the user."
+    ],
+    "options": [],
+    "examples": [
+      "monaca create myproject"
+    ]
+  }
+}
