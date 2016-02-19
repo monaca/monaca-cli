@@ -2,6 +2,11 @@ var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
 var browserSync = require('browser-sync');
 
+var __projectDirname = __dirname, argvs = process.argv;
+if (argvs[argvs.length - 2] === '--dirname') {
+  __projectDirname = argvs[argvs.length - 1]
+}
+
 ////////////////////
 // build
 ////////////////////
@@ -16,7 +21,7 @@ gulp.task('default', $.taskListing.withFilters(null, 'default'));
 // compile-stylus
 ////////////////////
 gulp.task('compile-stylus', function() {
-  return gulp.src([__dirname + '/www/lib/onsen/stylus/default.styl'])
+  return gulp.src([__projectDirname + '/www/lib/onsen/stylus/default.styl'])
     .pipe(plumber())
     .pipe($.stylus({errors: true, define: {mylighten: mylighten}}))
     .pipe($.autoprefixer('> 1%', 'last 2 version', 'ff 12', 'ie 8', 'opera 12', 'chrome 12', 'safari 12', 'android 2'))
@@ -25,7 +30,7 @@ gulp.task('compile-stylus', function() {
       path.basename = 'onsen-css-components';
       path.ext = 'css';
     }))
-    .pipe(gulp.dest(__dirname + '/www/styles/'));
+    .pipe(gulp.dest(__projectDirname + '/www/styles/'));
 
   // needs for compile
   function mylighten(param) {
@@ -42,7 +47,7 @@ gulp.task('compile-stylus', function() {
 // jshint
 ////////////////////
 gulp.task('jshint', function() {
-  return gulp.src([__dirname + '/www/*.js', __dirname + '/www/js/**/*.js'])
+  return gulp.src([__projectDirname + '/www/*.js', __projectDirname + '/www/js/**/*.js'])
     .pipe(plumber())
     .pipe($.cached('jshint'))
     .pipe($.jshint())
@@ -55,19 +60,19 @@ gulp.task('jshint', function() {
 ////////////////////
 gulp.task('serve', ['build', 'browser-sync'], function() {
   gulp.watch(
-    [__dirname + '/www/lib/onsen/stylus/**/*.styl'],
+    [__projectDirname + '/www/lib/onsen/stylus/**/*.styl'],
     {debounceDelay: 400},
     ['compile-stylus']
   );
 
   gulp.watch(
-    [__dirname + '/www/*.js', __dirname + '/www/js/**/*.js'],
+    [__projectDirname + '/www/*.js', __projectDirname + '/www/js/**/*.js'],
     {debounceDelay: 400},
     ['jshint']
   );
 
   gulp.watch(
-    [__dirname + '/www/**/*.*'],
+    [__projectDirname + '/www/**/*.*'],
     {debounceDelay: 400},
     ['prepare-cordova']
   );
@@ -79,7 +84,7 @@ gulp.task('serve', ['build', 'browser-sync'], function() {
 gulp.task('browser-sync', function() {
   browserSync({
     server: {
-      baseDir: __dirname + '/www/',
+      baseDir: __projectDirname + '/www/',
       directory: true
     },
     ghostMode: false,
@@ -90,7 +95,7 @@ gulp.task('browser-sync', function() {
   });
 
   gulp.watch([
-    __dirname + '/www/**/*.{js,html,css,svg,png,gif,jpg,jpeg}'
+    __projectDirname + '/www/**/*.{js,html,css,svg,png,gif,jpg,jpeg}'
   ], {
     debounceDelay: 400
   }, function() {
@@ -104,7 +109,7 @@ gulp.task('browser-sync', function() {
 gulp.task('prepare-cordova', function() {
   return gulp.src('')
     .pipe($.plumber())
-    .pipe($.shell(['cordova prepare'], {cwd: __dirname}));
+    .pipe($.shell(['cordova prepare'], {cwd: __projectDirname}));
 });
 
 // utils

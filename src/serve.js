@@ -18,17 +18,32 @@
   ServeTask.assureCordovaProject = function(projectPath) {
     var deferred = Q.defer();
 
-    var assureFile = function(fn) {
-      var deferred = Q.defer(),
-        loc = path.join(projectPath, fn),
-        template = path.join(__dirname, 'serve', fn);
+    var assureInstallation = function(nodeModules) {
+      var deferred = Q.defer();
 
-      fs.exists(loc, function(exists) {
+      fs.exists(nodeModules, function(exists) {
         if (exists) {
           deferred.resolve();
         } else {
-          shell.cp(template, loc);
-          deferred.resolve();
+          util.print('Installing packages. Please wait. This might take a couple of minutes.');
+
+          var process = exec('npm install --loglevel error', {cwd: path.join(__dirname, 'serve')});
+
+          process.stdout.on('data', function(data) {
+            util.print(data);
+          });
+
+          process.stderr.on('data', function(data) {
+            util.err(data);
+          });
+
+          process.on('exit', function(code) {
+            if (code === 0) {
+              deferred.resolve();
+            } else {
+              deferred.reject('Failed installing packages.');
+            }
+          });
         }
       });
 
@@ -39,28 +54,7 @@
       if (!exists) {
         deferred.reject('Directory doesn\'t contain a www/ folder.');
       } else {
-        Q.all([assureFile('gulpfile.js'), assureFile('package.json')]).then(
-          function() {
-            util.print('Installing packages. Please wait. This might take a couple of minutes.');
-
-            var process = exec('npm install');
-            process.on('exit', function(code) {
-              if (code === 0) {
-                deferred.resolve();
-              } else {
-                deferred.reject('Failed installing packages.');
-              }
-            });
-
-            process.stdout.on('data', function(data) {
-              util.print(data);
-            });
-
-            process.stderr.on('data', function(data) {
-              util.err(data);
-            });
-          }
-        );
+        deferred.resolve(assureInstallation(path.join(__dirname, 'serve', 'node_modules')));
       }
     });
 
@@ -88,7 +82,7 @@
             color: 'yellow'
           }, {
             name: 'gulp',
-            process: exec(path.join(__dirname, '..', 'node_modules', '.bin', 'gulp') + ' serve'),
+            process: exec(path.join(__dirname, 'serve', 'node_modules', '.bin', 'gulp') + ' serve --dirname ' + process.cwd(), {cwd: path.join(__dirname, 'serve')}),
             color: 'cyan'
           }],
           stopProcesses = function() {
