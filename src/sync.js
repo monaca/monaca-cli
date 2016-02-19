@@ -6,7 +6,6 @@
     path = require('path'),
     Q = require(path.join(__dirname, 'qustom')),
     child_process = require('child_process'),
-    nwBin = require('nw').findpath(),
     Monaca = require('monaca-lib').Monaca,
     Localkit = require('monaca-lib').Localkit,
     util = require(path.join(__dirname, 'util'));
@@ -384,8 +383,20 @@
     );
   };
 
-  var inspectorCallback = function(result) {
-    child_process.spawn(nwBin, [result.app, result.webSocketUrl]);
+  var loadInspector = function(localkit) {
+    try {
+      var nwBin = require('nw').findpath();
+
+      localkit.initInspector({
+        inspectorCallback: function(result) {
+          child_process.spawn(nwBin, [result.app, result.webSocketUrl]);
+        }
+      });
+    } catch (error) {
+      if ( error.code === 'MODULE_NOT_FOUND' ) {
+        util.warn('Node-webkit (NW.js) module is not installed. Inspector utilities will be disabled. \nPlease install NW.js with \'npm install nw\' and restart the livesync or use Chrome Web Inspector instead.\n')
+      }
+    }
   };
 
   SyncTask.multiserve = function() {
@@ -397,9 +408,7 @@
       util.err('Unable to start livesync: ' + error);
     }
 
-    localkit.initInspector({
-      inspectorCallback: inspectorCallback
-    });
+    loadInspector(localkit);
 
     var projects = argv._.slice(1);
 
@@ -471,9 +480,7 @@
       process.exit(1);
     }
 
-    localkit.initInspector({
-      inspectorCallback: inspectorCallback
-    });
+    loadInspector(localkit);
 
     util.print('Starting HTTP server...');
     localkit.startHttpServer({
