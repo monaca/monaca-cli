@@ -18,10 +18,10 @@
   ServeTask.assureCordovaProject = function(projectPath) {
     var deferred = Q.defer();
 
-    var assureInstallation = function(nodeModules) {
+    var assureHttpServer = function(httpServerBin) {
       var deferred = Q.defer();
 
-      fs.exists(nodeModules, function(exists) {
+      fs.exists(httpServerBin, function(exists) {
         if (exists) {
           deferred.resolve();
         } else {
@@ -54,7 +54,7 @@
       if (!exists) {
         deferred.reject('Directory doesn\'t contain a www/ folder.');
       } else {
-        deferred.resolve(assureInstallation(path.join(__dirname, 'serve', 'node_modules')));
+        deferred.resolve(assureHttpServer(path.join(__dirname, 'serve', 'node_modules', '.bin', 'http-server')));
       }
     });
 
@@ -65,31 +65,33 @@
     this.assureCordovaProject(process.cwd()).then(
       function() {
         var fixLog = function(data) {
-            var ret = data.toString()
-              .split('\n')
-              .filter(function(item) {
-                return item !== '';
-              })
-              .map(function(item) {
-                return item + '\n';
-              });
-
-            return ret;
-          },
-          processes = [{
-            name: 'Cordova',
-            process: exec(path.join(__dirname, '..', 'node_modules', '.bin', 'cordova') + ' ' + process.argv.slice(2).join(' ')),
-            color: 'yellow'
-          }, {
-            name: 'gulp',
-            process: exec(path.join(__dirname, 'serve', 'node_modules', '.bin', 'gulp') + ' serve --dirname ' + process.cwd(), {cwd: path.join(__dirname, 'serve')}),
-            color: 'cyan'
-          }],
-          stopProcesses = function() {
-            processes.forEach(function(item) {
-              item.process.kill();
+          return data.toString()
+            .split('\n')
+            .filter(function(item) {
+              return item !== '';
+            })
+            .map(function(item) {
+              return item + '\n';
             });
-          };
+        };
+
+        var port = process.argv.length >= 4 ? process.argv[3] : 8000;
+
+        var processes = [{
+          name: 'Cordova',
+          process: exec(path.join(__dirname, '..', 'node_modules', '.bin', 'cordova') + ' ' + process.argv.slice(2).join(' ')),
+          color: 'yellow'
+        }, {
+          name: 'http-server',
+          process: exec(path.join(__dirname, 'serve', 'node_modules', '.bin', 'http-server') + ' ' + path.join(process.cwd(), 'www') + ' -c-1 -o -p ' + port, {cwd: __dirname}),
+          color: 'cyan'
+        }];
+
+        var stopProcesses = function() {
+          processes.forEach(function(item) {
+            item.process.kill();
+          });
+        };
 
         processes.forEach(function(item) {
           item.process.stdout.on('data', function(data) {
