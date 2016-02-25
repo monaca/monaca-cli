@@ -37,24 +37,15 @@
   RemoteTask.build = function() {
     var params = {};
 
-    if (argv.platform) {
-      params.platform = argv.platform;
-    }
+    ['platform', 'android_webview', 'android_arch', 'email', 'output']
+    .forEach(function(property) {
+      if (argv.hasOwnProperty(property)) {
+        params[property] = argv[property];
+      }
+    });
 
-    if (argv['build-type']) {
+    if (argv.hasOwnProperty('build-type')) {
       params.purpose = argv['build-type'];
-    }
-
-    if (argv.android_webview) {
-      params.android_webview = argv.android_webview;
-    }
-
-    if (argv.android_arch) {
-      params.android_arch = argv.android_arch;
-    }
-
-    if (argv.email) {
-      params.email = argv.email;
     }
 
     var findProjectDir = function(cwd) {
@@ -199,18 +190,26 @@
                       function(url) {
                         monaca.getSessionUrl(url).then(
                           function(sessionUrl) {
-                            var buildDir = '';
-                            shell.mkdir('-p', path.join(cwd, 'build'));
+                            var outputPath = '';
                             monaca.download(sessionUrl, {}, function(response) {
-                              var filename = '';
-                              if (typeof response.headers['content-disposition'] === 'string') {
-                                filename = response.headers['content-disposition'].match(/filename="?([^"]+)"?/)[1];
+                              if (params.output) {
+                                outputPath = path.resolve(params.output);
+                              } else {
+                                shell.mkdir('-p', path.join(cwd, 'build'));
+                                var filename = '';
+                                if (typeof response.headers['content-disposition'] === 'string') {
+                                  var regexMatch = response.headers['content-disposition'].match(/filename="?([^"]+)"?/);
+                                  if (regexMatch) {
+                                    filename = regexMatch[1];
+                                  }
+                                }
+                                outputPath = path.join(cwd, 'build', filename || 'output.bin');
                               }
-                              buildDir = path.join(cwd, 'build', filename);
-                              return buildDir;
+
+                              return outputPath;
                             }).then(
                               function(name) {
-                                util.print('Your package is stored at ' + buildDir);
+                                util.print('Your package is stored at ' + outputPath);
                               },
                               function(error) {
                                 util.err(error);
