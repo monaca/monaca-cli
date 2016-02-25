@@ -5,9 +5,8 @@
     rl = require('readline'),
     argv = require('optimist').argv,
     path = require('path'),
-    exec = require('child_process').exec,
     Q = require(path.join(__dirname, 'qustom')),
-    xmldom = require('xmldom').DOMParser,
+    XMLDom = require('xmldom').DOMParser,
     XMLSerializer = require('xmldom').XMLSerializer,
     serializer = new XMLSerializer(),
     Monaca = require('monaca-lib').Monaca,
@@ -39,57 +38,58 @@
   CreateTask.createApp = function(template) {
     var dirName = argv._[1];
 
-    monaca.createFromTemplate(template.templateId, path.resolve(dirName)).then(
+    monaca.createFromTemplate(template.templateId, path.resolve(dirName))
+      .then(
         function() {
-          util.print("Project created successfully.")
+          util.print('Project created successfully.');
           return true;
         },
-        function(err) {
-          util.err("Error occurred while creating project : " + JSON.stringify(err));
-          return Q.reject(err);
+        function(error) {
+          util.err('Error occurred while creating project : ' + JSON.stringify(error));
+          return Q.reject(error);
         }
       )
       .then(
         function() {
-          // extract the project name if nested path is given before project name.
+          // Extract the project name if nested path is given before project name.
           // E.g. if command is 'create project Apps/Finance/myFinanceApp', then myFinanceApp will be taken as project name.
           var projectName = path.basename(dirName);
 
-          injectData(path.join(path.resolve(dirName), "config.xml"), "name", projectName)
+          injectData(path.join(path.resolve(dirName), 'config.xml'), 'name', projectName)
             .catch(
-              function(err) {
-                util.err("An error occurred while injecting project name in config.xml : " + err);
+              function(error) {
+                util.err('An error occurred while injecting project name in config.xml : ' + error);
               }
             );
         },
-        function(err) {
-          util.err(err);
+        function(error) {
+          util.err(error);
         }
-      )
+      );
   };
 
   function injectData(path, node, value) {
     var deferred = Q.defer();
-    fs.readFile(path, 'utf8', function(err, data) {
-      if (err) {
-        deferred.reject(err);
+    fs.readFile(path, 'utf8', function(error, data) {
+      if (error) {
+        deferred.reject(error);
       } else {
-        var doc = new xmldom().parseFromString(data, 'application/xml');
+        var doc = new XMLDom().parseFromString(data, 'application/xml');
         var nodes = doc.getElementsByTagName(node);
         if (nodes.length > 0) {
           nodes[0].textContent = value;
-          fs.writeFile(path, serializer.serializeToString(doc), function(err) {
-            if (err) {
-              deferred.reject(err);
+          fs.writeFile(path, serializer.serializeToString(doc), function(error) {
+            if (error) {
+              deferred.reject(error);
             } else {
               deferred.resolve();
             }
-          })
+          });
         } else {
-          Q.reject("'" + node + "' not found in xml file.");
+          Q.reject('\'' + node + '\' not found in xml file.');
         }
       }
-    })
+    });
     return deferred.promise;
   }
 
@@ -113,8 +113,8 @@
         }.bind(this);
         question();
       }.bind(this),
-      function(err) {
-        util.err("Error in getting project templates list :" + err);
+      function(error) {
+        util.err('Error in getting project templates list :' + error);
         process.exit(1);
       }
     );
@@ -127,10 +127,11 @@
       function(list) {
         deferred.resolve(list);
       },
-      function(err) {
-        deferred.reject(err);
+      function(error) {
+        deferred.reject(error);
       }
-    )
+    );
+
     return deferred.promise;
   };
 

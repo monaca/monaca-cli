@@ -51,13 +51,13 @@
     run: function() {
       var taskName = argv._.length ? argv._[0] : null;
 
-      // version
+      // Version.
       if (taskName === 'version' || argv.version || argv.v) {
         this.printVersion();
         return;
       }
 
-      // help
+      // Help.
       if (!taskName || taskName === 'help') {
         this.printHelp();
         return;
@@ -97,11 +97,11 @@
 
       var tasks = Object.keys(taskList).map(function(taskSet) {
           return Object.keys(taskList[taskSet]).map(function(taskName) {
-            var task = taskList[taskSet][taskName]
+            var task = taskList[taskSet][taskName];
             if (task.showInHelp !== false) {
               return [taskName, task.description];
             } else {
-              return ["", ""];
+              return ['', ''];
             }
           });
         })
@@ -109,7 +109,7 @@
           return a.concat(b);
         })
         .filter(function(a) {
-          return a.join("") !== "";
+          return a.join('') !== '';
         });
 
       tasks.forEach(function(task) {

@@ -4,7 +4,6 @@
   var path = require('path'),
     exec = require('child_process').exec,
     fs = require('fs'),
-    shell = require('shelljs'),
     Q = require(path.join(__dirname, 'qustom')),
     util = require(path.join(__dirname, 'util'));
 

@@ -95,7 +95,8 @@
           deferred.resolve(projectId);
         },
         function(error) {
-          monaca.getProjectInfo(cwd).then(
+          monaca.getProjectInfo(cwd)
+            .then(
               function(info) {
                 return monaca.createProject({
                   name: info.name,
@@ -125,14 +126,16 @@
             );
         }
       );
+
       return deferred.promise;
     };
 
     findProjectDir(process.cwd())
       .then(
         function(cwd) {
-          util.print("Uploading project to Monaca Cloud...");
-          assureMonacaProject(cwd).then(
+          util.print('Uploading project to Monaca Cloud...');
+          assureMonacaProject(cwd)
+            .then(
               function() {
                 var nbrOfFiles = 0;
                 return monaca.uploadProject(cwd).then(
@@ -163,32 +166,32 @@
             )
             .then(
               function() {
-                // open the browser if no platform parameter is provided.
+                // Open the browser if no platform parameter is provided.
                 if (!argv.platform) {
                   var url = 'https://ide.monaca.mobi/project/' + projectInfo.projectId + '/' + (argv['build-type'] ? 'debugger' : 'build');
-                  monaca.getSessionUrl(url)
-                    .then(
-                      function(url) {
-                        open(url);
-                      },
-                      function(error) {
-                        util.err('Unable to open build page.');
-                        process.exit(1);
-                      }
-                    );
+                  monaca.getSessionUrl(url).then(
+                    function(url) {
+                      open(url);
+                    },
+                    function(error) {
+                      util.err('Unable to open build page.');
+                      process.exit(1);
+                    }
+                  );
                 } else {
                   // Build project on Monaca Cloud and download it into ./build folder.
-                  util.print("Building project on Monaca Cloud...");
-                  monaca.buildProject(projectInfo.projectId, params).
-                  then(function(result) {
+                  util.print('Building project on Monaca Cloud...');
+                  monaca.buildProject(projectInfo.projectId, params)
+                    .then(
+                      function(result) {
                         if (result.binary_url) {
                           return result.binary_url;
                         } else {
                           return Q.reject(result.error_message);
                         }
                       },
-                      function(err) {
-                        return Q.reject(err);
+                      function(error) {
+                        return Q.reject(error);
                       },
                       function(progress) {
                         util.print(progress);
@@ -197,42 +200,42 @@
                       function(url) {
                         monaca.getSessionUrl(url).then(
                           function(sessionUrl) {
-                            var buildDir = "";
+                            var buildDir = '';
                             shell.mkdir('-p', path.join(cwd, 'build'));
                             monaca.download(sessionUrl, {}, function(response) {
-                              var filename = "";
+                              var filename = '';
                               if (typeof response.headers['content-disposition'] === 'string') {
                                 filename = response.headers['content-disposition'].match(/filename="?([^"]+)"?/)[1];
                               }
-                              buildDir = path.join(cwd, "build", filename);
+                              buildDir = path.join(cwd, 'build', filename);
                               return buildDir;
                             }).then(
                               function(name) {
-                                util.print("Your package is stored at " + buildDir);
+                                util.print('Your package is stored at ' + buildDir);
                               },
-                              function(err) {
-                                util.err(err);
+                              function(error) {
+                                util.err(error);
                               }
-                            )
+                            );
                           },
                           function(error) {
                             util.err(error);
                           }
-                        )
+                        );
                       },
                       function(error) {
                         util.err(error);
                       }
-                    )
+                    );
                 }
               },
-              function(err) {
-                util.err("Unable to build this project " + err);
+              function(error) {
+                util.err('Unable to build this project ' + error);
               }
-            )
+            );
         },
-        function(err) {
-          util.err(err);
+        function(error) {
+          util.err(error);
         }
       );
   };

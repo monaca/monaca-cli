@@ -22,7 +22,7 @@
         } else if (taskName === 'download') {
           this.download();
         } else if (taskName === 'clone') {
-          // true flag ensures that cloud project id is saved locally.
+          // 'true' flag ensures that cloud project id is saved locally.
           this.clone(true);
         } else if (taskName === 'import') {
           this.clone(false);
@@ -65,7 +65,7 @@
 
   SyncTask.upload = function() {
     var options = {};
-    if (argv["dry-run"]) {
+    if (argv['dry-run']) {
       options.dryrun = true;
     }
     if (argv.delete) {
@@ -96,7 +96,8 @@
               deferred.resolve(projectId);
             },
             function(error) {
-              monaca.getProjectInfo(cwd).then(
+              monaca.getProjectInfo(cwd)
+                .then(
                   function(info) {
                     return monaca.createProject({
                       name: info.name,
@@ -138,24 +139,24 @@
                 function(files) {
                   if (options.dryrun && !options.force) {
                     if (files && Object.keys(files.uploaded).length > 0) {
-                      util.print("Following files will be uploaded.")
+                      util.print('Following files will be uploaded.');
                       util.print(Object.keys(files.uploaded).map(
                           function(file, index) {
-                            return (index + 1) + ". " + file;
+                            return (index + 1) + '. ' + file;
                           })
-                        .join("\n")
+                        .join('\n')
                       );
                     } else {
                       util.print('No files will be uploaded since project is already in sync.');
                     }
                     if (options.delete) {
                       if (files && Object.keys(files.deleted).length > 0) {
-                        util.print("\nFollowing files will be deleted on Monaca Cloud.")
+                        util.print('\nFollowing files will be deleted on Monaca Cloud.');
                         util.print(Object.keys(files.deleted).map(
                             function(file, index) {
-                              return (index + 1) + ". " + file;
+                              return (index + 1) + '. ' + file;
                             })
-                          .join("\n")
+                          .join('\n')
                         );
                       } else {
                         util.print('\nNo files will be deleted on Monaca Cloud.');
@@ -186,7 +187,7 @@
               util.err('Unable to create monaca project: ' + error);
             }
           );
-        }
+        };
 
         // If --dry-run or --force option is used then no need to show warning message to user.
         if (options.dryrun || options.force) {
@@ -213,7 +214,7 @@
 
   SyncTask.download = function() {
     var options = {};
-    if (argv["dry-run"]) {
+    if (argv['dry-run']) {
       options.dryrun = true;
     }
     if (argv.delete) {
@@ -230,24 +231,24 @@
             function(files) {
               if (options.dryrun && !options.force) {
                 if (files && Object.keys(files.remoteFiles).length > 0) {
-                  util.print("Following files will be downloaded.");
+                  util.print('Following files will be downloaded.');
                   util.print(Object.keys(files.remoteFiles).map(
                       function(file, index) {
-                        return (index + 1) + ". " + file;
+                        return (index + 1) + '. ' + file;
                       })
-                    .join("\n")
+                    .join('\n')
                   );
                 } else {
                   util.print('No files will be downloaded since project is already in sync.');
                 }
                 if (options.delete) {
                   if (files && Object.keys(files.deleted).length > 0) {
-                    util.print("\nFollowing files will be deleted locally.");
+                    util.print('\nFollowing files will be deleted locally.');
                     util.print(Object.keys(files.deleted).map(
                         function(file, index) {
-                          return (index + 1) + ". " + file;
+                          return (index + 1) + '. ' + file;
                         })
-                      .join("\n")
+                      .join('\n')
                     );
                   } else {
                     util.print('\nNo files will be deleted locally.');
@@ -272,7 +273,7 @@
               nbrOfFiles++;
             }
           );
-        }
+        };
 
         // If user is dry running 'monaca download' or forcing it then no need to show warning message.
         if (options.dryrun || options.force) {
@@ -309,6 +310,7 @@
           var project = projects[i];
           util.print('\t' + (i + 1) + '. ' + project.name);
         }
+
         util.print('');
 
         var question = function() {
@@ -327,7 +329,7 @@
               }
             }
           });
-        }
+        };
 
         question();
 
@@ -345,22 +347,22 @@
               util.err('Unable to read destination directory.');
             } else {
               var absolutePath = path.resolve(destPath);
-              var action = saveCloudProjectID ? "Cloning" : "Importing";
-              util.print(action + ' "' + project.name + '" to ' + absolutePath);
+              var action = saveCloudProjectID ? 'Cloning' : 'Importing';
+              util.print(action + ' \'' + project.name + '\' to ' + absolutePath);
 
               monaca.cloneProject(project.projectId, destPath).then(
                 function() {
-                  var action = saveCloudProjectID ? "cloned" : "imported";
+                  var action = saveCloudProjectID ? 'cloned' : 'imported';
                   util.print('Project successfully ' + action + ' from Monaca Cloud!');
                   if (saveCloudProjectID) {
                     monaca.setProjectId(absolutePath, project.projectId).then(
                       function() {
-                        // project id is saved in local .json file
+                        // Project id is saved in local .json file.
                       },
                       function(error) {
-                        util.err("Project is cloned to given location but Cloud project ID for this project could not be saved. \nThis project is not linked with corresponding project on Monaca Cloud.");
+                        util.err('Project is cloned to given location but Cloud project ID for this project could not be saved. \nThis project is not linked with corresponding project on Monaca Cloud.');
                       }
-                    )
+                    );
                   }
                 },
                 function(error) {
@@ -374,8 +376,7 @@
               );
             }
           });
-        }
-
+        };
       },
       function(error) {
         util.err('Unable to fetch project list: ' + error);
@@ -394,7 +395,7 @@
       });
     } catch (error) {
       if ( error.code === 'MODULE_NOT_FOUND' ) {
-        util.warn('Node-webkit (NW.js) module is not installed. Inspector utilities will be disabled. \nPlease install NW.js with \'npm install nw\' and restart the livesync or use Chrome Web Inspector instead.\n')
+        util.warn('Node-webkit (NW.js) module is not installed. Inspector utilities will be disabled. \nPlease install NW.js with \'npm install nw\' and restart the livesync or use Chrome Web Inspector instead.\n');
       }
     }
   };
@@ -505,7 +506,8 @@
 
             var projectPath = process.cwd();
 
-            localkit.addProject(projectPath).then(
+            localkit.addProject(projectPath)
+              .then(
                 function() {
                   return monaca.getLocalProjectId(projectPath);
                 },
@@ -539,7 +541,6 @@
                   process.exit(1);
                 }
               );
-
           },
           function(error) {
             util.err('Unable to start beacon transmitter: ' + error);
