@@ -139,25 +139,15 @@
                 function(files) {
                   if (options.dryrun && !options.force) {
                     if (files && Object.keys(files.uploaded).length > 0) {
-                      util.print('Following files will be uploaded.');
-                      util.print(Object.keys(files.uploaded).map(
-                          function(file, index) {
-                            return (index + 1) + '. ' + file;
-                          })
-                        .join('\n')
-                      );
+                      util.print('Following files will be uploaded:');
+                      util.displayObjectKeys(files.uploaded);
                     } else {
                       util.print('No files will be uploaded since project is already in sync.');
                     }
                     if (options.delete) {
                       if (files && Object.keys(files.deleted).length > 0) {
-                        util.print('\nFollowing files will be deleted on Monaca Cloud.');
-                        util.print(Object.keys(files.deleted).map(
-                            function(file, index) {
-                              return (index + 1) + '. ' + file;
-                            })
-                          .join('\n')
-                        );
+                        util.print('\nFollowing files will be deleted on Monaca Cloud:');
+                        util.displayObjectKeys(files.deleted);
                       } else {
                         util.print('\nNo files will be deleted on Monaca Cloud.');
                       }
@@ -174,13 +164,9 @@
                   util.err('Upload failed: ' + error);
                 },
                 function(progress) {
-                  var per = 100 * (progress.index + 1) / progress.total;
-                  per = per.toString().substr(0, 5) + '%';
-                  util.print(('[' + per + '] ').verbose + progress.path);
-
+                  util.displayProgress(progress);
                   nbrOfFiles++;
                 }
-
               );
             },
             function(error) {
@@ -231,25 +217,15 @@
             function(files) {
               if (options.dryrun && !options.force) {
                 if (files && Object.keys(files.remoteFiles).length > 0) {
-                  util.print('Following files will be downloaded.');
-                  util.print(Object.keys(files.remoteFiles).map(
-                      function(file, index) {
-                        return (index + 1) + '. ' + file;
-                      })
-                    .join('\n')
-                  );
+                  util.print('Following files will be downloaded:');
+                  util.displayObjectKeys(files.remoteFiles);
                 } else {
                   util.print('No files will be downloaded since project is already in sync.');
                 }
                 if (options.delete) {
                   if (files && Object.keys(files.deleted).length > 0) {
-                    util.print('\nFollowing files will be deleted locally.');
-                    util.print(Object.keys(files.deleted).map(
-                        function(file, index) {
-                          return (index + 1) + '. ' + file;
-                        })
-                      .join('\n')
-                    );
+                    util.print('\nFollowing files will be deleted locally:');
+                    util.displayObjectKeys(files.deleted);
                   } else {
                     util.print('\nNo files will be deleted locally.');
                   }
@@ -266,10 +242,7 @@
               util.err('Download failed: ' + error);
             },
             function(progress) {
-              var per = 100 * (progress.index + 1) / progress.total;
-              per = per.toString().substr(0, 5) + '%';
-              util.print(('[' + per + '] ').verbose + progress.path);
-
+              util.displayProgress(progress);
               nbrOfFiles++;
             }
           );
@@ -369,9 +342,7 @@
                   util.err('Clone failed: ' + JSON.stringify(error));
                 },
                 function(progress) {
-                  var per = 100 * (progress.index + 1) / progress.total;
-                  per = per.toString().substr(0, 5) + '%';
-                  util.print(('[' + per + '] ').verbose + progress.path);
+                  util.displayProgress(progress);
                 }
               );
             }

@@ -152,9 +152,7 @@
                     return false;
                   },
                   function(progress) {
-                    var per = 100 * (progress.index + 1) / progress.total;
-                    per = per.toString().substr(0, 5) + '%';
-                    util.print(('[' + per + '] ').verbose + progress.path);
+                    util.displayProgress(progress);
                     nbrOfFiles++;
                   }
                 );
@@ -194,8 +192,9 @@
                         return Q.reject(error);
                       },
                       function(progress) {
-                        util.print(progress);
-                      })
+                        util.displayProgress(progress);
+                      }
+                    )
                     .then(
                       function(url) {
                         monaca.getSessionUrl(url).then(

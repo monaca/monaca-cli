@@ -13,6 +13,21 @@
     process.stderr.write(msg.warn + '\n');
   };
 
+  var displayObjectKeys = function(object) {
+    println(
+      Object.keys(object).map(function(file, index) {
+        return (index + 1) + '. ' + file;
+      })
+      .join('\n')
+    );
+  };
+
+  var displayProgress = function(progress) {
+    var per = 100 * (progress.index + 1) / progress.total;
+    per = per.toString().substr(0, 5) + '%';
+    println(('[' + per + '] ').verbose + progress.path);
+  };
+
   var displayHelp = function(taskName, taskList) {
     var task = taskList[taskName],
       i, desc;
@@ -78,6 +93,8 @@
     print: println,
     err: printerr,
     warn: printwarn,
+    displayProgress: displayProgress,
+    displayObjectKeys: displayObjectKeys,
     displayHelp: displayHelp
   };
 })();
