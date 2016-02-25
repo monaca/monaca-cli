@@ -3,7 +3,7 @@
 
   var read = require('read'),
     path = require('path'),
-    Q = require(path.join(__dirname, 'qustom')),
+    Q = require('q'),
     open = require('open'),
     Monaca = require('monaca-lib').Monaca,
     Localkit = require('monaca-lib').Localkit,

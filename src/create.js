@@ -5,7 +5,7 @@
     rl = require('readline'),
     argv = require('optimist').argv,
     path = require('path'),
-    Q = require(path.join(__dirname, 'qustom')),
+    Q = require('q'),
     XMLDom = require('xmldom').DOMParser,
     XMLSerializer = require('xmldom').XMLSerializer,
     serializer = new XMLSerializer(),

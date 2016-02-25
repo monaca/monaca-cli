@@ -4,7 +4,7 @@
   var path = require('path'),
     exec = require('child_process').exec,
     fs = require('fs'),
-    Q = require(path.join(__dirname, 'qustom')),
+    Q = require('q'),
     util = require(path.join(__dirname, 'util'));
 
   var ServeTask = {};

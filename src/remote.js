@@ -6,7 +6,7 @@
     argv = require('optimist').argv,
     shell = require('shelljs'),
     Monaca = require('monaca-lib').Monaca,
-    Q = require(path.join(__dirname, 'qustom')),
+    Q = require('q'),
     util = require(path.join(__dirname, 'util'));
 
   var monaca = new Monaca();

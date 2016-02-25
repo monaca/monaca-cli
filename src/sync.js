@@ -4,7 +4,7 @@
   var read = require('read'),
     argv = require('optimist').argv,
     path = require('path'),
-    Q = require(path.join(__dirname, 'qustom')),
+    Q = require('q'),
     child_process = require('child_process'),
     Monaca = require('monaca-lib').Monaca,
     Localkit = require('monaca-lib').Localkit,
