@@ -31,52 +31,53 @@
 
   var Monaca = {
     _getTask: function() {
-      var taskName = '';
+      var task = {};
+      task.name = '';
 
       for (var i = 0; i < argv._.length; i++) {
         var v = argv._[i];
-        taskName = [taskName, v].join(' ').trim();
+        task.name = [task.name, v].join(' ').trim();
 
         for (var taskSet in taskList) {
           if (taskList.hasOwnProperty(taskSet)) {
-            for (var task in taskList[taskSet]) {
-              if (task === taskName && taskList[taskSet].hasOwnProperty(task)) {
-                return taskSet;
+            for (var taskName in taskList[taskSet]) {
+              if (taskName === task.name && taskList[taskSet].hasOwnProperty(taskName)) {
+                task.set = taskSet;
+                return task;
               }
             }
           }
         }
       }
+
+      return task;
     },
     run: function() {
-      var taskName = argv._.length ? argv._[0] : null;
 
       // Version.
-      if (taskName === 'version' || argv.version || argv.v) {
+      if (argv._[0] === 'version' || argv.version || argv.v) {
         this.printVersion();
-        return;
+        process.exit(0);
       }
 
       // Help.
-      if (!taskName || taskName === 'help') {
+      if (!argv._[0] || argv._[0] === 'help') {
         this.printHelp();
-        return;
+        process.exit(0);
       }
 
-      var taskSet = this._getTask();
+      var task = this._getTask();
 
-      if (!taskSet) {
-        process.stderr.write(('Error: ' + taskName + ' is not a valid task.\n').error);
+      if (!task.set) {
+        process.stderr.write(('Error: ' + task.name + ' is not a valid task.\n').error);
         process.exit(1);
       }
 
-      var taskNameParts = taskName.split(' ').length;
-
-      if (argv._[taskNameParts] === 'help' || argv.help || argv.h || (taskName === 'create' && argv._.length < 2)) {
-        util.displayHelp(taskName, taskList[taskSet]);
+      if (argv.help || argv.h || (task.name === 'create' && argv._.length < 2)) {
+        util.displayHelp(task.name, taskList[task.set]);
         process.exit(0);
       } else {
-        (require(path.join(__dirname, taskSet))).run(taskName);
+        (require(path.join(__dirname, task.set))).run(task.name);
       }
     },
     printVersion: function() {
