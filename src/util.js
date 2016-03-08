@@ -23,9 +23,13 @@
   };
 
   var displayProgress = function(progress) {
-    var per = 100 * (progress.index + 1) / progress.total;
-    per = per.toString().substr(0, 5) + '%';
-    println(('[' + per + '] ').verbose + progress.path);
+    if (typeof progress === 'object' && progress !== null) {
+      var per = 100 * (progress.index + 1) / progress.total;
+      per = per.toString().substr(0, 5) + '%';
+      println(('[' + per + '] ').verbose + progress.path);
+    } else {
+      process.stdout.write('.');
+    }
   };
 
   var displayHelp = function(taskName, taskList) {

@@ -25,6 +25,10 @@
         "release (for iOS, Android and Chrome Apps)"
       ],
       [
+        "--output",
+        "The path in which the built file will be stored (specify also the filename)"
+      ],
+      [
         "--android_webview",
         "If platform is android. Should be one of - default, crosswalk"
       ],

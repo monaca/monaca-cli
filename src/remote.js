@@ -155,85 +155,90 @@
             )
             .then(
               function() {
-                // Open the browser if no platform parameter is provided.
-                if (!argv.platform) {
-                  var url = 'https://ide.monaca.mobi/project/' + projectInfo.projectId + '/' + (argv['build-type'] ? 'debugger' : 'build');
-                  monaca.getSessionUrl(url).then(
-                    function(url) {
-                      open(url);
-                    },
-                    function(error) {
-                      util.err('Unable to open build page.');
-                      process.exit(1);
-                    }
-                  );
-                } else {
-                  // Build project on Monaca Cloud and download it into ./build folder.
-                  util.print('Building project on Monaca Cloud...');
-                  monaca.buildProject(projectInfo.projectId, params)
-                    .then(
-                      function(result) {
-                        if (result.binary_url) {
-                          return result.binary_url;
-                        } else {
-                          return Q.reject(result.error_message);
-                        }
-                      },
-                      function(error) {
-                        return Q.reject(error);
-                      },
-                      function(progress) {
-                        util.displayProgress(progress);
-                      }
-                    )
-                    .then(
-                      function(url) {
+                return monaca.checkBuildAvailability(projectInfo.projectId, params.platform, params.purpose)
+                  .then(
+                    function() {
+                      // Open the browser if no platform parameter is provided.
+                      if (!argv.platform) {
+                        var url = 'https://ide.monaca.mobi/project/' + projectInfo.projectId + '/' + (argv['build-type'] ? 'debugger' : 'build');
                         monaca.getSessionUrl(url).then(
-                          function(sessionUrl) {
-                            var outputPath = '';
-                            monaca.download(sessionUrl, {}, function(response) {
-                              if (params.output) {
-                                outputPath = path.resolve(params.output);
-                              } else {
-                                shell.mkdir('-p', path.join(cwd, 'build'));
-                                var filename = '';
-                                if (typeof response.headers['content-disposition'] === 'string') {
-                                  var regexMatch = response.headers['content-disposition'].match(/filename="?([^"]+)"?/);
-                                  if (regexMatch) {
-                                    filename = regexMatch[1];
-                                  }
-                                }
-                                outputPath = path.join(cwd, 'build', filename || 'output.bin');
-                              }
-
-                              return outputPath;
-                            }).then(
-                              function(name) {
-                                util.print('Your package is stored at ' + outputPath);
-                              },
-                              function(error) {
-                                util.err(error);
-                              }
-                            );
+                          function(url) {
+                            open(url);
                           },
                           function(error) {
-                            util.err(error);
+                            util.err('Unable to open build page.');
+                            process.exit(1);
                           }
                         );
-                      },
-                      function(error) {
-                        util.err(error);
+                      } else {
+                        // Build project on Monaca Cloud and download it into ./build folder.
+                        util.print('Building project on Monaca Cloud...');
+                        monaca.buildProject(projectInfo.projectId, params)
+                          .then(
+                            function(result) {
+                              if (result.binary_url) {
+                                return result.binary_url;
+                              } else {
+                                return Q.reject(result.error_message);
+                              }
+                            },
+                            function(error) {
+                              return Q.reject(error);
+                            },
+                            function(progress) {
+                              util.displayProgress(progress);
+                            }
+                          )
+                          .then(
+                            function(url) {
+                              monaca.getSessionUrl(url).then(
+                                function(sessionUrl) {
+                                  monaca.download(sessionUrl, {}, function(response) {
+                                    if (params.output) {
+                                      return path.resolve(params.output);
+                                    } else {
+                                      shell.mkdir('-p', path.join(cwd, 'build'));
+                                      var filename = '';
+                                      if (typeof response.headers['content-disposition'] === 'string') {
+                                        var regexMatch = response.headers['content-disposition'].match(/filename="?([^"]+)"?/);
+                                        if (regexMatch) {
+                                          filename = regexMatch[1];
+                                        }
+                                      }
+                                      return path.join(cwd, 'build', filename || 'output.bin');
+                                    }
+                                  }).then(
+                                    function(filename) {
+                                      util.print('\nYour package is stored at ' + filename);
+                                    },
+                                    function(error) {
+                                      util.err('\n' + error);
+                                    }
+                                  );
+                                },
+                                function(error) {
+                                  util.err(error);
+                                }
+                              );
+                            },
+                            function(error) {
+                              util.err(error);
+                            }
+                          );
                       }
-                    );
-                }
+                    },
+                    function(error) {
+                      util.err('Unable to build this project: ' + error);
+                    }
+                  );
               },
               function(error) {
-                util.err('Unable to build this project ' + error);
+                util.err('Unable to create monaca project: ' + error);
               }
             );
         },
-        function(error) {
-          util.err(error);
+        function(err) {
+          util.err(err);
         }
       );
   };
