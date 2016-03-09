@@ -112,7 +112,7 @@
                 } else {
                   if (error.hasOwnProperty('code') && error.code == 503) {
                     if (error.hasOwnProperty('result') && error.result.hasOwnProperty('confirm') && error.result.confirm) {
-                      util.warn(error.message);
+                      util.warn(error);
                       read({
                         prompt: ' [Y/n]:'
                       }, function(err, answer) {
@@ -123,7 +123,7 @@
                         }
                       });
                     } else {
-                      util.warn(error.message);
+                      util.warn(error);
                       if (error.hasOwnProperty('result') && error.result.hasOwnProperty('redirect')) {
                         read({
                           prompt: 'Press Enter to continue...'
@@ -140,7 +140,7 @@
                       open('https://monaca.mobi/plan/change');
                     });
                   } else {
-                    util.err('Unable to sign in: ' + error.message);
+                    util.err('Unable to sign in: ', error);
                     util.print('If you don\'t yet have a Monaca account, please sign up at https://monaca.mobi/en/register/start .');
                   }
                 }
@@ -148,7 +148,7 @@
             );
           },
           function(error) {
-            util.err('Unable to get credentials: ' + error);
+            util.err('Unable to get credentials: ', error);
           }
         );
       }.bind(this)
@@ -168,7 +168,7 @@
           return localkit.clearPairing();
         },
         function(error) {
-          util.err('Unable to sign out: ' + error);
+          util.err('Unable to sign out: ', error);
         }
       )
       .then(
@@ -176,7 +176,7 @@
           util.print('Removed Monaca Debugger pairing information.');
         },
         function(error) {
-          util.err('Unable to remove Monaca Debugger pairing information: ' + error);
+          util.err('Unable to remove Monaca Debugger pairing information: ', error);
         }
       )
       .finally(

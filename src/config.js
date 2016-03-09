@@ -32,7 +32,7 @@
         }
       },
       function(error) {
-        util.err('Unable to get configuration: ' + error);
+        util.err('Unable to get configuration: ', error);
         process.exit(1);
       }
     );
@@ -44,7 +44,7 @@
         util.print('Proxy server set to "' + proxyServer + '".');
       },
       function(error) {
-        util.err('Unable to set proxy server: ' + error);
+        util.err('Unable to set proxy server: ', error);
         process.exit(1);
       }
     );
@@ -60,7 +60,7 @@
         }
       },
       function(error) {
-        util.err('Unable to remove proxy server: ' + error);
+        util.err('Unable to remove proxy server: ', error);
         process.exit(1);
       }
     );

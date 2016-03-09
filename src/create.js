@@ -58,7 +58,7 @@
           injectData(path.join(path.resolve(dirName), 'config.xml'), 'name', projectName)
             .catch(
               function(error) {
-                util.err('An error occurred while injecting project name in config.xml : ' + error);
+                util.err('An error occurred while injecting project name in config.xml : ', error);
               }
             );
         },
@@ -114,7 +114,7 @@
         question();
       }.bind(this),
       function(error) {
-        util.err('Error in getting project templates list :' + error);
+        util.err('Error in getting project templates list :', error);
         process.exit(1);
       }
     );

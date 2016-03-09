@@ -161,7 +161,7 @@
                   }
                 },
                 function(error) {
-                  util.err('Upload failed: ' + error);
+                  util.err('Upload failed: ', error);
                 },
                 function(progress) {
                   util.displayProgress(progress);
@@ -170,7 +170,7 @@
               );
             },
             function(error) {
-              util.err('Unable to create monaca project: ' + error);
+              util.err('Unable to create monaca project: ', error);
             }
           );
         };
@@ -193,7 +193,7 @@
         }
       },
       function(error) {
-        util.err('Unable to upload project: ' + error);
+        util.err('Unable to upload project: ', error);
       }
     );
   };
@@ -239,7 +239,7 @@
               }
             },
             function(error) {
-              util.err('Download failed: ' + error);
+              util.err('Download failed: ', error);
             },
             function(progress) {
               util.displayProgress(progress);
@@ -267,7 +267,7 @@
 
       },
       function(error) {
-        util.err('Unable to download project: ' + error);
+        util.err('Unable to download project: ', error);
       }
     );
   };
@@ -350,7 +350,7 @@
         };
       },
       function(error) {
-        util.err('Unable to fetch project list: ' + error);
+        util.err('Unable to fetch project list: ', error);
       }
     );
   };
@@ -377,7 +377,7 @@
     try {
       localkit = new Localkit(monaca, true);
     } catch (error) {
-      util.err('Unable to start livesync: ' + error);
+      util.err('Unable to start livesync: ', error);
     }
 
     loadInspector(localkit);
@@ -396,7 +396,7 @@
           return localkit.startWatch();
         },
         function(error) {
-          util.err('Unable to add projects: ' + error);
+          util.err('Unable to add projects: ', error);
           process.exit(1);
         }
       )
@@ -408,7 +408,7 @@
           });
         },
         function(error) {
-          util.err('Unable to start file watching: ' + error);
+          util.err('Unable to start file watching: ', error);
           process.exit(1);
         }
       )
@@ -427,7 +427,7 @@
           return localkit.startBeaconTransmitter();
         },
         function(error) {
-          util.err('Unable to start HTTP server: ' + error);
+          util.err('Unable to start HTTP server: ', error);
           process.exit(1);
         }
       )
@@ -436,7 +436,7 @@
           util.print('Waiting for connections from Monaca debugger...'.help);
         },
         function(error) {
-          util.err('Unable to start beacon transmitter: ' + error);
+          util.err('Unable to start beacon transmitter: ', error);
           process.exit(1);
         }
       );
@@ -448,7 +448,7 @@
     try {
       localkit = new Localkit(monaca, true);
     } catch (error) {
-      util.err('Unable to start livesync: ' + error);
+      util.err('Unable to start livesync: ', error);
       process.exit(1);
     }
 
@@ -483,7 +483,7 @@
                   return monaca.getLocalProjectId(projectPath);
                 },
                 function(error) {
-                  util.err('Unable to add project: ' + error);
+                  util.err('Unable to add project: ', error);
                   process.exit(1);
                 }
               )
@@ -499,7 +499,7 @@
                   return localkit.startWatch();
                 },
                 function(error) {
-                  util.err('Unable to get project id: ' + error);
+                  util.err('Unable to get project id: ', error);
                 }
               )
               .then(
@@ -508,19 +508,19 @@
                   return localkit.startProject(projectPath);
                 },
                 function(error) {
-                  util.err('Unable to start file watching: ' + error);
+                  util.err('Unable to start file watching: ', error);
                   process.exit(1);
                 }
               );
           },
           function(error) {
-            util.err('Unable to start beacon transmitter: ' + error);
+            util.err('Unable to start beacon transmitter: ', error);
             process.exit(1);
           }
         );
       },
       function(error) {
-        util.err('Unable to start HTTP server: ' + error);
+        util.err('Unable to start HTTP server: ', error);
         util.print('This is probably due to the port already being in use. Please use --port option to change port.');
         process.exit(1);
       }

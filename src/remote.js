@@ -139,7 +139,7 @@
                     return true;
                   },
                   function(error) {
-                    util.err('Upload failed: ' + error);
+                    util.err('Upload failed: ', error);
                     return false;
                   },
                   function(progress) {
@@ -149,7 +149,7 @@
                 );
               },
               function(error) {
-                util.err('Unable to create monaca project: ' + error);
+                util.err('Unable to create monaca project: ', error);
                 Q.reject(error);
               }
             )
@@ -212,7 +212,7 @@
                                       util.print('\nYour package is stored at ' + filename);
                                     },
                                     function(error) {
-                                      util.err('\n' + error);
+                                      util.err('\n', error);
                                     }
                                   );
                                 },
@@ -228,17 +228,17 @@
                       }
                     },
                     function(error) {
-                      util.err('Unable to build this project: ' + error);
+                      util.err('Unable to build this project: ', error);
                     }
                   );
               },
               function(error) {
-                util.err('Unable to create monaca project: ' + error);
+                util.err('Unable to create monaca project: ', error);
               }
             );
         },
-        function(err) {
-          util.err(err);
+        function(error) {
+          util.err(error);
         }
       );
   };

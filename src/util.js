@@ -5,12 +5,26 @@
     process.stdout.write(msg + '\n');
   };
 
-  var printerr = function(msg) {
-    process.stderr.write(msg.error + '\n');
+  var _print = function(type, items) {
+    var msg = '';
+
+    for (var i = 0; i < items.length; i++) {
+      if (typeof items[i] === 'string') {
+        msg += items[i];
+      } else if (items[i] && typeof items[i] === 'object' && items[i].message) {
+        msg += items[i].message;
+      }
+    }
+
+    process.stderr.write(msg[type] + '\n');
+  }
+
+  var printerr = function() {
+    _print('error', arguments);
   };
 
-  var printwarn = function(msg) {
-    process.stderr.write(msg.warn + '\n');
+  var printwarn = function() {
+    _print('warn', arguments);
   };
 
   var displayObjectKeys = function(object) {

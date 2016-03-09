@@ -114,7 +114,7 @@
         });
       },
       function(error) {
-        util.err('Failed serving project: ' + error);
+        util.err('Failed serving project: ', error);
         process.exit(1);
       }
     );
