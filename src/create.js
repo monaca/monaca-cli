@@ -21,17 +21,7 @@
       function() {
         this.showTemplateQuestion();
       }.bind(this),
-      function(error) {
-        if (error === 'ECONNRESET') {
-          util.err('Unable to connect to Monaca Cloud.');
-          util.print('Are you connected to the Internet?');
-          util.print('If you need to use a proxy, please configure it with "monaca proxy".');
-        } else {
-          util.err('Must be signed in to use this command.');
-          util.print('Please sign in with \'monaca login\'.');
-          util.print('If you don\'t have an account yet you can create one at https://monaca.mobi/en/register/start');
-        }
-      }
+      util.displayLoginErrors
     );
   };
 
@@ -41,30 +31,15 @@
     monaca.createFromTemplate(template.templateId, path.resolve(dirName))
       .then(
         function() {
-          util.print('Project created successfully.');
-          return true;
-        },
-        function(error) {
-          util.err('Error occurred while creating project : ' + JSON.stringify(error));
-          return Q.reject(error);
-        }
-      )
-      .then(
-        function() {
           // Extract the project name if nested path is given before project name.
           // E.g. if command is 'create project Apps/Finance/myFinanceApp', then myFinanceApp will be taken as project name.
-          var projectName = path.basename(dirName);
-
-          injectData(path.join(path.resolve(dirName), 'config.xml'), 'name', projectName)
-            .catch(
-              function(error) {
-                util.err('An error occurred while injecting project name in config.xml : ', error);
-              }
-            );
+          return injectData(path.join(path.resolve(dirName), 'config.xml'), 'name', path.basename(dirName));
         },
-        function(error) {
-          util.err(error);
-        }
+        util.fail.bind(null, 'Error occurred while creating project: ')
+      )
+      .then(
+        util.print.bind(null, '\nProject created successfully.'),
+        util.fail.bind(null, 'An error occurred while injecting project name in config.xml: ')
       );
   };
 
@@ -86,7 +61,7 @@
             }
           });
         } else {
-          Q.reject('\'' + node + '\' not found in xml file.');
+          deferred.reject('\'' + node + '\' not found in xml file.');
         }
       }
     });
@@ -94,12 +69,14 @@
   }
 
   CreateTask.showTemplateQuestion = function() {
-    this.getTemplateList().then(
+    monaca.getTemplates().then(
       function(templateList) {
-        console.log(('Which project template do you want to use?\n').prompt);
+        util.print('Which project template do you want to use?'.prompt);
+
         templateList.forEach(function(item, index) {
-          util.print('\t' + (index + 1) + '. ' + item.title);
+          util.print(' ' + (index + 1) + '. ' + item.title);
         });
+
         var question = function() {
           var i = rl.createInterface(process.stdin, process.stdout, null);
           i.question(('\nType number: ').input, function(answer) {
@@ -111,28 +88,12 @@
             }
           }.bind(this));
         }.bind(this);
+
         question();
+
       }.bind(this),
-      function(error) {
-        util.err('Error in getting project templates list :', error);
-        process.exit(1);
-      }
+      util.fail.bind(null, 'Error in getting project templates list: ')
     );
-
-  };
-
-  CreateTask.getTemplateList = function() {
-    var deferred = Q.defer();
-    monaca.getTemplates().then(
-      function(list) {
-        deferred.resolve(list);
-      },
-      function(error) {
-        deferred.reject(error);
-      }
-    );
-
-    return deferred.promise;
   };
 
   module.exports = CreateTask;

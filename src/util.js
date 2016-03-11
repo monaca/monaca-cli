@@ -17,7 +17,7 @@
     }
 
     process.stderr.write(msg[type] + '\n');
-  }
+  };
 
   var printerr = function() {
     _print('error', arguments);
@@ -25,6 +25,11 @@
 
   var printwarn = function() {
     _print('warn', arguments);
+  };
+
+  var fail = function() {
+    _print('error', arguments);
+    process.exit(1);
   };
 
   var displayObjectKeys = function(object) {
@@ -41,8 +46,20 @@
       var per = 100 * (progress.index + 1) / progress.total;
       per = per.toString().substr(0, 5) + '%';
       println(('[' + per + '] ').verbose + progress.path);
-    } else {
+    } else if (typeof progress === 'string') {
       process.stdout.write('.');
+    }
+  };
+
+  var displayLoginErrors = function(error) {
+    if (error === 'ECONNRESET') {
+      printerr('Unable to connect to Monaca Cloud.');
+      println('Are you connected to the Internet?');
+      println('If you need to use a proxy, please configure it with "monaca proxy".');
+    } else {
+      printerr('Must be signed in to use this command.');
+      println('Please sign in with \'monaca login\'.');
+      println('If you don\'t have an account yet you can create one at https://monaca.mobi/en/register/start');
     }
   };
 
@@ -111,8 +128,10 @@
     print: println,
     err: printerr,
     warn: printwarn,
+    fail: fail,
     displayProgress: displayProgress,
     displayObjectKeys: displayObjectKeys,
+    displayLoginErrors: displayLoginErrors,
     displayHelp: displayHelp
   };
 })();

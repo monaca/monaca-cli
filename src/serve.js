@@ -17,43 +17,27 @@
   ServeTask.assureCordovaProject = function(projectPath) {
     var deferred = Q.defer();
 
-    var assureHttpServer = function(httpServerBin) {
-      var deferred = Q.defer();
-
-      fs.exists(httpServerBin, function(exists) {
-        if (exists) {
-          deferred.resolve();
-        } else {
-          util.print('Installing packages. Please wait. This might take a couple of minutes.');
-
-          var process = exec('npm install --loglevel error', {cwd: path.join(__dirname, 'serve')});
-
-          process.stdout.on('data', function(data) {
-            util.print(data);
-          });
-
-          process.stderr.on('data', function(data) {
-            util.err(data);
-          });
-
-          process.on('exit', function(code) {
-            if (code === 0) {
-              deferred.resolve();
-            } else {
-              deferred.reject('Failed installing packages.');
-            }
-          });
-        }
-      });
-
-      return deferred.promise;
-    };
-
     fs.exists(path.join(projectPath, 'www'), function(exists) {
       if (!exists) {
         deferred.reject('Directory doesn\'t contain a www/ folder.');
       } else {
-        deferred.resolve(assureHttpServer(path.join(__dirname, 'serve', 'node_modules', '.bin', 'http-server')));
+        var httpServerBin = path.join(__dirname, 'serve', 'node_modules', '.bin', 'http-server');
+
+        fs.exists(httpServerBin, function(exists) {
+          if (exists) {
+            deferred.resolve();
+          } else {
+            util.print('Installing packages. Please wait. This might take a couple of minutes.\n');
+
+            var npmProcess = exec('npm install --loglevel error', {cwd: path.join(__dirname, 'serve')});
+
+            npmProcess.stdout.on('data', util.print);
+            npmProcess.stderr.on('data', util.err);
+            npmProcess.on('exit', function(code) {
+              code === 0 ? deferred.resolve() : deferred.reject('Failed installing packages.');
+            });
+          }
+        });
       }
     });
 
@@ -113,10 +97,7 @@
           });
         });
       },
-      function(error) {
-        util.err('Failed serving project: ', error);
-        process.exit(1);
-      }
+      util.fail.bind(null, 'Failed serving project: ')
     );
   };
 

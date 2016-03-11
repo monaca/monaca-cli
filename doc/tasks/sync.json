@@ -56,7 +56,7 @@
       ],
       [
         "--dry-run",
-        "simulates the upload operation, provides details of which files will be uploaded"
+        "simulates the upload operation, provides details of which files will be uploaded."
       ],
       [
         "",
@@ -87,7 +87,7 @@
       ],
       [
         "--dry-run",
-        "simulates the download operation, provides details of which files will be downloaded"
+        "simulates the download operation, provides details of which files will be downloaded."
       ],
       [
         "",
@@ -98,7 +98,7 @@
   "livesync": {
     "description": "starts a server that waits for connections from Monaca Debugger",
     "longDescription": [
-      "Debug the application on a device and receive code changes instantly.",
+      "Debug one or more applications on a device and receive code changes instantly.",
       "",
       "This command starts a web server for the Monaca Debugger to connect to.",
       "It also starts broadcasting messages to tell debuggers in the local network",
@@ -108,29 +108,18 @@
     ],
     "options": [
       [
+        "paths",
+        "list of directories. omit it to serve the current directory."
+      ],
+      [
         "--port",
         "http port to listen on. default is 8080."
       ]
     ],
-    "usage": "monaca livesync",
+    "usage": "monaca livesync [<paths>]",
     "examples": [
-      "monaca livesync"
-    ]
-  },
-  "multiserve": {
-    "description": "serves several projects to the Monaca Debugger",
-    "longDescription": [
-      "Serve a list of projects to the Monaca Debugger."
-    ],
-    "options": [
-      [
-        "paths",
-        "list of directories"
-      ]
-    ],
-    "usage": "monaca multiserve <paths>",
-    "examples": [
-      "monaca multiserve /path/to/project /path/to/another/project"
+      "monaca livesync",
+      "monaca livesync /path/to/project /path/to/another/project"
     ]
   }
 }

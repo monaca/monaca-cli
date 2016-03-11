@@ -31,10 +31,7 @@
           util.print('Current proxy server is "' + proxyServer + '".');
         }
       },
-      function(error) {
-        util.err('Unable to get configuration: ', error);
-        process.exit(1);
-      }
+      util.fail.bind(null, 'Unable to get configuration: ')
     );
   };
 
@@ -43,10 +40,7 @@
       function(proxyServer) {
         util.print('Proxy server set to "' + proxyServer + '".');
       },
-      function(error) {
-        util.err('Unable to set proxy server: ', error);
-        process.exit(1);
-      }
+      util.fail.bind(null, 'Unable to set proxy server: ')
     );
   };
 
@@ -59,10 +53,7 @@
           util.print('No proxy server configured.');
         }
       },
-      function(error) {
-        util.err('Unable to remove proxy server: ', error);
-        process.exit(1);
-      }
+      util.fail.bind(null, 'Unable to remove proxy server: ')
     );
   };
 

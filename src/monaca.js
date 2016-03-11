@@ -69,8 +69,7 @@
       var task = this._getTask();
 
       if (!task.set) {
-        process.stderr.write(('Error: ' + task.name + ' is not a valid task.\n').error);
-        process.exit(1);
+        util.fail('Error: ' + task.name + ' is not a valid task.');
       }
 
       if (argv.help || argv.h || (task.name === 'create' && argv._.length < 2)) {
@@ -81,7 +80,7 @@
       }
     },
     printVersion: function() {
-      console.log(VERSION.info.bold);
+      util.print(VERSION.info.bold);
     },
     printLogo: function() {
       var logoFile = path.join(__dirname, '..', 'doc', 'logo.txt'),
