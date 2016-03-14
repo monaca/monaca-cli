@@ -72,7 +72,9 @@ var Monaca = {
       util.fail('Error: ' + task.name + ' is not a valid task.');
     }
 
-    if (argv.help || argv.h || (task.name === 'create' && argv._.length < 2)) {
+    if (argv.help || argv.h
+      || (task.name === 'create' && argv._.length < 2)
+      || (task.name === 'remote build' && !argv.browser && argv._.length < 3)) {
       util.displayHelp(task.name, taskList[task.set]);
       process.exit(0);
     } else {

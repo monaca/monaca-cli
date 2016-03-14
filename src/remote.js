@@ -31,21 +31,30 @@ RemoteTask.run = function(taskName) {
 
 RemoteTask.build = function() {
   var params = {};
+  params.platform = argv._[2];
+  params.purpose = argv['build-type'] || 'debug';
 
-  ['platform', 'android_webview', 'android_arch', 'email', 'output']
+  ['browser', 'android_webview', 'android_arch', 'output']
   .forEach(function(property) {
     if (argv.hasOwnProperty(property)) {
       params[property] = argv[property];
     }
   });
 
-  if (argv.hasOwnProperty('build-type')) {
-    params.purpose = argv['build-type'];
+  if (!params.browser && (!params.platform || !params.purpose)) {
+    util.fail('Missing parameters. Please write --help to see the correct usage.');
   }
 
   var cwd, projectInfo;
 
-  lib.findProjectDir(process.cwd(), monaca)
+  lib.confirmOverwrite({action: 'upload'})
+    // Waiting for user permission.
+    .then(
+      function() {
+        return lib.findProjectDir(process.cwd(), monaca);
+      },
+      util.fail
+    )
     // Checking project directory.
     .then(
       function(directory) {
@@ -67,16 +76,17 @@ RemoteTask.build = function() {
     .then(
       function(files) {
         lib.printSuccessMessage({action: 'upload'}, files);
-        return monaca.checkBuildAvailability(projectInfo.projectId, params.platform, params.purpose);
+        if (!params.browser) {
+          return monaca.checkBuildAvailability(projectInfo.projectId, params.platform, params.purpose);
+        }
       },
       util.fail.bind(null, 'Upload failed: '),
       util.displayProgress
     )
-    // Checking build availabilty.
+    // Checking build availabilty (if no browser).
     .then(
       function() {
-        if (!argv.platform) {
-          // Open the browser if no platform parameter is provided.
+        if (argv.browser) {
           var url = 'https://ide.monaca.mobi/project/' + projectInfo.projectId + '/' + (argv['build-type'] ? 'debugger' : 'build');
           return monaca.getSessionUrl(url).then(
             function(url) {
