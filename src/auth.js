@@ -108,7 +108,7 @@ AuthTask.login = function() {
             util.warn('Monaca CLI is under the evaluation period. It will expire in ' + user.localkitEvaluationDays + ' days.');
             util.warn('You need to upgrade the plan when the evaluation period ends.');
           }
-          util.print('\nSuccessfully signed in as ' + user.username + '.');
+          util.success('\nSuccessfully signed in as ' + user.username + '.');
         },
         function(error) {
           if (error === 'ECONNRESET') {

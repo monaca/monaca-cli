@@ -138,7 +138,7 @@ RemoteTask.build = function() {
     // Downloading binary file from Monaca Cloud.
     .then(
       function(filepath) {
-        util.print('\n\nYour package is stored at ' + filepath);
+        util.success('\n\nYour package is stored at ' + filepath);
       },
       util.fail.bind(null, '\n')
     );

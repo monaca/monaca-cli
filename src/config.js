@@ -38,7 +38,7 @@ ConfigTask.showProxy = function() {
 ConfigTask.setProxy = function(proxyServer) {
   monaca.setConfig('http_proxy', proxyServer).then(
     function(proxyServer) {
-      util.print('Proxy server set to "' + proxyServer + '".');
+      util.success('Proxy server set to "' + proxyServer + '".');
     },
     util.fail.bind(null, 'Unable to set proxy server: ')
   );

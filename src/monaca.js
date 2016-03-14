@@ -17,7 +17,8 @@ colors.setTheme({
   help: 'cyan',
   warn: ['yellow', 'bold'],
   debug: 'blue',
-  error: ['red', 'bold']
+  error: ['red', 'bold'],
+  success: ['green', 'bold']
 });
 
 var taskList = {};

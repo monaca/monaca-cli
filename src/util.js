@@ -1,10 +1,6 @@
 (function() {
 'use strict';
 
-var println = function(msg) {
-  process.stdout.write(msg + '\n');
-};
-
 var _print = function(type, items) {
   var msg = '';
 
@@ -16,7 +12,11 @@ var _print = function(type, items) {
     }
   }
 
-  process.stderr.write(msg[type] + '\n');
+  process.stderr.write((type ? msg[type] : msg) + '\n');
+};
+
+var println = function() {
+  _print('', arguments);
 };
 
 var printerr = function() {
@@ -25,6 +25,10 @@ var printerr = function() {
 
 var printwarn = function() {
   _print('warn', arguments);
+};
+
+var printsuccess = function() {
+  _print('success', arguments);
 };
 
 var fail = function() {
@@ -128,6 +132,7 @@ module.exports = {
   print: println,
   err: printerr,
   warn: printwarn,
+  success: printsuccess,
   fail: fail,
   displayProgress: displayProgress,
   displayObjectKeys: displayObjectKeys,

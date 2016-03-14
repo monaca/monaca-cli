@@ -38,7 +38,7 @@ CreateTask.createApp = function(template) {
       util.fail.bind(null, 'Error occurred while creating project: ')
     )
     .then(
-      util.print.bind(null, '\nProject created successfully.'),
+      util.success.bind(null, '\nProject created successfully.'),
       util.fail.bind(null, 'An error occurred while injecting project name in config.xml: ')
     );
 };

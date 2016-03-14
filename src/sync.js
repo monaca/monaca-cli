@@ -151,7 +151,7 @@ SyncTask.clone = function(saveCloudProjectID) {
     // Cloning project.
     .then(
       function() {
-        util.print('\nProject successfully ' + (saveCloudProjectID ? 'cloned' : 'imported') + ' from Monaca Cloud!');
+        util.success('\nProject successfully ' + (saveCloudProjectID ? 'cloned' : 'imported') + ' from Monaca Cloud!');
 
         if (saveCloudProjectID) {
           monaca.setProjectId(project.absolutePath, project.projectId).catch(function(error) {
