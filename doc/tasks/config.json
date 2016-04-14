@@ -1,0 +1,17 @@
+{
+  "proxy": {
+    "description": "configure proxy to use when connecting to Monaca Cloud",
+    "longDescription": [
+      "Configure a proxy server.",
+      "",
+      "The proxy server is defined as \"http://my.proxy.com:8080\"."
+    ],
+    "usage": [
+      "monaca proxy"
+    ],
+    "examples": [
+      "monaca proxy set http://my.proxy.com:8080",
+      "monaca proxy rm"
+    ]
+  }
+}

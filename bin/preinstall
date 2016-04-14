@@ -1,55 +1,51 @@
 #!/usr/bin/env node
 
 var exec = require("child_process").exec,
-    hasError = false;
+  hasError = false;
 
+// Check xcode
+var checkComponent = function(component, callback) {
+  callback = callback || function() {};
 
-// check xcode
-var checkComponent = function(component, callback){
-    callback = callback || function(){};
+  if (component.platform.indexOf(process.platform) === -1) {
+    callback();
+    return;
+  }
 
-    if (component.platform.indexOf(process.platform) === -1) {
-        callback();   
-        return;
+  console.log('\nChecking for ' + component.name + ' ...');
+
+  exec(component.cmd, function(err, stdout, stderr) {
+    if (err) {
+      hasError = true;
+      process.stderr.write('NG: Ensure you have installed ' + component.name + '.\n');
+    } else {
+      console.log('OK');
     }
 
-    console.log('\nChecking for ' + component.name + ' ...');
-
-    exec(component.cmd, function(err, stdout, stderr) {
-        if (err) {
-            hasError = true;
-            process.stderr.write('NG: Ensure you have installed ' + component.name + '.\n');
-        } else {
-            console.log('OK');
-        }
-
-        callback();
-    });
+    callback();
+  });
 };
 
-var components = [
-    {
-        name: 'XCode',
-        cmd: "pkgutil --pkgs='com\.apple\.pkg\.Xcode.*'",
-        platform: ['darwin']
-    },
-    {
-        name: 'XCode Command Line Tools',
-        cmd: 'xcode-select -p',
-        platform: ['darwin']
-    }
-];
+var components = [{
+  name: 'XCode',
+  cmd: "pkgutil --pkgs='com\.apple\.pkg\.Xcode.*'",
+  platform: ['darwin']
+}, {
+  name: 'XCode Command Line Tools',
+  cmd: 'xcode-select -p',
+  platform: ['darwin']
+}];
 
-(function loop(){
-    if (!components.length) {
-        if (hasError) {
-            process.stderr.write('\nWarning: Several dependent components is not installed. Please install that.\n');
-        } else {
-            console.log('\nSuccess: Confirmed that the dependent components are installed.');
-        }
-
-        return;
+(function loop() {
+  if (!components.length) {
+    if (hasError) {
+      process.stderr.write('\nWarning: Several dependent components is not installed. Please install that.\n');
+    } else {
+      console.log('\nSuccess: Confirmed that the dependent components are installed.');
     }
 
-    checkComponent(components.shift(), loop);
+    return;
+  }
+
+  checkComponent(components.shift(), loop);
 })()

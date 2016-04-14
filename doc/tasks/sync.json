@@ -1,0 +1,125 @@
+{
+  "clone": {
+    "description": "clone project from the Monaca Cloud",
+    "longDescription": [
+      "Clones a project from the Monaca Cloud.",
+      "",
+      "The command downloads a list of available projects",
+      "and then displays a list for the user to choose from.",
+      "",
+      "The project will be downloaded to a directory specified by the user.",
+      "Also a link is created with corresponding monaca cloud project.",
+      "User can later sync this project with monaca cloud."
+    ],
+    "usage": "monaca clone",
+    "examples": [
+      "monaca clone"
+    ]
+  },
+  "import": {
+    "description": "import project from the Monaca Cloud",
+    "longDescription": [
+      "Imports a project from the Monaca Cloud.",
+      "",
+      "The command downloads a list of available projects",
+      "and then displays a list for the user to choose from.",
+      "",
+      "The project will be downloaded to a directory",
+      "specified by the user."
+    ],
+    "usage": "monaca import",
+    "examples": [
+      "monaca import"
+    ]
+  },
+  "upload": {
+    "description": "upload project to Monaca Cloud",
+    "longDescription": [
+      "Uploads the current project to the Monaca Cloud.",
+      "",
+      "This command requires you to be logged in. The project",
+      "files will be compared with the remote files so only",
+      "changed and new files will be uploaded."
+    ],
+    "usage": "monaca upload",
+    "examples": [
+      "monaca upload"
+    ],
+    "options": [
+      [
+        "--delete",
+        "deletes those files on Monaca cloud which are not present locally."
+      ],
+      [
+        "--force",
+        "doesn't ask user for permission to continue."
+      ],
+      [
+        "--dry-run",
+        "simulates the upload operation, provides details of which files will be uploaded."
+      ],
+      [
+        "",
+        "and deleted in case --delete option is also used. no actual i/o is done."
+      ]
+    ]
+  },
+  "download": {
+    "description": "download project from Monaca Cloud",
+    "longDescription": [
+      "Download project from the Monaca Cloud.",
+      "",
+      "This command will connect to the Monaca Cloud and",
+      "download all the file changes that's been made."
+    ],
+    "usage": "monaca download",
+    "examples": [
+      "monaca download"
+    ],
+    "options": [
+      [
+        "--delete",
+        "deletes those files locally which are not present on Monaca Cloud."
+      ],
+      [
+        "--force",
+        "doesn't ask user for permission to continue."
+      ],
+      [
+        "--dry-run",
+        "simulates the download operation, provides details of which files will be downloaded."
+      ],
+      [
+        "",
+        "and deleted in case --delete option is also used. no actual i/o is done."
+      ]
+    ]
+  },
+  "livesync": {
+    "description": "starts a server that waits for connections from Monaca Debugger",
+    "longDescription": [
+      "Debug one or more applications on a device and receive code changes instantly.",
+      "",
+      "This command starts a web server for the Monaca Debugger to connect to.",
+      "It also starts broadcasting messages to tell debuggers in the local network",
+      "to connect to it.",
+      "",
+      "When a debugger has connected it will send file system changes to it."
+    ],
+    "options": [
+      [
+        "paths",
+        "list of directories. omit it to serve the current directory."
+      ],
+      [
+        "--port",
+        "http port to listen on. default is 8080."
+      ]
+    ],
+    "usage": "monaca livesync [<paths>]",
+    "examples": [
+      "monaca livesync",
+      "monaca livesync /path/to/project /path/to/another/project"
+    ]
+  }
+}

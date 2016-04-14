@@ -1,155 +1,155 @@
-var argv = require('optimist').argv,
-    colors = require('colors'),
-    fs = require('fs'),
-    path = require('path');
+(function() {
+'use strict';
 
-var util = require(path.join(__dirname, 'util'));
+var argv = require('optimist').argv,
+  colors = require('colors'),
+  fs = require('fs'),
+  path = require('path'),
+  util = require(path.join(__dirname, 'util'));
 
 colors.setTheme({
-    silly: 'rainbow',
-    input: 'grey',
-    verbose: 'cyan',
-    prompt: 'grey',
-    info: 'green',
-    data: 'grey',
-    help: 'cyan',
-    warn: ['yellow', 'bold'],
-    debug: 'blue',
-    error: ['red', 'bold']
+  silly: 'rainbow',
+  input: 'grey',
+  verbose: 'cyan',
+  prompt: 'grey',
+  info: 'green',
+  data: 'grey',
+  help: 'cyan',
+  warn: ['yellow', 'bold'],
+  debug: 'blue',
+  error: ['red', 'bold'],
+  success: ['green', 'bold']
 });
 
-var taskList = [
-    new (require(path.join(__dirname, 'create')).CreateTask)(),
-    new (require(path.join(__dirname, 'cordova')).CordovaTask)(),
-    new (require(path.join(__dirname, 'serve')).ServeTask)(),
-    new (require(path.join(__dirname, 'auth')).AuthTask)(),
-    new (require(path.join(__dirname, 'sync')).SyncTask)(),
-    new (require(path.join(__dirname, 'remote')).RemoteTask)(),
-    new (require(path.join(__dirname, 'config')).ConfigTask)()
-];
+var taskList = {};
+
+var docsPath = '../doc/tasks/';
+fs.readdirSync(path.join(__dirname, docsPath)).forEach(function(filename) {
+  taskList[filename.split('.')[0]] = JSON.parse(fs.readFileSync(path.join(__dirname, docsPath, filename), 'utf-8'));
+});
 
 var VERSION = require(path.join(__dirname, '..', 'package.json')).version;
 
 var Monaca = {
-    _getTask: function() {
-        var taskName = '',
-          i, j;
+  _getTask: function() {
+    var task = {};
+    task.name = '';
 
-        for (i = 0; i < argv._.length; i++) {
-          var v = argv._[i];
-          taskName = [taskName, v].join(' ').trim();
+    for (var i = 0; i < argv._.length; i++) {
+      var v = argv._[i];
+      task.name = [task.name, v].join(' ').trim();
 
-          for (j = 0; j < taskList.length; j++) {
-            var task = taskList[j];
-
-            if (task.isMyTask(taskName)) {
-              return [task, taskName];
+      for (var taskSet in taskList) {
+        if (taskList.hasOwnProperty(taskSet)) {
+          for (var taskName in taskList[taskSet]) {
+            if (taskName === task.name && taskList[taskSet].hasOwnProperty(taskName)) {
+              task.set = taskSet;
+              return task;
             }
           }
         }
-    },
-    run: function() {
-        var taskName = argv._.length ? argv._[0] : null;
+      }
+    }
 
-        // version
-        if (taskName === 'version' || argv.version || argv.v) {
-            this.printVersion();
-            return;
-        }
+    return task;
+  },
+  run: function() {
 
-        // help
-        if (!taskName || taskName === 'help') {
-            this.printHelp();
-            return;
-        }
+    // Version.
+    if (argv._[0] === 'version' || argv.version || argv.v) {
+      this.printVersion();
+      process.exit(0);
+    }
 
-        var ret = this._getTask();
+    // Help.
+    if (!argv._[0] || argv._[0] === 'help') {
+      this.printHelp();
+      process.exit(0);
+    }
 
-        if (!ret) {
-            process.stderr.write(('Error: ' + taskName + ' is not a valid task.\n').error);
-            process.exit(1);
-        }
+    var task = this._getTask();
 
-        var task = ret[0];
-        taskName = ret[1];
+    if (!task.set) {
+      util.fail('Error: ' + task.name + ' is not a valid task.');
+    }
 
-        var taskNameParts = taskName.split(' ').length;
+    if (argv.help || argv.h
+      || (task.name === 'create' && argv._.length < 2)
+      || (task.name === 'remote build' && !argv.browser && argv._.length < 3)) {
+      util.displayHelp(task.name, taskList[task.set]);
+      process.exit(0);
+    } else {
+      (require(path.join(__dirname, task.set))).run(task.name);
+    }
+  },
+  printVersion: function() {
+    util.print(VERSION.info.bold);
+  },
+  printLogo: function() {
+    var logoFile = path.join(__dirname, '..', 'doc', 'logo.txt'),
+      logo = fs.readFileSync(logoFile).toString();
 
-        if (argv._[taskNameParts] === 'help' || argv.help || argv.h) {
-          task.displayHelp(taskName);
-        }
-        else {
-          task.run(taskName);
-        }
-    },
-    printVersion: function() {
-        console.log(VERSION.info.bold);
-    },
-    printLogo: function() {
-      var logoFile = path.join(__dirname, '..', 'doc', 'logo.txt'),
-        logo = fs.readFileSync(logoFile).toString();
+    util.print(logo.bold.blue);
+    util.print(' Version ' + VERSION + '\n');
+  },
+  printUsage: function() {
+    util.print('Usage: monaca command [args]\n');
+  },
+  printCommands: function() {
+    util.print('Commands:\n');
 
-      util.print(logo.bold.blue);
-      util.print(' Version ' + VERSION + '\n');
-    },
-    printUsage: function() {
-      util.print('Usage: monaca command [args]\n');
-    },
-    printCommands: function() {
-      util.print('Commands:\n');
-
-      var tasks = taskList.map(function(task) {        
-        return Object.keys(task.taskList).map(function(key) {          
-          if(task.taskList[key].showInHelp !== false) {
-            return [key, task.taskList[key].description];
+    var tasks = Object.keys(taskList).map(function(taskSet) {
+        return Object.keys(taskList[taskSet]).map(function(taskName) {
+          var task = taskList[taskSet][taskName];
+          if (task.showInHelp !== false) {
+            return [taskName, task.description];
+          } else {
+            return ['', ''];
           }
-          else {
-            return ["",""];
-          }
-        });        
-      })      
+        });
+      })
       .reduce(function(a, b) {
         return a.concat(b);
       })
       .filter(function(a) {
-        return a.join("") !== "";
+        return a.join('') !== '';
       });
 
+    tasks.forEach(function(task) {
+      var cmd = task[0],
+        desc = task[1],
+        dots = new Array(15 - cmd.length).join('.');
+      util.print('  ' + cmd.bold.info + '  ' + dots.grey + '  ' + desc.bold);
+    });
 
-      tasks.forEach(function(task) {
-        var cmd = task[0],
-          desc = task[1],
-          dots = new Array(15 - cmd.length).join('.');
-        util.print('  ' + cmd.bold.info + '  ' + dots.grey + '  ' + desc.bold);
-      });
+    util.print('');
+  },
+  printDescription: function() {
+    util.print('Description:\n');
 
-      util.print('');
-    },
-    printDescription: function() {
-      util.print('Description:\n');
+    util.print('  Monaca command-line interface.\n');
 
-      util.print('  Monaca command-line interface.\n');
+    util.print('  To learn about a specific command type:\n');
+    util.print('  $ monaca <command> --help\n');
+  },
+  printExamples: function() {
+    util.print('Examples:\n');
 
-      util.print('  To learn about a specific command type:\n');
-      util.print('  $ monaca <command> --help\n');
-    },
-    printExamples: function() {
-      util.print('Examples:\n');
+    util.print('  $ monaca create myproject');
+    util.print('  $ cd myproject');
+    util.print('  $ monaca build');
+    util.print('  $ monaca run android');
+  },
+  printHelp: function() {
+    this.printLogo();
+    this.printUsage();
+    this.printDescription();
+    this.printCommands();
+    this.printExamples();
 
-      util.print('  $ monaca create myproject');
-      util.print('  $ cd myproject');
-      util.print('  $ monaca build');
-      util.print('  $ monaca run android');
-    },
-    printHelp: function() {
-      this.printLogo();
-      this.printUsage();
-      this.printDescription();
-      this.printCommands();
-      this.printExamples();
-
-      util.print('');
-    }
+    util.print('');
+  }
 };
 
 exports.Monaca = Monaca;
+})();

@@ -1,156 +1,105 @@
+(function() {
+'use strict';
+
 var path = require('path'),
-    exec = require('child_process').exec,
-    fs = require('fs'),
-    shell = require('shelljs'),
-    Q = require('q');
+  exec = require('child_process').exec,
+  fs = require('fs'),
+  Q = require('q'),
+  util = require(path.join(__dirname, 'util'));
 
-var util = require(path.join(__dirname, 'util'));
-  
-var BaseTask = require(path.join(__dirname, 'task')).BaseTask;
-
-var ServeTask = function(){};
-
-ServeTask.prototype = new BaseTask();
-
-ServeTask.prototype.taskList = {
-  serve: {
-    description: 'runs a local web server for assets',
-    longDescription: [
-      'Starts a local web server that serves the www assets.',
-      '',
-      'Will watch the file-system for changes and reload the',
-      'browser when a change occurs.',
-      '',
-      'Port defaults to 8000'
-    ],
-    usage: 'monaca serve [port]',
-    examples: [
-      'monaca serve',
-      'monaca serve 8001'
-    ],
-    showInHelp : false
-  }
-};
+var ServeTask = {};
 
 /*
  * Checks that directory contains www.
  * If it does it will copy package.json and gulpfile.js from the templates folder
  * if needed.
  */
-ServeTask.prototype.assureCordovaProject = function(projectPath) {
+ServeTask.assureCordovaProject = function(projectPath) {
   var deferred = Q.defer();
-
-  var assureFile = function(fn) {
-    var deferred = Q.defer(),
-      loc = path.join(projectPath, fn),
-      template = path.join(__dirname, 'serve', fn);
-
-    fs.exists(loc, function(exists) {
-      if (exists) {
-        deferred.resolve();
-      }
-      else {
-        shell.cp(template, loc);
-        deferred.resolve();
-      }
-    });
-
-    return deferred.promise;
-  };
 
   fs.exists(path.join(projectPath, 'www'), function(exists) {
     if (!exists) {
       deferred.reject('Directory doesn\'t contain a www/ folder.');
-    }
-    else {
-      Q.all([assureFile('gulpfile.js'), assureFile('package.json')]).then(
-        function() {
-          util.print('Installing packages. Please wait. This might take a couple of minutes.');
+    } else {
+      var httpServerBin = path.join(__dirname, 'serve', 'node_modules', '.bin', 'http-server');
 
-          var process = exec('npm install');
-          process.on('exit', function(code) {
-            if (code === 0) {
-              deferred.resolve();
-            }
-            else {
-              deferred.reject('Failed installing packages.');
-            }
-          });
+      fs.exists(httpServerBin, function(exists) {
+        if (exists) {
+          deferred.resolve();
+        } else {
+          util.print('Installing packages. Please wait. This might take a couple of minutes.\n');
 
-          process.stdout.on('data', function(data) {
-            util.print(data);
-          });
+          var npmProcess = exec('npm install --loglevel error', {cwd: path.join(__dirname, 'serve')});
 
-          process.stderr.on('data', function(data) {
-            util.err(data);
+          npmProcess.stdout.on('data', util.print);
+          npmProcess.stderr.on('data', util.err);
+          npmProcess.on('exit', function(code) {
+            code === 0 ? deferred.resolve() : deferred.reject('Failed installing packages.');
           });
         }
-      );
+      });
     }
   });
 
   return deferred.promise;
 };
 
-ServeTask.prototype.run = function(taskName){
-    if (!this.isMyTask(taskName)) {
-      return;
-    }
+ServeTask.run = function(taskName) {
+  this.assureCordovaProject(process.cwd()).then(
+    function() {
+      var fixLog = function(data) {
+        return data.toString()
+          .split('\n')
+          .filter(function(item) {
+            return item !== '';
+          })
+          .map(function(item) {
+            return item + '\n';
+          });
+      };
 
-    this.assureCordovaProject(process.cwd()).then(
-      function() {
-        var fixLog = function(data){
-                var ret = data.toString()
-                    .split('\n')
-                    .filter(function(item){ return item !== ''; })
-                    .map(function(item){ return item + '\n'; });
+      var port = process.argv.length >= 4 ? process.argv[3] : 8000;
 
-                return ret;
-            },
-            processes = [
-                {
-                    name: 'Cordova',
-                    process: exec(path.join(__dirname, '..', 'node_modules', '.bin', 'cordova') + ' '  + process.argv.slice(2).join(' ')),
-                    color: 'yellow'
-                },
-                {
-                    name: 'gulp',
-                    process: exec(path.join(__dirname, '..', 'node_modules', '.bin', 'gulp') + ' serve'),
-                    color: 'cyan'
-                }
-            ],
-            stopProcesses = function(){
-                processes.forEach(function(item){
-                    item.process.kill();
-                });
-            };
+      var processes = [{
+        name: 'Cordova',
+        process: exec(path.join(__dirname, '..', 'node_modules', '.bin', 'cordova') + ' ' + process.argv.slice(2).join(' ')),
+        color: 'yellow'
+      }, {
+        name: 'http-server',
+        process: exec(path.join(__dirname, 'serve', 'node_modules', '.bin', 'http-server') + ' ' + path.join(process.cwd(), 'www') + ' -c-1 -o -p ' + port, {cwd: __dirname}),
+        color: 'cyan'
+      }];
 
-        processes.forEach(function(item){
-            item.process.stdout.on('data', function(data){
-                fixLog(data).forEach(function(log){
-                    process.stdout.write((item.name + ': ').bold[item.color] + log.info);
-                });
-            });
-
-            item.process.stderr.on('data', function(data){
-                fixLog(data).forEach(function(log){
-                    process.stderr.write((item.name + ': ').bold[item.color] + log.error);
-                });
-            });
-
-            item.process.on('exit', function(code){
-                if (code !== 0) {
-                    stopProcesses();
-                    process.exit(code);
-                }
-            });
+      var stopProcesses = function() {
+        processes.forEach(function(item) {
+          item.process.kill();
         });
-      },
-      function(error) {
-        util.error('Failed serving project: ' + error);
-        process.exit(1);
-      }
-    );
+      };
+
+      processes.forEach(function(item) {
+        item.process.stdout.on('data', function(data) {
+          fixLog(data).forEach(function(log) {
+            process.stdout.write((item.name + ': ').bold[item.color] + log.info);
+          });
+        });
+
+        item.process.stderr.on('data', function(data) {
+          fixLog(data).forEach(function(log) {
+            process.stderr.write((item.name + ': ').bold[item.color] + log.error);
+          });
+        });
+
+        item.process.on('exit', function(code) {
+          if (code !== 0) {
+            stopProcesses();
+            process.exit(code);
+          }
+        });
+      });
+    },
+    util.fail.bind(null, 'Failed serving project: ')
+  );
 };
 
-exports.ServeTask = ServeTask;
+module.exports = ServeTask;
+})();
