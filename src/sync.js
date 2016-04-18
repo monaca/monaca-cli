@@ -206,7 +206,7 @@ SyncTask.livesync = function() {
     .then(
       function() {
         util.print('Starting HTTP server...');
-        return localkit.startHttpServer({ httPort: argv.port });
+        return localkit.startHttpServer({ httpPort: argv.port });
       },
       util.fail.bind(null, 'Unable to start file watching: ')
     )
