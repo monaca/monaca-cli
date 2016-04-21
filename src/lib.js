@@ -3,7 +3,7 @@
 
 var path = require('path'),
   Q = require('q'),
-  read = require('read'),
+  inquirer = require('inquirer'),
   util = require(path.join(__dirname, 'util'));
 
 var findProjectDir = function(cwd, monaca) {
@@ -72,19 +72,15 @@ var confirmOverwrite = function(options) {
    return Q.resolve();
   }
 
-  var deferred = Q.defer();
   util.warn('This operation will overwrite all ' + (options.action === 'upload' ? 'remote changes that has been made.' : 'local changes you have made.'));
-  read({
-   prompt: 'Do you want to continue? [y/N] '
-  }, function(error, answer) {
-   if (error || answer.toLowerCase().charAt(0) !== 'y') {
-     deferred.reject('Aborting operation.');
-   } else {
-     deferred.resolve();
-   }
+  return inquirer.prompt({
+    type: 'confirm',
+    name: 'overwrite',
+    message: 'Do you want to continue?',
+    default: false
+  }).then(function(answers) {
+    return answers.overwrite ? Q.resolve() : Q.reject();
   });
-
-  return deferred.promise;
 };
 
 // Prints the success message.

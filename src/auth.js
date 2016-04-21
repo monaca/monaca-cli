@@ -1,7 +1,7 @@
 (function() {
 'use strict';
 
-var read = require('read'),
+var inquirer = require('inquirer'),
   path = require('path'),
   Q = require('q'),
   open = require('open'),
@@ -21,66 +21,43 @@ AuthTask.run = function(taskName) {
   }
 };
 
-AuthTask.getEmail = function() {
-  var deferred = Q.defer();
+AuthTask.getCredentials = function(doubleCheck) {
+  var passwordCheck;
+  var emailValidation = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var paramEmail = emailValidation.test(process.argv[3]) ? process.argv[3] : null;
 
-  if (process.argv[3]) {
-    deferred.resolve(process.argv[3]);
-  } else {
-    read({
-      prompt: 'Email address: '
-    }, function(error, email) {
-      if (error) {
-        deferred.reject(error);
-      } else {
-        deferred.resolve(email);
+  return inquirer.prompt([
+    {
+      type: 'input',
+      name: 'email',
+      message: 'Enter your email address:',
+      when: !paramEmail,
+      validate: function(email) {
+        return emailValidation.test(email);
       }
-    });
-  }
-
-  return deferred.promise;
-};
-
-AuthTask.getPassword = function() {
-  var deferred = Q.defer();
-
-  read({
-    prompt: 'Password: ',
-    silent: true
-  }, function(error, password) {
-    if (error) {
-      deferred.reject(error);
-    } else {
-      deferred.resolve(password);
+    },
+    {
+      type: 'password',
+      name: 'password',
+      message: 'Enter your password:',
+      validate: function(password) {
+        passwordCheck = password;
+        return password.length >= 6;
+      }
+    },
+    {
+      type: 'password',
+      name: 'confirmPassword',
+      message: 'Confirm your password:',
+      when: !!doubleCheck,
+      validate: function(confirmPassword) {
+        return confirmPassword.length >= 6 && confirmPassword === passwordCheck;
+      }
     }
+  ]).then(function(answers) {
+    !paramEmail || (answers.email = paramEmail);
+    return answers;
   });
-
-  return deferred.promise;
-};
-
-AuthTask.getCredentials = function() {
-  var deferred = Q.defer();
-
-  this.getEmail().then(
-    function(email) {
-      this.getPassword().then(
-        function(password) {
-          deferred.resolve({
-            email: email,
-            password: password
-          });
-        },
-        function(error) {
-          deferred.reject('Unable to get password.');
-        }
-      );
-    }.bind(this),
-    function(error) {
-      deferred.reject('Unabled to get email.');
-    }
-  );
-
-  return deferred.promise;
 };
 
 AuthTask.login = function() {
@@ -145,8 +122,8 @@ AuthTask.login = function() {
                 open('https://monaca.mobi/plan/change');
               });
             } else {
-              util.err('Unable to sign in: ', error);
-              util.print('If you don\'t yet have a Monaca account, please sign up at https://monaca.mobi/en/register/start .');
+              util.err('\nUnable to sign in: ', error);
+              util.print('If you don\'t yet have a Monaca account, please sign up with \'monaca signup\' or visit https://monaca.mobi/en/register/start .');
             }
           }
         }

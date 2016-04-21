@@ -83,9 +83,7 @@ CreateTask.showTemplateQuestion = function() {
         name: 'category',
         message: 'Choose a template category:',
         choices: Object.keys(categories).map(function(key) {
-          var category = { name: key };
-          categories[key].length || (category.disabled = 'Coming soon');
-          return category;
+          return categories[key].length ? { name: key } : { name: key, disabled: 'Coming soon' };
         })
       }).then(function(answerCategory) {
         inquirer.prompt({

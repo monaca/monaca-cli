@@ -1,7 +1,7 @@
 (function() {
 'use strict';
 
-var read = require('read'),
+var inquirer = require('inquirer'),
   argv = require('optimist').argv,
   path = require('path'),
   Q = require('q'),
@@ -77,67 +77,32 @@ SyncTask.clone = function(saveCloudProjectID) {
   var project;
 
   monaca.getProjects()
-    // Getting project list.
     .then(
       function(projects) {
-        util.print('Please choose one of the following projects:\n');
-
-        for (var i = 0, l = projects.length; i < l; i++) {
-          util.print(' ' + (i + 1) + '. ' + projects[i].name);
-        }
-
-        util.print('');
-
-        var deferred = Q.defer();
-        var question = function() {
-          read({
-            prompt: 'Project number: '
-          }, function(error, idx) {
-            if (error) {
-              deferred.reject('Unable to read project number.');
-            } else {
-              var projectId = parseInt(idx);
-
-              if (projectId > 0 && projectId <= projects.length) {
-                project = projects[projectId - 1];
-                return deferred.resolve(project);
-              }
-
-              question();
+        return inquirer.prompt([
+          {
+            type: 'list',
+            name: 'projectIndex',
+            message: 'Which project would you like to synchronize?',
+            choices: projects.map(function(p, i) { p.value = i; return p; })
+          },
+          {
+            type: 'input',
+            name: 'destPath',
+            message: 'Destination directory:',
+            default: function(answers) {
+              return projects[answers.projectIndex].name.replace(/\s+/g, '_');
             }
-          });
-        };
-        question();
-
-        return deferred.promise;
-      },
-      util.fail.bind(null, 'Unable to fetch project list: ')
-    )
-    // Waiting for user input - Project number.
-    .then(
-      function(project) {
-        var deferred = Q.defer();
-        read({
-          prompt: 'Destination directory: ',
-          default: project.name,
-          edit: true
-        }, function(error, destPath) {
-          if (error) {
-            return deferred.reject('Unable to read destination directory.');
           }
+        ]
+        ).then(function(answers) {
+          project = projects[answers.projectIndex];
+          project.destPath = answers.destPath;
+          project.absolutePath = path.resolve(answers.destPath);
 
-          if (destPath.trim() === '') {
-            destPath = process.cwd();
-          }
-          project.destPath = destPath;
-          project.absolutePath = path.resolve(destPath);
-
-          deferred.resolve();
+          return project;
         });
-
-        return deferred.promise;
-      },
-      util.fail
+      }
     )
     // Waiting for user input - Destination directory.
     .then(
