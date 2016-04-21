@@ -2,10 +2,10 @@
 'use strict';
 
 var fs = require('fs'),
-  rl = require('readline'),
   argv = require('optimist').argv,
   path = require('path'),
   Q = require('q'),
+  inquirer = require('inquirer'),
   XMLDom = require('xmldom').DOMParser,
   XMLSerializer = require('xmldom').XMLSerializer,
   serializer = new XMLSerializer(),
@@ -19,7 +19,9 @@ var CreateTask = {};
 CreateTask.run = function(taskName) {
   monaca.relogin().then(
     function() {
-      this.showTemplateQuestion();
+      fs.exists(path.resolve(argv._[1]), function(exists) {
+        exists ? util.fail('Directory already exists.') : this.showTemplateQuestion();
+      }.bind(this));
     }.bind(this),
     util.displayLoginErrors
   );
@@ -28,7 +30,7 @@ CreateTask.run = function(taskName) {
 CreateTask.createApp = function(template) {
   var dirName = argv._[1];
 
-  monaca.createFromTemplate(template.templateId, path.resolve(dirName))
+  monaca.downloadTemplate(template.resource, path.resolve(dirName))
     .then(
       function() {
         // Extract the project name if nested path is given before project name.
@@ -70,26 +72,31 @@ function injectData(path, node, value) {
 
 CreateTask.showTemplateQuestion = function() {
   monaca.getTemplates().then(
-    function(templateList) {
-      util.print('Which project template do you want to use?'.prompt);
-
-      templateList.forEach(function(item, index) {
-        util.print(' ' + (index + 1) + '. ' + item.title);
+    function(result) {
+      var categories = {};
+      result.template.forEach(function(category) {
+        categories[category.type] = category.list;
       });
 
-      var question = function() {
-        var i = rl.createInterface(process.stdin, process.stdout, null);
-        i.question(('\nType number: ').input, function(answer) {
-          i.close();
-          if (answer.match(/\d+/) && templateList[parseInt(answer) - 1]) {
-            this.createApp(templateList[parseInt(answer) - 1]);
-          } else {
-            question();
-          }
+      inquirer.prompt({
+        type: 'list',
+        name: 'category',
+        message: 'Choose a template category:',
+        choices: Object.keys(categories).map(function(key) {
+          var category = { name: key };
+          categories[key].length || (category.disabled = 'Coming soon');
+          return category;
+        })
+      }).then(function(answerCategory) {
+        inquirer.prompt({
+          type: 'list',
+          name: 'template',
+          message: 'Which project template do you want to use?',
+          choices: categories[answerCategory.category].map(function(template, index) { return {name: template.name, value: index}; })
+        }).then(function(answerTemplate) {
+          this.createApp(categories[answerCategory.category][answerTemplate.template]);
         }.bind(this));
-      }.bind(this);
-
-      question();
+      }.bind(this));
 
     }.bind(this),
     util.fail.bind(null, 'Error in getting project templates list: ')
