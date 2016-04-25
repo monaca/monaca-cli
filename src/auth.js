@@ -3,7 +3,6 @@
 
 var inquirer = require('inquirer'),
   path = require('path'),
-  Q = require('q'),
   open = require('open'),
   Monaca = require('monaca-lib').Monaca,
   Localkit = require('monaca-lib').Localkit,
@@ -95,10 +94,13 @@ AuthTask.login = function() {
             if (error.hasOwnProperty('code') && error.code == 503) {
               if (error.hasOwnProperty('result') && error.result.hasOwnProperty('confirm') && error.result.confirm) {
                 util.warn(error);
-                read({
-                  prompt: ' [Y/n]:'
-                }, function(err, answer) {
-                  if (answer.toLowerCase().charAt(0) !== 'n') {
+                inquirer.prompt({
+                  type: 'confirm',
+                  name: 'confirm',
+                  message: 'Proceed?',
+                  default: true
+                }).then(function(answer) {
+                  if (answer.confirm) {
                     if (error.result.hasOwnProperty('redirect')) {
                       open(error.result.redirect);
                     }
@@ -107,18 +109,22 @@ AuthTask.login = function() {
               } else {
                 util.warn(error);
                 if (error.hasOwnProperty('result') && error.result.hasOwnProperty('redirect')) {
-                  read({
-                    prompt: 'Press Enter to continue...'
-                  }, function() {
+                  inquirer.prompt({
+                    type: 'confirm',
+                    name: 'confirm',
+                    message: 'Press Enter to continue...'
+                  }).then(function(answer) {
                     open(error.result.redirect);
                   });
                 }
               }
             } else if (error.hasOwnProperty('code') && error.code == 402) {
               util.err('Your Monaca CLI evaluation period has expired. Please upgrade the plan to continue.');
-              read({
-                prompt: 'Press Enter to display upgrade page.'
-              }, function(err, answer) {
+              inquirer.prompt({
+                type: 'confirm',
+                name: 'confirm',
+                message: 'Press Enter to display upgrade page.'
+              }).then(function(answer) {
                 open('https://monaca.mobi/plan/change');
               });
             } else {
