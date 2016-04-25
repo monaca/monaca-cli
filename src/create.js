@@ -17,7 +17,7 @@ var monaca = new Monaca();
 var CreateTask = {};
 
 CreateTask.run = function(taskName) {
-  monaca.relogin().then(
+  monaca.prepareSession().then(
     function() {
       fs.exists(path.resolve(argv._[1]), function(exists) {
         exists ? util.fail('Directory already exists.') : this.showTemplateQuestion();

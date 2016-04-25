@@ -144,11 +144,11 @@ AuthTask.logout = function() {
         util.print('You have been signed out.');
         return localkit.clearPairing();
       },
-      util.err.bind(null, 'Unable to sign out: ')
+      util.fail.bind(null, 'Unable to sign out: ')
     )
     .then(
       util.print.bind(null, 'Removed Monaca Debugger pairing information.'),
-      util.err.bind(null, 'Unable to remove Monaca Debugger pairing information: ')
+      util.fail.bind(null, 'Unable to remove Monaca Debugger pairing information: ')
     );
 };
 

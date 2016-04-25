@@ -15,7 +15,7 @@ var monaca = new Monaca();
 var RemoteTask = {};
 
 RemoteTask.run = function(taskName) {
-  monaca.relogin().then(
+  monaca.prepareSession().then(
     function() {
       var task = argv._[1];
 

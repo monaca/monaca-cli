@@ -16,7 +16,7 @@ var monaca = new Monaca();
 var SyncTask = {};
 
 SyncTask.run = function(taskName) {
-  monaca.relogin().then(
+  monaca.prepareSession().then(
     function() {
       if (taskName === 'clone') {
         this.clone(true); // 'true' flag ensures that cloud project id is saved locally.
