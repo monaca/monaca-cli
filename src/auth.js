@@ -4,9 +4,9 @@
 var read = require('read'),
   path = require('path'),
   Q = require('q'),
-  open = require('open'),
   Monaca = require('monaca-lib').Monaca,
   Localkit = require('monaca-lib').Localkit,
+  lib = require(path.join(__dirname, 'lib')),
   util = require(path.join(__dirname, 'util'));
 
 var monaca = new Monaca();
@@ -16,6 +16,8 @@ var AuthTask = {};
 AuthTask.run = function(taskName) {
   if (taskName == 'login') {
     this.login();
+  } else if (taskName === 'signup') {
+    this.signup();
   } else {
     this.logout();
   }
@@ -41,7 +43,7 @@ AuthTask.getEmail = function() {
   return deferred.promise;
 };
 
-AuthTask.getPassword = function() {
+AuthTask.getPassword = function(doubleCheck) {
   var deferred = Q.defer();
 
   read({
@@ -51,32 +53,50 @@ AuthTask.getPassword = function() {
     if (error) {
       deferred.reject(error);
     } else {
-      deferred.resolve(password);
+      if (doubleCheck) {
+        read({
+          prompt: 'Confirm password: ',
+          silent: true
+        }, function(error, confirmPassword) {
+          if (error) {
+            deferred.reject(error);
+          } else {
+            if (password === confirmPassword) {
+              deferred.resolve([password, confirmPassword]);
+            } else {
+              deferred.reject('Password does not match.');
+            }
+          }
+        });
+      } else {
+        deferred.resolve([password]);
+      }
     }
   });
 
   return deferred.promise;
 };
 
-AuthTask.getCredentials = function() {
+AuthTask.getCredentials = function(doubleCheck) {
   var deferred = Q.defer();
 
   this.getEmail().then(
     function(email) {
-      this.getPassword().then(
+      this.getPassword(doubleCheck).then(
         function(password) {
           deferred.resolve({
             email: email,
-            password: password
+            password: password[0],
+            confirmPassword: password[1]
           });
         },
         function(error) {
-          deferred.reject('Unable to get password.');
+          deferred.reject(error);
         }
       );
     }.bind(this),
     function(error) {
-      deferred.reject('Unabled to get email.');
+      deferred.reject(error);
     }
   );
 
@@ -89,7 +109,7 @@ AuthTask.login = function() {
       util.print('You are already signed in. Please sign out with \'monaca logout\' in order to sign in with another user.');
     },
     function() {
-      this.getCredentials()
+      this.getCredentials(false)
       .then(
         function(credentials) {
           var pkg = require(path.join(__dirname, '..', 'package.json'));
@@ -110,46 +130,7 @@ AuthTask.login = function() {
           }
           util.success('\nSuccessfully signed in as ' + user.username + '.');
         },
-        function(error) {
-          if (error === 'ECONNRESET') {
-            util.print('Unable to connect to Monaca Cloud. Are you connected to the internet?').warn;
-            util.print('If you need to use a proxy, please configure it with "monaca proxy".');
-          } else {
-            if (error.hasOwnProperty('code') && error.code == 503) {
-              if (error.hasOwnProperty('result') && error.result.hasOwnProperty('confirm') && error.result.confirm) {
-                util.warn(error);
-                read({
-                  prompt: ' [Y/n]:'
-                }, function(err, answer) {
-                  if (answer.toLowerCase().charAt(0) !== 'n') {
-                    if (error.result.hasOwnProperty('redirect')) {
-                      open(error.result.redirect);
-                    }
-                  }
-                });
-              } else {
-                util.warn(error);
-                if (error.hasOwnProperty('result') && error.result.hasOwnProperty('redirect')) {
-                  read({
-                    prompt: 'Press Enter to continue...'
-                  }, function() {
-                    open(error.result.redirect);
-                  });
-                }
-              }
-            } else if (error.hasOwnProperty('code') && error.code == 402) {
-              util.err('Your Monaca CLI evaluation period has expired. Please upgrade the plan to continue.');
-              read({
-                prompt: 'Press Enter to display upgrade page.'
-              }, function(err, answer) {
-                open('https://monaca.mobi/plan/change');
-              });
-            } else {
-              util.err('Unable to sign in: ', error);
-              util.print('If you don\'t yet have a Monaca account, please sign up at https://monaca.mobi/en/register/start .');
-            }
-          }
-        }
+        lib.loginErrorHandler
       )
       ;
     }.bind(this)
@@ -173,6 +154,80 @@ AuthTask.logout = function() {
       util.print.bind(null, 'Removed Monaca Debugger pairing information.'),
       util.err.bind(null, 'Unable to remove Monaca Debugger pairing information: ')
     );
+};
+
+AuthTask.signup = function() {
+  monaca.relogin().then(
+    function() {
+      util.print('You are signed in. Please sign out with \'monaca logout\' before creating a new account.');
+    },
+    function() {
+      var credentials;
+      this.getCredentials(true)
+      .then(
+        function(result) {
+          credentials = result;
+          var pkg = require(path.join(__dirname, '..', 'package.json'));
+
+          return monaca.signup(credentials.email, credentials.password, credentials.confirmPassword, {
+            version: 'monaca-cli ' + pkg.version
+          });
+        },
+        util.fail
+      )
+      .then(
+        function(token) {
+          util.print('\nThanks for sign up!');
+          util.print('You should get a confirmation email in your inbox. Please open the email and click the link inside.');
+          util.print('Waiting for the sign up to complete...'.help);
+
+          var deferred = Q.defer();
+
+          var intervalHandle = setInterval(function() {
+            monaca.isActivatedUser(token)
+              .then(function() {
+                if (deferred.promise.inspect().state === 'pending') {
+                  clearInterval(intervalHandle);
+                  deferred.resolve();
+                }
+              }, function(error) {
+                if (error) {
+                  clearInterval(intervalHandle);
+                  util.fail(error, '\nLooks like something went wrong. Plase try again later.');
+                }
+              });
+          }, 3000);
+
+          // Send "exit" event when program is terminated.
+          process.on('SIGINT', function() {
+            clearInterval(intervalHandle);
+            process.exit(0);
+          });
+
+          return deferred.promise;
+        },
+        util.fail
+      )
+      .then(
+        function() {
+          util.success('Activation confirmed.');
+          var pkg = require(path.join(__dirname, '..', 'package.json'));
+          return monaca.login(credentials.email, credentials.password, {
+            version: 'monaca-cli ' + pkg.version
+          });
+        },
+        util.fail
+      )
+      .then(
+        function() {
+          var user = monaca.loginBody;
+          util.success('You are now logged in as ' + user.username + '.');
+        },
+        lib.loginErrorHandler
+      )
+      ;
+    }.bind(this)
+  );
 };
 
 module.exports = AuthTask;
