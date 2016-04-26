@@ -1,9 +1,9 @@
 (function() {
 'use strict';
 
-var read = require('read'),
+var inquirer = require('inquirer'),
   path = require('path'),
-  Q = require('q'),
+  open = require('open'),
   Monaca = require('monaca-lib').Monaca,
   Localkit = require('monaca-lib').Localkit,
   lib = require(path.join(__dirname, 'lib')),
@@ -23,84 +23,44 @@ AuthTask.run = function(taskName) {
   }
 };
 
-AuthTask.getEmail = function() {
-  var deferred = Q.defer();
-
-  if (process.argv[3]) {
-    deferred.resolve(process.argv[3]);
-  } else {
-    read({
-      prompt: 'Email address: '
-    }, function(error, email) {
-      if (error) {
-        deferred.reject(error);
-      } else {
-        deferred.resolve(email);
-      }
-    });
-  }
-
-  return deferred.promise;
-};
-
-AuthTask.getPassword = function(doubleCheck) {
-  var deferred = Q.defer();
-
-  read({
-    prompt: 'Password: ',
-    silent: true
-  }, function(error, password) {
-    if (error) {
-      deferred.reject(error);
-    } else {
-      if (doubleCheck) {
-        read({
-          prompt: 'Confirm password: ',
-          silent: true
-        }, function(error, confirmPassword) {
-          if (error) {
-            deferred.reject(error);
-          } else {
-            if (password === confirmPassword) {
-              deferred.resolve([password, confirmPassword]);
-            } else {
-              deferred.reject('Password does not match.');
-            }
-          }
-        });
-      } else {
-        deferred.resolve([password]);
-      }
-    }
-  });
-
-  return deferred.promise;
-};
-
 AuthTask.getCredentials = function(doubleCheck) {
-  var deferred = Q.defer();
+  var passwordCheck;
+  var emailValidation = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var paramEmail = emailValidation.test(process.argv[3]) ? process.argv[3] : null;
 
-  this.getEmail().then(
-    function(email) {
-      this.getPassword(doubleCheck).then(
-        function(password) {
-          deferred.resolve({
-            email: email,
-            password: password[0],
-            confirmPassword: password[1]
-          });
-        },
-        function(error) {
-          deferred.reject(error);
-        }
-      );
-    }.bind(this),
-    function(error) {
-      deferred.reject(error);
+  return inquirer.prompt([
+    {
+      type: 'input',
+      name: 'email',
+      message: 'Enter your email address:',
+      when: !paramEmail,
+      validate: function(email) {
+        return emailValidation.test(email);
+      }
+    },
+    {
+      type: 'password',
+      name: 'password',
+      message: 'Enter your password:',
+      validate: function(password) {
+        passwordCheck = password;
+        return password.length >= 6;
+      }
+    },
+    {
+      type: 'password',
+      name: 'confirmPassword',
+      message: 'Confirm your password:',
+      when: !!doubleCheck,
+      validate: function(confirmPassword) {
+        return confirmPassword.length >= 6 && confirmPassword === passwordCheck;
+      }
+
     }
-  );
-
-  return deferred.promise;
+  ]).then(function(answers) {
+    !paramEmail || (answers.email = paramEmail);
+    return answers;
+  });
 };
 
 AuthTask.login = function() {
@@ -148,11 +108,11 @@ AuthTask.logout = function() {
         util.print('You have been signed out.');
         return localkit.clearPairing();
       },
-      util.err.bind(null, 'Unable to sign out: ')
+      util.fail.bind(null, 'Unable to sign out: ')
     )
     .then(
       util.print.bind(null, 'Removed Monaca Debugger pairing information.'),
-      util.err.bind(null, 'Unable to remove Monaca Debugger pairing information: ')
+      util.fail.bind(null, 'Unable to remove Monaca Debugger pairing information: ')
     );
 };
 

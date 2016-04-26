@@ -63,7 +63,7 @@ var displayLoginErrors = function(error) {
   } else {
     printerr('Must be signed in to use this command.');
     println('Please sign in with \'monaca login\'.');
-    println('If you don\'t have an account yet you can create one at https://monaca.mobi/en/register/start');
+    println('If you don\'t yet have a Monaca account, please sign up with \'monaca signup\'.');
   }
 };
 
