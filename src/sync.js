@@ -16,20 +16,22 @@ var monaca = new Monaca();
 var SyncTask = {};
 
 SyncTask.run = function(taskName) {
-  monaca.prepareSession().then(
-    function() {
-      if (taskName === 'clone') {
-        this.clone(true); // 'true' flag ensures that cloud project id is saved locally.
-      } else if (taskName === 'import') {
-        this.clone(false);
-      } else if (taskName === 'debug') {
-        this.livesync();
-      } else if (taskName === 'upload' || taskName === 'download') {
-        this.load(taskName);
-      }
-    }.bind(this),
-    util.displayLoginErrors
-  );
+  if (taskName === 'debug') {
+    monaca.relogin().then(this.livesync.bind(this), util.displayLoginErrors);
+  } else {
+    monaca.prepareSession().then(
+      function() {
+        if (taskName === 'clone') {
+          this.clone(true); // 'true' flag ensures that cloud project id is saved locally.
+        } else if (taskName === 'import') {
+          this.clone(false);
+        } else if (taskName === 'upload' || taskName === 'download') {
+          this.load(taskName);
+        }
+      }.bind(this),
+      util.displayLoginErrors
+    );
+  }
 };
 
 SyncTask.load = function(action) {
