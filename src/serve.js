@@ -104,6 +104,8 @@ ServeTask.run = function(taskName) {
         });
 
         item.process.on('exit', function(code) {
+          fileWatcherTranspiler.stop();
+
           if (code !== 0) {
             stopProcesses();
             process.exit(code);
