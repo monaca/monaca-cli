@@ -3,7 +3,7 @@
 
 var inquirer = require('inquirer'),
   path = require('path'),
-  open = require('open'),
+  Q = require('q'),
   Monaca = require('monaca-lib').Monaca,
   Localkit = require('monaca-lib').Localkit,
   lib = require(path.join(__dirname, 'lib')),
