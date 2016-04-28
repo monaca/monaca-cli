@@ -5,9 +5,11 @@ var path = require('path'),
   exec = require('child_process').exec,
   fs = require('fs'),
   Q = require('q'),
-  util = require(path.join(__dirname, 'util'));
+  util = require(path.join(__dirname, 'util')),
+  Monaca = require('monaca-lib').Monaca;
 
 var ServeTask = {};
+var monaca = new Monaca();
 
 /*
  * Checks that directory contains www.
@@ -45,7 +47,9 @@ ServeTask.assureCordovaProject = function(projectPath) {
 };
 
 ServeTask.run = function(taskName) {
-  this.assureCordovaProject(process.cwd()).then(
+  this.assureCordovaProject(process.cwd()).then(function(){
+    return monaca.transpile(process.cwd());
+  }).then(
     function() {
       var fixLog = function(data) {
         return data.toString()
@@ -60,15 +64,25 @@ ServeTask.run = function(taskName) {
 
       var port = process.argv.length >= 4 ? process.argv[3] : 8000;
 
+      // Execute filewatcher here with transpiler
+      var FileWatcher = require(path.join(__dirname, '..', 'node_modules', 'monaca-lib', 'src', 'localkit', 'fileWatcher'));
+      var fileWatcherTranspiler = new FileWatcher();
+
+      fileWatcherTranspiler.onchange(function(changeType, filePath) {
+        monaca.transpile(process.cwd());
+      }.bind(this));
+      fileWatcherTranspiler.run(path.join(process.cwd(), 'src'));
+
       var processes = [{
         name: 'Cordova',
-        process: exec(path.join(__dirname, '..', 'node_modules', '.bin', 'cordova') + ' ' + process.argv.slice(2).join(' ')),
+        process: exec(path.join(__dirname, '..', 'node_modules', '.bin', 'cordova') + ' serve' + process.argv.slice(9).join(' ')),
         color: 'yellow'
       }, {
         name: 'http-server',
         process: exec(path.join(__dirname, 'serve', 'node_modules', '.bin', 'http-server') + ' ' + path.join(process.cwd(), 'www') + ' -c-1 -o -p ' + port, {cwd: __dirname}),
         color: 'cyan'
-      }];
+      }
+      ];
 
       var stopProcesses = function() {
         processes.forEach(function(item) {

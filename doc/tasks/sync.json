@@ -95,7 +95,7 @@
       ]
     ]
   },
-  "livesync": {
+  "debug": {
     "description": "starts a server that waits for connections from Monaca Debugger",
     "longDescription": [
       "Debug one or more applications on a device and receive code changes instantly.",
@@ -116,10 +116,10 @@
         "http port to listen on. default is 8080."
       ]
     ],
-    "usage": "monaca livesync [<paths>]",
+    "usage": "monaca debug [<paths>]",
     "examples": [
-      "monaca livesync",
-      "monaca livesync /path/to/project /path/to/another/project"
+      "monaca debug",
+      "monaca debug /path/to/project /path/to/another/project"
     ]
   }
 }

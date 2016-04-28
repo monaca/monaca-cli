@@ -22,7 +22,7 @@ SyncTask.run = function(taskName) {
         this.clone(true); // 'true' flag ensures that cloud project id is saved locally.
       } else if (taskName === 'import') {
         this.clone(false);
-      } else if (taskName === 'livesync') {
+      } else if (taskName === 'debug') {
         this.livesync();
       } else if (taskName === 'upload' || taskName === 'download') {
         this.load(taskName);
@@ -135,7 +135,7 @@ SyncTask.livesync = function() {
   try {
     localkit = new Localkit(monaca, true);
   } catch (error) {
-    util.fail('Unable to start livesync: ', error);
+    util.fail('Unable to start debug: ', error);
   }
 
   try {
@@ -148,7 +148,7 @@ SyncTask.livesync = function() {
     });
   } catch (error) {
     if ( error.code === 'MODULE_NOT_FOUND' ) {
-      util.warn('Node-webkit (NW.js) module is not installed. Inspector utilities will be disabled. \nPlease install NW.js with \'npm install nw\' and restart the livesync or use Chrome Web Inspector instead.\n');
+      util.warn('Node-webkit (NW.js) module is not installed. Inspector utilities will be disabled. \nPlease install NW.js with \'npm install nw\' and restart the debug or use Chrome Web Inspector instead.\n');
     }
   }
 
@@ -181,7 +181,7 @@ SyncTask.livesync = function() {
 
         // Send "exit" event when program is terminated.
         process.on('SIGINT', function() {
-          util.print('Stopping livesync...');
+          util.print('Stopping debug...');
           this.sendExitEvent();
           process.exit(0);
         }.bind(localkit.projectEvents));

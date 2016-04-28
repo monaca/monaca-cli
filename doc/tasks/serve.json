@@ -1,5 +1,5 @@
 {
-  "serve": {
+  "preview": {
     "description": "runs a local web server for assets",
     "longDescription": [
       "Starts a local web server that serves the www assets.",
@@ -9,10 +9,10 @@
       "",
       "Port defaults to 8000"
     ],
-    "usage": "monaca serve [port]",
+    "usage": "monaca preview [port]",
     "examples": [
-      "monaca serve",
-      "monaca serve 8001"
+      "monaca preview",
+      "monaca preview 8001"
     ],
     "showInHelp": false
   }
