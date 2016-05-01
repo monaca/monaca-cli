@@ -63,7 +63,7 @@ var Monaca = {
 
     // Help.
     if (!argv._[0] || argv._[0] === 'help') {
-      this.printHelp();
+      this.printHelp(argv.all);
       process.exit(0);
     }
 
@@ -78,9 +78,17 @@ var Monaca = {
       || (task.name === 'remote build' && !argv.browser && argv._.length < 3)) {
       util.displayHelp(task.name, taskList[task.set]);
       process.exit(0);
-    } else {
-      (require(path.join(__dirname, task.set))).run(task.name);
     }
+
+    var runner = function(task) {
+      var result = (require(path.join(__dirname, task.set))).run(task.name);
+      Promise.resolve(result).then(function(result) {
+        if (result && result.nextTask) {
+          runner(result.nextTask);
+        }
+      })
+    };    
+    runner(task);
   },
   printVersion: function() {
     util.print(VERSION.info.bold);
@@ -90,19 +98,23 @@ var Monaca = {
       logo = fs.readFileSync(logoFile).toString();
 
     util.print(logo.bold.blue);
-    util.print(' Version ' + VERSION + '\n');
+    util.print(' Command Line Interface for Monaca and Onsen UI');
+    util.print(' Monaca CLI Version ' + VERSION + '\n');
   },
   printUsage: function() {
     util.print('Usage: monaca command [args]\n');
   },
-  printCommands: function() {
-    util.print('Commands:\n');
+  printCommands: function(showAll) {
+    util.print('Commands: (use --all to show all)\n');
 
-    var tasks = Object.keys(taskList).map(function(taskSet) {
+    showAll = showAll || false;
+
+    var tasks = Object.keys(taskList)
+      .map(function(taskSet) {
         return Object.keys(taskList[taskSet]).map(function(taskName) {
           var task = taskList[taskSet][taskName];
-          if (task.showInHelp !== false) {
-            return [taskName, task.description];
+          if (task.showInHelp !== false || showAll === true) {
+            return [taskName, task];
           } else {
             return ['', ''];
           }
@@ -115,9 +127,16 @@ var Monaca = {
         return a.join('') !== '';
       });
 
-    tasks.forEach(function(task) {
+    tasks
+      .sort(function(a, b) {
+        var a_key = a[0];
+        if (a[1].order < b[1].order) return -1;         
+        if (a[1].order > b[1].order) return 1;
+        return 0;
+      })
+    .forEach(function(task) {
       var cmd = task[0],
-        desc = task[1],
+        desc = task[1].description,
         dots = new Array(15 - cmd.length).join('.');
       util.print('  ' + cmd.bold.info + '  ' + dots.grey + '  ' + desc.bold);
     });
@@ -125,26 +144,23 @@ var Monaca = {
     util.print('');
   },
   printDescription: function() {
-    util.print('Description:\n');
-
-    util.print('  Monaca command-line interface.\n');
-
     util.print('  To learn about a specific command type:\n');
     util.print('  $ monaca <command> --help\n');
   },
   printExamples: function() {
-    util.print('Examples:\n');
+    util.print('Typical Usage:\n');
 
-    util.print('  $ monaca create myproject');
+    util.print('  $ monaca create myproject # Create a new project from various templates');
     util.print('  $ cd myproject');
-    util.print('  $ monaca build');
-    util.print('  $ monaca run android');
+    util.print('  $ monaca preview # Preview app on a browser');
+    util.print('  $ monaca debug # Run the app in Monaca Debugger');
+    util.print('  $ monaca remote build # Execute remote build for packaging');
   },
-  printHelp: function() {
+  printHelp: function(showAll) {
     this.printLogo();
     this.printUsage();
     this.printDescription();
-    this.printCommands();
+    this.printCommands(showAll);
     this.printExamples();
 
     util.print('');

@@ -17,14 +17,9 @@ var monaca = new Monaca();
 var CreateTask = {};
 
 CreateTask.run = function(taskName) {
-  monaca.prepareSession().then(
-    function() {
-      fs.exists(path.resolve(argv._[1]), function(exists) {
-        exists ? util.fail('Directory already exists.') : this.showTemplateQuestion();
-      }.bind(this));
-    }.bind(this),
-    util.displayLoginErrors
-  );
+  fs.exists(path.resolve(argv._[1]), function(exists) {
+    exists ? util.fail('Directory already exists.') : this.showTemplateQuestion();
+  }.bind(this));
 };
 
 CreateTask.createApp = function(template) {
@@ -40,7 +35,18 @@ CreateTask.createApp = function(template) {
       util.fail.bind(null, 'Error occurred while creating project: ')
     )
     .then(
-      util.success.bind(null, '\nProject created successfully.'),
+      function() {
+        util.success('\nProject created successfully.')
+        var message = [
+            '',
+            'Type "cd ' + dirName + '" and run monaca command again.',
+            '  > monaca preview      => Run app in the browser',
+            '  > monaca debug        => Run app in the device using Monaca Debugger',
+            '  > monaca remote build => Start remote build for iOS/Android/Windows',
+            '  > monaca upload       => Upload this project to Monaca Cloud IDE'
+          ].join("\n");
+        util.print(message);
+      }.bind(null),
       util.fail.bind(null, 'An error occurred while injecting project name in config.xml: ')
     );
 };
@@ -71,6 +77,7 @@ function injectData(path, node, value) {
 }
 
 CreateTask.showTemplateQuestion = function() {
+
   monaca.getTemplates().then(
     function(result) {
       var categories = {};
@@ -90,7 +97,13 @@ CreateTask.showTemplateQuestion = function() {
           type: 'list',
           name: 'template',
           message: 'Which project template do you want to use?',
-          choices: categories[answerCategory.category].map(function(template, index) { return {name: template.name, value: index}; })
+          choices: categories[answerCategory.category]
+            .sort(function(a, b) {
+              if (a.name > b.name) return -1;
+              if (a.name < b.name) return 1;
+              return 0;
+            })
+            .map(function(template, index) { return {name: template.name, value: index}; })
         }).then(function(answerTemplate) {
           this.createApp(categories[answerCategory.category][answerTemplate.template]);
         }.bind(this));

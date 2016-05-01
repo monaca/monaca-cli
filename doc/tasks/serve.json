@@ -1,6 +1,7 @@
 {
   "preview": {
-    "description": "runs a local web server for assets",
+    "order": 2,
+    "description": "runs a local web server for preview",
     "longDescription": [
       "Starts a local web server that serves the www assets.",
       "",
@@ -14,6 +15,6 @@
       "monaca preview",
       "monaca preview 8001"
     ],
-    "showInHelp": false
+    "showInHelp": true
   }
 }

@@ -1,6 +1,8 @@
 (function() {
 'use strict';
 
+var Q = require('q');
+
 var _print = function(type, items) {
   var msg = '';
 
@@ -56,15 +58,32 @@ var displayProgress = function(progress) {
 };
 
 var displayLoginErrors = function(error) {
+
+  var deferred = Q.defer();
+
   if (error === 'ECONNRESET') {
     printerr('Unable to connect to Monaca Cloud.');
     println('Are you connected to the Internet?');
     println('If you need to use a proxy, please configure it with "monaca proxy".');
   } else {
-    printerr('Must be signed in to use this command.');
-    println('Please sign in with \'monaca login\'.');
-    println('If you don\'t yet have a Monaca account, please sign up with \'monaca signup\'.');
+    printerr('Must be signed in to Monaca when using this command.');
+    println();
+    println('Monaca account is free for the basic usage.');
+    println('For more details, visit https://monaca.io/pricing.html')
+    println();
+    println('Starting Sign Up - use "monaca login" if you already have an account.')
+    println();
+
+    deferred.resolve({
+      nextTask: {
+        set: 'auth',
+        name: 'signup'
+      }
+    });
+
   }
+
+  return deferred.promise;
 };
 
 var displayHelp = function(taskName, taskList) {

@@ -48,6 +48,9 @@ ServeTask.assureCordovaProject = function(projectPath) {
 
 ServeTask.run = function(taskName) {
   this.assureCordovaProject(process.cwd()).then(function(){
+    if (monaca.requireTranspile(process.cwd())) {
+      util.print('Running transpiler');
+    }
     return monaca.transpile(process.cwd());
   }).then(
     function() {
@@ -68,10 +71,15 @@ ServeTask.run = function(taskName) {
       var FileWatcher = require(path.join(__dirname, '..', 'node_modules', 'monaca-lib', 'src', 'localkit', 'fileWatcher'));
       var fileWatcherTranspiler = new FileWatcher();
 
-      fileWatcherTranspiler.onchange(function(changeType, filePath) {
-        monaca.transpile(process.cwd());
-      }.bind(this));
-      fileWatcherTranspiler.run(path.join(process.cwd(), 'src'));
+      if (monaca.requireTranspile(process.cwd())) {
+        fileWatcherTranspiler.onchange(function(changeType, filePath) {
+          util.print('Transpiling ' + filePath + '...');
+          monaca.transpile(process.cwd());
+          util.print('Done');
+        }.bind(this));
+        util.print('Watching changes...');
+        fileWatcherTranspiler.run(path.join(process.cwd(), 'src'));
+      }
 
       var processes = [{
         name: 'Cordova',
@@ -79,7 +87,7 @@ ServeTask.run = function(taskName) {
         color: 'yellow'
       }, {
         name: 'http-server',
-        process: exec(path.join(__dirname, 'serve', 'node_modules', '.bin', 'http-server') + ' ' + path.join(process.cwd(), 'www') + ' -c-1 -o -p ' + port, {cwd: __dirname}),
+        process: exec('node' + ' ' + path.join(__dirname, 'serve', 'node_modules', 'http-server', 'bin', 'http-server') + ' ' + path.join(process.cwd(), 'www') + ' -c-1 -o -p ' + port, {cwd: __dirname}),
         color: 'cyan'
       }
       ];

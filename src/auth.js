@@ -15,7 +15,7 @@ var AuthTask = {};
 
 AuthTask.run = function(taskName) {
   if (taskName == 'login') {
-    this.login();
+    return this.login();
   } else if (taskName === 'signup') {
     this.signup();
   } else {
@@ -64,12 +64,14 @@ AuthTask.getCredentials = function(doubleCheck) {
 };
 
 AuthTask.login = function() {
-  monaca.relogin().then(
+  return monaca.relogin().then(
     function() {
       util.print('You are already signed in. Please sign out with \'monaca logout\' in order to sign in with another user.');
     },
     function() {
-      this.getCredentials(false)
+      util.print('Use "monaca signup" command if you need to sign up.');
+      util.print();
+      return this.getCredentials(false)
       .then(
         function(credentials) {
           var pkg = require(path.join(__dirname, '..', 'package.json'));
@@ -90,7 +92,9 @@ AuthTask.login = function() {
           }
           util.success('\nSuccessfully signed in as ' + user.username + '.');
         },
-        lib.loginErrorHandler
+        function(error) {
+          return lib.loginErrorHandler(error);
+        }
       )
       ;
     }.bind(this)

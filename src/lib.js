@@ -154,8 +154,14 @@ var loginErrorHandler = function (error) {
         open('https://monaca.mobi/plan/change');
       });
     } else {
+      util.err();
       util.err('Unable to sign in: ', error);
-      util.print('If you don\'t yet have a Monaca account, please sign up using \'monaca signup\'.');
+      return {
+        nextTask: {
+          set: 'auth',
+          name: 'login'
+        }
+      };
     }
   }
 };

@@ -1,5 +1,6 @@
 {
   "create": {
+    "order": 1,
     "description": "create a new Monaca project",
     "usage": "monaca create path",
     "longDescription": [

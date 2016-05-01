@@ -17,9 +17,11 @@ var SyncTask = {};
 
 SyncTask.run = function(taskName) {
   if (taskName === 'debug') {
-    monaca.relogin().then(this.livesync.bind(this), util.displayLoginErrors);
+    return monaca.relogin().then(this.livesync.bind(this), function() {
+      return util.displayLoginErrors();
+    }.bind(this));
   } else {
-    monaca.prepareSession().then(
+    return monaca.prepareSession().then(
       function() {
         if (taskName === 'clone') {
           this.clone(true); // 'true' flag ensures that cloud project id is saved locally.
@@ -132,25 +134,86 @@ SyncTask.clone = function(saveCloudProjectID) {
 };
 
 SyncTask.livesync = function() {
-  var localkit;
+  var localkit, nwError = false;
 
   try {
-    localkit = new Localkit(monaca, true);
+    localkit = new Localkit(monaca, false);
   } catch (error) {
     util.fail('Unable to start debug: ', error);
   }
 
+  if (Object.keys(localkit.pairingKeys).length == 0) {
+    util.print('');
+    util.print('Welcome to Monaca debug - Live-reload and debug in the real device');
+    util.print('');
+    util.print('To get started, you need to install Monaca Debugger on your phone.')
+    util.print('');
+    util.print('   For Android Devices: Search and install "Monaca" in Google Play');
+    util.print('   For iOS Devices: Search and install "Monaca" in App Store');
+    util.print('')
+    util.print('After installation, connect your device to the same WiFi network');
+    util.print('and it will find this computer for pairing.')
+    util.print('')
+    util.print('Debugging Guide (JavaScript Dev Tools)')
+    util.print('  https://docs.monaca.io/en/manual/debugger/debug/#debugger-with-local-tools')
+    util.print('')
+    util.print('Troubleshooting Guide:')
+    util.print('  https://docs.monaca.io/en/manual/debugger/troubleshooting')
+    util.print('')
+  } else {
+    util.print('Please run Monaca Debugger on your device.');
+    util.print('')
+    util.print('Debugging Guide (JavaScript Dev Tools)')
+    util.print('  https://docs.monaca.io/en/manual/debugger/debug/#debugger-with-local-tools')
+    util.print('')
+    util.print('Troubleshooting Guide:')
+    util.print('  https://docs.monaca.io/en/manual/debugger/troubleshooting')
+    util.print('')
+  }
+
+  try {
+    localkit.on('debuggerConnected', function(client) {
+      util.print('Debugger connected: ' + client.deviceManufacturer + ' ' + client.deviceType);
+    })
+    localkit.on('debuggerDisconnected', function(client) {
+      util.print('Debugger disconnected: ' + client.deviceManufacturer + ' ' + client.deviceType);
+    })
+    localkit.on('httpResponse', function(response) {
+      util.print(' ' + response.message + ' > ' + response.code);
+    })
+    localkit.on('inspectorError', function(error) {
+      switch (error) {
+      case 'ERROR_ADB':
+        util.print();
+        util.err('Error running ADB command.');
+        util.err('Make sure you installed Android SDK and adb is in your PATH.');
+        util.print('Download site: http://developer.android.com/sdk/index.html')
+        util.print();
+        break;
+      case 'ERROR_START_PROXY':
+        util.err('Failed starting the proxy. Check if iOS device is properly connected and authorized.');
+        break;
+      default:
+        util.err('Error launching inspector. Please check the connection to the device. ERRNO=' + error);
+        util.print('Troubleshooting Guide: https://docs.monaca.io/en/manual/debugger/troubleshooting/');
+        break;
+      }
+    });
+  } catch (error) { }
+
   try {
     var nwBin = require('nw').findpath();
+    var adbPath =  path.join(__dirname, '..', 'bin', process.platform, (process.platform == "win32") ? 'adb.exe' : 'adb');
 
     localkit.initInspector({
       inspectorCallback: function(result) {
         child_process.spawn(nwBin, [result.app, result.webSocketUrl]);
-      }
+      },
+      adbPath: adbPath
     });
   } catch (error) {
     if ( error.code === 'MODULE_NOT_FOUND' ) {
-      util.warn('Node-webkit (NW.js) module is not installed. Inspector utilities will be disabled. \nPlease install NW.js with \'npm install nw\' and restart the debug or use Chrome Web Inspector instead.\n');
+      nwError = true;
     }
   }
 
@@ -164,16 +227,15 @@ SyncTask.livesync = function() {
     // Adding projects.
     .then(
       function() {
-        util.print('Starting file watching...');
+        // Starting file watching
         return localkit.startWatch();
       },
       util.fail.bind(null, 'Unable to add projects: ')
     )
-    // Starting file watching.
     .then(
       function() {
-        util.print('Starting HTTP server...');
-        return localkit.startHttpServer({ httpPort: argv.port });
+        // Starting HTTP server
+        return localkit.startHttpServer({ onConnect: connect, httpPort: argv.port });
       },
       util.fail.bind(null, 'Unable to start file watching: ')
     )
@@ -188,8 +250,7 @@ SyncTask.livesync = function() {
           process.exit(0);
         }.bind(localkit.projectEvents));
 
-        util.print(('Listening on ' + server.address + ':' + server.port).help);
-        util.print('Starting beacon transmitter...');
+        util.print('Waiting for Monaca Debugger connecting to ' + server.address + ':' + server.port + '.');
         return localkit.startBeaconTransmitter();
       },
       util.fail.bind(null, 'Unable to start HTTP server: ')
@@ -197,10 +258,14 @@ SyncTask.livesync = function() {
     // Starting beacon transmiter.
     .then(
       function() {
-        util.print('Waiting for connections from Monaca debugger...'.help);
+        if (nwError) {
+          util.warn('\nNode Webkit is not installed, so inspector capabilities will be disabled.\nPlease run "npm install nw" and restart the debug.\n');
+        }
+
       },
       util.fail.bind(null, 'Unable to start beacon transmitter: ')
     );
+
 };
 
 module.exports = SyncTask;

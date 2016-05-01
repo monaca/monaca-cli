@@ -1,5 +1,6 @@
 {
   "proxy": {
+    "order": 50,
     "description": "configure proxy to use when connecting to Monaca Cloud",
     "longDescription": [
       "Configure a proxy server.",

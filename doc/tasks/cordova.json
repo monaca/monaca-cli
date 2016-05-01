@@ -1,5 +1,6 @@
 {
   "info": {
+    "order": 32,
     "description": "show info about Cordova environment",
     "usage": "monaca info",
     "longDescription": [
@@ -12,6 +13,7 @@
     "showInHelp": false
   },
   "platform": {
+    "order": 31,
     "description": "add, update and remove platforms",
     "longDescription": [
       "Manage platforms. Can be used to add or remove platforms.",
@@ -45,7 +47,8 @@
     "showInHelp": false
   },
   "plugin": {
-    "description": "manage installed plugins",
+    "order": 30,
+    "description": "manage Cordova Plugin",
     "longDescription": [
       "Manage installed plugins",
       "",
@@ -74,6 +77,7 @@
     ]
   },
   "prepare": {
+    "order": 33,
     "description": "prepare project for build",
     "longDescription": "Copies file for a specified (or all) platform(s).",
     "usage": "monaca prepare [platform]",
@@ -84,6 +88,7 @@
     "showInHelp": false
   },
   "compile": {
+    "order": 34,
     "description": "build the project",
     "longDescription": "Build the project for a specified platform, or all platforms.",
     "usage": "monaca compile [platform]",
@@ -94,6 +99,7 @@
     "showInHelp": false
   },
   "run": {
+    "order": 35,
     "description": "deploys project on a device / emulator",
     "longDescription": "Deploys app on a specified platform or emulator.",
     "usage": "monaca run [platform]",
@@ -127,6 +133,7 @@
     "showInHelp": false
   },
   "build": {
+    "order": 36,
     "description": "shortcut for prepare, then compile",
     "longDescription": "Shortcut for `monaca prepare` then `monaca compile`.",
     "usage": "monaca build [platform]",
@@ -137,6 +144,7 @@
     "showInHelp": false
   },
   "emulate": {
+    "order": 37,
     "description": "run project in emulator",
     "longDescription": "Run project in emulator. Shortcut for `monaca run --emulator`.",
     "usage": "monaca emulate [platform]",
