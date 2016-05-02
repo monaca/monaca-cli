@@ -202,7 +202,8 @@ SyncTask.livesync = function() {
   } catch (error) { }
 
   try {
-    var nwBin = require('nw').findpath();
+    var nw = path.join(process.cwd(), 'node_modules', 'nw');
+    var nwBin = require(nw).findpath();
     var adbPath =  path.join(__dirname, '..', 'bin', process.platform, (process.platform == "win32") ? 'adb.exe' : 'adb');
 
     localkit.initInspector({
