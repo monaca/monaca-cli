@@ -74,8 +74,13 @@ ServeTask.run = function(taskName) {
       if (monaca.requireTranspile(process.cwd())) {
         fileWatcherTranspiler.onchange(function(changeType, filePath) {
           util.print('Transpiling ' + filePath + '...');
-          monaca.transpile(process.cwd());
-          util.print('Done');
+
+          monaca.transpile(process.cwd())
+	    .then(function() {
+              util.print('Done');
+	    }, function(error) {
+	      util.err('Failed to transpile: ', error);
+	    });
         }.bind(this));
         util.print('Watching changes...');
         fileWatcherTranspiler.run(path.join(process.cwd(), 'src'));
@@ -84,11 +89,13 @@ ServeTask.run = function(taskName) {
       var processes = [{
         name: 'Cordova',
         process: exec(path.join(__dirname, '..', 'node_modules', '.bin', 'cordova') + ' serve' + process.argv.slice(9).join(' ')),
-        color: 'yellow'
+        color: 'yellow',
+        alive: true
       }, {
         name: 'http-server',
         process: exec('node' + ' ' + path.join(__dirname, 'serve', 'node_modules', 'http-server', 'bin', 'http-server') + ' ' + path.join(process.cwd(), 'www') + ' -c-1 -o -p ' + port, {cwd: __dirname}),
-        color: 'cyan'
+        color: 'cyan',
+        alive: true
       }
       ];
 
@@ -112,13 +119,26 @@ ServeTask.run = function(taskName) {
         });
 
         item.process.on('exit', function(code) {
-          fileWatcherTranspiler.stop();
+	  item.alive = false;
+
+	  var shouldKeepRunning = false;
+	  processes.forEach(function(i) {
+            if (i.alive) {
+              shouldKeepRuninng = true;
+	    }
+	  });
+	  if (!shouldKeepRunning) {
+            fileWatcherTranspiler.stop();
+	  }
 
           if (code !== 0) {
             stopProcesses();
             process.exit(code);
           }
         });
+
+
+
       });
     },
     util.fail.bind(null, 'Failed serving project: ')
