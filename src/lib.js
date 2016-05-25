@@ -4,7 +4,7 @@
 var path = require('path'),
   Q = require('q'),
   open = require('open'),
-  inquirer = require('inquirer'),
+  inquirer = require('monaca-inquirer'),
   util = require(path.join(__dirname, 'util'));
 
 var findProjectDir = function(cwd, monaca) {
