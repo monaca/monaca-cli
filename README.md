@@ -38,13 +38,12 @@ debug ..........  run app on device using Monaca Debugger
 remote build  ..  build project on Monaca Cloud
 login  .........  sign in to Monaca Cloud
 logout  ........  sign out from Monaca Cloud
+signup  ........  register a new Monaca account
 clone  .........  clone project from the Monaca Cloud
 import  ........  import project from the Monaca Cloud
 upload  ........  upload project to Monaca Cloud
 download  ......  download project from Monaca Cloud
 plugin  ........  manage installed plugins
-livesync  ......  starts a server that waits for connections from Monaca Debugger
-multiserve  ....  serves several projects to the Monaca Debugger
 proxy  .........  configure proxy to use when connecting to Monaca Cloud
 ```
 
