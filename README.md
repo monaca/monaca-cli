@@ -33,6 +33,9 @@ to see a list of available commands:
 
 ```
 create  ........  create a new Monaca project
+preview ........  runs a local web server for preview
+debug ..........  run app on device using Monaca Debugger
+remote build  ..  build project on Monaca Cloud
 login  .........  sign in to Monaca Cloud
 logout  ........  sign out from Monaca Cloud
 clone  .........  clone project from the Monaca Cloud
@@ -42,7 +45,6 @@ download  ......  download project from Monaca Cloud
 plugin  ........  manage installed plugins
 livesync  ......  starts a server that waits for connections from Monaca Debugger
 multiserve  ....  serves several projects to the Monaca Debugger
-remote build  ..  build project on Monaca Cloud
 proxy  .........  configure proxy to use when connecting to Monaca Cloud
 ```
 
