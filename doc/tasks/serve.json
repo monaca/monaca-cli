@@ -13,7 +13,14 @@
     "usage": "monaca preview [port]",
     "examples": [
       "monaca preview",
-      "monaca preview 8001"
+      "monaca preview 8001",
+      "monaca preview --no-open"
+    ],
+    "options": [
+      [
+        "--no-open",
+        "Do not open browser"
+      ]
     ],
     "showInHelp": true
   }
