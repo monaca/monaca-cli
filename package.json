@@ -35,7 +35,7 @@
     "open": "0.0.5",
     "optimist": "^0.6.1",
     "q": "^1.1.2",
-    "monaca-inquirer": "frankdiox/Inquirer.js",
+    "monaca-inquirer": "^1.0.3",
     "shelljs": "^0.3.0",
     "xmldom": "^0.1.19"
   }
