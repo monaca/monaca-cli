@@ -6,7 +6,11 @@ var path = require('path'),
   fs = require('fs'),
   Q = require('q'),
   util = require(path.join(__dirname, 'util')),
-  Monaca = require('monaca-lib').Monaca;
+  Monaca = require('monaca-lib').Monaca,
+  argv = require('optimist')
+    .alias('p', 'port')
+    .default('open', true)
+    .argv;
 
 var ServeTask = {};
 var monaca = new Monaca();
@@ -65,18 +69,6 @@ ServeTask.run = function(taskName) {
           });
       };
 
-      var port = 8000; var isNotFoundPort = true;
-      var openBrowser = true; var isNotFoundOpenBrowser = true;
-      process.argv.forEach(function(arg, i) {
-        if (isNotFoundPort && i >= 3 && !!arg.match(/^([0-9]+)$/)) {
-          port = arg;
-          isNotFoundPort = false;
-        } else if (isNotFoundOpenBrowser && i >= 3 && arg === '--no-open') {
-          openBrowser = false;
-          isNotFoundOpenBrowser = false;
-        }
-      });
-
       // Execute filewatcher here with transpiler
       var FileWatcher = require(path.join(__dirname, '..', 'node_modules', 'monaca-lib', 'src', 'localkit', 'fileWatcher'));
       var fileWatcherTranspiler = new FileWatcher();
@@ -103,7 +95,7 @@ ServeTask.run = function(taskName) {
         alive: true
       }, {
         name: 'http-server',
-        process: exec('node' + ' ' + path.join(__dirname, 'serve', 'node_modules', 'http-server', 'bin', 'http-server') + ' ' + path.join(process.cwd(), 'www') + ' -c-1 ' + (openBrowser ? ' -o ' : '') + ' -p ' + port, {cwd: __dirname}),
+        process: exec('node' + ' ' + path.join(__dirname, 'serve', 'node_modules', 'http-server', 'bin', 'http-server') + ' ' + path.join(process.cwd(), 'www') + ' -c-1 ' + (argv.open ? ' -o ' : '') + ' -p ' + (argv.port || 8000), {cwd: __dirname}),
         color: 'cyan',
         alive: true
       }
