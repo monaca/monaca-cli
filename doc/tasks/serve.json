@@ -7,13 +7,23 @@
       "",
       "Will watch the file-system for changes and reload the",
       "browser when a change occurs.",
-      "",
-      "Port defaults to 8000"
+      ""
     ],
-    "usage": "monaca preview [port]",
+    "usage": "monaca preview",
     "examples": [
       "monaca preview",
-      "monaca preview 8001"
+      "monaca preview -p 8001",
+      "monaca preview --no-open"
+    ],
+    "options": [
+      [
+        "--port, -p",
+        "Port. Defaults to 8000"
+      ],
+      [
+        "--no-open",
+        "Do not open browser"
+      ]
     ],
     "showInHelp": true
   }

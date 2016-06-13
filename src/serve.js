@@ -6,7 +6,11 @@ var path = require('path'),
   fs = require('fs'),
   Q = require('q'),
   util = require(path.join(__dirname, 'util')),
-  Monaca = require('monaca-lib').Monaca;
+  Monaca = require('monaca-lib').Monaca,
+  argv = require('optimist')
+    .alias('p', 'port')
+    .default('open', true)
+    .argv;
 
 var ServeTask = {};
 var monaca = new Monaca();
@@ -65,8 +69,6 @@ ServeTask.run = function(taskName) {
           });
       };
 
-      var port = process.argv.length >= 4 ? process.argv[3] : 8000;
-
       // Execute filewatcher here with transpiler
       var FileWatcher = require(path.join(__dirname, '..', 'node_modules', 'monaca-lib', 'src', 'localkit', 'fileWatcher'));
       var fileWatcherTranspiler = new FileWatcher();
@@ -93,7 +95,7 @@ ServeTask.run = function(taskName) {
         alive: true
       }, {
         name: 'http-server',
-        process: exec('node' + ' ' + path.join(__dirname, 'serve', 'node_modules', 'http-server', 'bin', 'http-server') + ' ' + path.join(process.cwd(), 'www') + ' -c-1 -o -p ' + port, {cwd: __dirname}),
+        process: exec('node' + ' ' + path.join(__dirname, 'serve', 'node_modules', 'http-server', 'bin', 'http-server') + ' ' + path.join(process.cwd(), 'www') + ' -c-1 ' + (argv.open ? ' -o ' : '') + ' -p ' + (argv.port || 8000), {cwd: __dirname}),
         color: 'cyan',
         alive: true
       }
