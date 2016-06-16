@@ -89,17 +89,11 @@ ServeTask.run = function(taskName) {
       }
 
       var processes = [{
-        name: 'Cordova',
-        process: exec(path.join(__dirname, '..', 'node_modules', '.bin', 'cordova') + ' serve' + process.argv.slice(9).join(' ')),
-        color: 'yellow',
-        alive: true
-      }, {
         name: 'http-server',
         process: exec('node' + ' ' + path.join(__dirname, 'serve', 'node_modules', 'http-server', 'bin', 'http-server') + ' ' + path.join(process.cwd(), 'www') + ' -c-1 ' + (argv.open ? ' -o ' : '') + ' -p ' + (argv.port || 8000), {cwd: __dirname}),
         color: 'cyan',
         alive: true
-      }
-      ];
+      }];
 
       var stopProcesses = function() {
         processes.forEach(function(item) {
@@ -121,26 +115,24 @@ ServeTask.run = function(taskName) {
         });
 
         item.process.on('exit', function(code) {
-	  item.alive = false;
+      	  item.alive = false;
 
-	  var shouldKeepRunning = false;
-	  processes.forEach(function(i) {
+      	  var shouldKeepRunning = false;
+      	  processes.forEach(function(i) {
             if (i.alive) {
               shouldKeepRuninng = true;
-	    }
-	  });
-	  if (!shouldKeepRunning) {
+      	    }
+      	  });
+
+      	  if (!shouldKeepRunning) {
             fileWatcherTranspiler.stop();
-	  }
+      	  }
 
           if (code !== 0) {
             stopProcesses();
             process.exit(code);
           }
         });
-
-
-
       });
     },
     util.fail.bind(null, 'Failed serving project: ')
