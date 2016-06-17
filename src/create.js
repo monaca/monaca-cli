@@ -88,8 +88,7 @@ CreateTask.showTemplateQuestion = function() {
       this.samples = result.sample;
       this.categories = categories;
 
-      inquiry.type.call(this);
-
+      inquiry.categories.call(this);
 
     }.bind(this),
     util.fail.bind(null, 'Error in getting project templates list: ')
@@ -98,50 +97,17 @@ CreateTask.showTemplateQuestion = function() {
 
 var inquiry = {
 
-  type: function() {
-    inquirer.prompt({
-      type: 'list',
-      name: 'type',
-      message: 'Select an option:',
-      choices: ['Sample Apps', 'Templates']
-    }).then(function(answer) {
-      answer.type === 'Sample Apps' ? inquiry.samples.call(this) : inquiry.categories.call(this);
-    }.bind(this));
-  },
-
-  samples: function() {
-    inquirer.prompt({
-      type: 'list',
-      name: 'sample',
-      message: 'Select a sample app:',
-      cancelable: true,
-      choices: this.samples.map(function(sample, index) {
-        return { name: sample.name + '   # ' + sample.description, short: sample.name, value: index }
-      }.bind(this))
-    }).then(function(answer) {
-      if (answer.sample === null) {
-        inquiry.type.call(this);
-      } else {
-        CreateTask.createApp(this.samples[answer.sample]);
-      }
-    }.bind(this));
-  },
-
   categories: function() {
     inquirer.prompt({
       type: 'list',
       name: 'category',
-      message: 'Choose a template category:',
-      cancelable: true,
+      message: 'Choose a category:',
+      cancelable: false,
       choices: Object.keys(this.categories).map(function(key) {
         return this.categories[key].length ? { name: key } : { name: key, disabled: 'Coming soon' };
-      }.bind(this))
+      }.bind(this)).concat([{ name: 'Sample Apps'}])
     }).then(function(answer) {
-      if (answer.category === null) {
-        inquiry.type.call(this);
-      } else {
-        inquiry.template.call(this, answer.category);
-      }
+      answer.category === 'Sample Apps' ? inquiry.samples.call(this) : inquiry.template.call(this, answer.category);
     }.bind(this));
   },
 
@@ -163,6 +129,24 @@ var inquiry = {
         inquiry.categories.call(this);
       } else {
         CreateTask.createApp(this.categories[answerCategory][answer.template]);
+      }
+    }.bind(this));
+  },
+
+  samples: function() {
+    inquirer.prompt({
+      type: 'list',
+      name: 'sample',
+      message: 'Select a sample app:',
+      cancelable: true,
+      choices: this.samples.map(function(sample, index) {
+        return { name: sample.name + '   # ' + sample.description, short: sample.name, value: index }
+      }.bind(this))
+    }).then(function(answer) {
+      if (answer.sample === null) {
+        inquiry.categories.call(this);
+      } else {
+        CreateTask.createApp(this.samples[answer.sample]);
       }
     }.bind(this));
   }
