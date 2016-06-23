@@ -4,6 +4,7 @@
 var fs = require('fs'),
   argv = require('optimist').argv,
   path = require('path'),
+  open = require('open'),
   Q = require('q'),
   inquirer = require('monaca-inquirer'),
   XMLDom = require('xmldom').DOMParser,
@@ -40,10 +41,10 @@ CreateTask.createApp = function(template) {
         var message = [
             '',
             'Type "cd ' + dirName + '" and run monaca command again.',
-            '  > monaca preview      => Run app in the browser',
-            '  > monaca debug        => Run app in the device using Monaca Debugger',
-            '  > monaca remote build => Start remote build for iOS/Android/Windows',
-            '  > monaca upload       => Upload this project to Monaca Cloud IDE'
+            '  > ' + 'monaca preview'.info + '      => Run app in the browser',
+            '  > ' + 'monaca debug'.info + '        => Run app in the device using Monaca Debugger',
+            '  > ' + 'monaca remote build'.info + ' => Start remote build for iOS/Android/Windows',
+            '  > ' + 'monaca upload'.info + '       => Upload this project to Monaca Cloud IDE'
           ].join("\n");
         util.print(message);
       }.bind(null),
@@ -115,8 +116,15 @@ var inquiry = {
     inquirer.prompt({
       type: 'list',
       name: 'template',
-      message: 'Which project template do you want to use?',
+      message: 'Select a template - Press ' + 'P'.info + ' to see a preview',
       cancelable: true,
+      keyAction: {
+        p: function(currentValue) {
+          if (this.categories[answerCategory][currentValue].preview) {
+            open(this.categories[answerCategory][currentValue].preview);
+          }
+        }.bind(this)
+      },
       choices: this.categories[answerCategory]
         .sort(function(a, b) {
           if (a.name > b.name) return -1;
@@ -137,8 +145,15 @@ var inquiry = {
     inquirer.prompt({
       type: 'list',
       name: 'sample',
-      message: 'Select a sample app:',
+      message: 'Select a sample app - Press ' + 'P'.info + ' to see a preview',
       cancelable: true,
+      keyAction: {
+        p: function(currentValue) {
+          if (this.samples[currentValue].preview) {
+            open(this.samples[currentValue].preview);
+          }
+        }.bind(this)
+      },
       choices: this.samples.map(function(sample, index) {
         return { name: sample.name + '   # ' + sample.description, short: sample.name, value: index }
       }.bind(this))
@@ -150,7 +165,7 @@ var inquiry = {
       }
     }.bind(this));
   }
-}
+};
 
 module.exports = CreateTask;
 })();
