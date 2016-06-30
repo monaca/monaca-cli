@@ -10,7 +10,10 @@ var _print = function(type, items) {
     if (typeof items[i] === 'string') {
       msg += items[i];
     } else if (items[i] && typeof items[i] === 'object' && items[i].message) {
-      msg += items[i].message;
+      if (items[i].log && Array.isArray(items[i].log)) {
+        msg += '\n\n' + items[i].log.join('\n');
+      }
+      msg += '\n' + items[i].message;
     }
   }
 
