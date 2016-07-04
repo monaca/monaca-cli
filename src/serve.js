@@ -74,15 +74,13 @@ ServeTask.run = function(taskName) {
 
           processes.push({
             name: 'webpack-dev-server',
-            process: exec('node' + ' ' + bin + ' --progress --config ' + path.join(process.cwd(), 'webpack.dev.config.js') +  (argv.port ? ' --port ' + argv.port : '')),
+            process: exec(bin + ' --open --progress --config ' + path.join(process.cwd(), 'webpack.dev.config.js') +  (argv.port ? ' --port ' + argv.port : '')),
             color: 'cyan',
             alive: true
           });
-
         } else {
           // HTTP Server Route
           bin = path.join(__dirname, 'serve', 'node_modules', 'http-server', 'bin', 'http-server');
-
 
           processes.push({
             name: 'http-server',
