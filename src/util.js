@@ -38,6 +38,18 @@ var fail = function() {
   process.exit(1);
 };
 
+var parseError = function(error) {
+  switch (typeof error) {
+    case 'object':
+      return error.message;
+    case 'array':
+      return error.join('\n');
+    default:
+      return error;
+  }
+};
+
+
 var displayObjectKeys = function(object) {
   println(
     Object.keys(object).map(function(file, index) {
@@ -153,6 +165,7 @@ module.exports = {
   warn: printwarn,
   success: printsuccess,
   fail: fail,
+  parseError: parseError,
   displayProgress: displayProgress,
   displayObjectKeys: displayObjectKeys,
   displayLoginErrors: displayLoginErrors,

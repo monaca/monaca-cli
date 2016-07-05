@@ -10,11 +10,11 @@ var path = require('path'),
   lib = require(path.join(__dirname, 'lib')),
   util = require(path.join(__dirname, 'util'));
 
-var monaca = new Monaca();
+var RemoteTask = {}, monaca;
 
-var RemoteTask = {};
+RemoteTask.run = function(taskName, info) {
+  monaca = new Monaca(info);
 
-RemoteTask.run = function(taskName) {
   monaca.prepareSession().then(
     function() {
       var task = argv._[1];
@@ -30,6 +30,7 @@ RemoteTask.run = function(taskName) {
 };
 
 RemoteTask.build = function() {
+
   var params = {};
   params.platform = argv._[2];
   params.purpose = argv['build-type'] || 'debug';
@@ -45,42 +46,49 @@ RemoteTask.build = function() {
     util.fail('Missing parameters. Please write --help to see the correct usage.');
   }
 
-  var cwd, projectInfo;
+  var report = {
+    event: 'remote-build',
+    arg1: params.platform,
+    otherArgs: JSON.stringify(params)
+  };
+  monaca.reportAnalytics(report);
+
+  var cwd, projectInfo, error = '';
 
   lib.confirmOverwrite({action: 'upload'})
     // Waiting for user permission.
     .then(
       function() {
         return lib.findProjectDir(process.cwd(), monaca);
-      },
-      util.fail
+      }
     )
     // Checking project directory.
     .then(
       function(directory) {
         cwd = directory;
         util.print('Uploading project to Monaca Cloud...');
+        error = 'Unable to create monaca project: ';
         return lib.assureMonacaProject(cwd, monaca);
-      },
-      util.fail
+      }
     )
     // Assuring this is a Monaca-like project.
     .then(
       function(info) {
         projectInfo = info;
+        error = 'Upload failed: ';
         return monaca.uploadProject(cwd);
-      },
-      util.fail.bind(null, 'Unable to create monaca project: ')
+      }
     )
     // Uploading project to Monaca Cloud.
     .then(
       function(files) {
         lib.printSuccessMessage({action: 'upload'}, files);
         if (!params.browser) {
+          error = 'Unable to build this project: ';
           return monaca.checkBuildAvailability(projectInfo.projectId, params.platform, params.purpose);
         }
       },
-      util.fail.bind(null, 'Upload failed: '),
+      Q.reject,
       util.displayProgress
     )
     // Checking build availabilty (if no browser).
@@ -88,29 +96,41 @@ RemoteTask.build = function() {
       function() {
         if (argv.browser) {
           var url = 'https://ide.monaca.mobi/project/' + projectInfo.projectId + '/' + (argv['debugger'] ? 'debugger' : 'build');
-          return monaca.getSessionUrl(url).then(
-            function(url) {
-              open(url, function() {
-                process.exit(0);
-              });
-              return Q.defer().promise;
-            },
-            util.fail.bind(null, 'Unable to open build page: ')
-          );
+          return monaca.getSessionUrl(url)
+            .then(
+              function(url) {
+                var deferred = Q.defer();
+                open(url, function(error) {
+                  if (error) {
+                    return deferred.reject(error);
+                  }
+                  deferred.resolve();
+                });
+                return deferred.promise;
+              }
+            )
+            .then(
+              monaca.reportFinish.bind(monaca, report),
+              monaca.reportFail.bind(monaca, report)
+            )
+            .then(
+              process.exit.bind(process, 1),
+              util.fail.bind(null, 'Unable to open build page: ')
+            );
         } else {
           // Build project on Monaca Cloud and download it into ./build folder.
           util.print('\nBuilding project on Monaca Cloud...');
+          error = 'Remote build failed:  ';
           return monaca.buildProject(projectInfo.projectId, params);
         }
-      },
-      util.fail.bind(null, 'Unable to build this project: ')
+      }
     )
     // Building the project remotely.
     .then(
       function(result) {
-        return result.binary_url ? monaca.getSessionUrl(result.binary_url) : util.fail(result.error_message);
+        return result.binary_url ? monaca.getSessionUrl(result.binary_url) : Q.reject(result.error_message);
       },
-      util.fail,
+      Q.reject,
       util.displayProgress
     )
     // Getting session URL.
@@ -132,15 +152,18 @@ RemoteTask.build = function() {
           shell.mkdir('-p', path.join(cwd, 'build'));
           return path.join(cwd, 'build', filename);
         });
-      },
-      util.fail
+      }
+    )
+    .then(
+      monaca.reportFinish.bind(monaca, report),
+      monaca.reportFail.bind(monaca, report)
     )
     // Downloading binary file from Monaca Cloud.
     .then(
       function(filepath) {
         util.success('\n\nYour package is stored at ' + filepath);
       },
-      util.fail.bind(null, '\n')
+      util.fail
     );
 };
 
