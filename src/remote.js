@@ -76,7 +76,8 @@ RemoteTask.build = function() {
       function(info) {
         projectInfo = info;
         error = 'Upload failed: ';
-        return monaca.uploadProject(cwd);
+        return monaca.uploadProject(cwd)
+          .progress(util.displayProgress);
       }
     )
     // Uploading project to Monaca Cloud.
@@ -87,9 +88,7 @@ RemoteTask.build = function() {
           error = 'Unable to build this project: ';
           return monaca.checkBuildAvailability(projectInfo.projectId, params.platform, params.purpose);
         }
-      },
-      Q.reject,
-      util.displayProgress
+      }
     )
     // Checking build availabilty (if no browser).
     .then(
@@ -121,7 +120,8 @@ RemoteTask.build = function() {
           // Build project on Monaca Cloud and download it into ./build folder.
           util.print('\nBuilding project on Monaca Cloud...');
           error = 'Remote build failed:  ';
-          return monaca.buildProject(projectInfo.projectId, params);
+          return monaca.buildProject(projectInfo.projectId, params)
+            .progress(util.displayProgress);
         }
       }
     )
@@ -129,9 +129,7 @@ RemoteTask.build = function() {
     .then(
       function(result) {
         return result.binary_url ? monaca.getSessionUrl(result.binary_url) : Q.reject(result.error_message);
-      },
-      Q.reject,
-      util.displayProgress
+      }
     )
     // Getting session URL.
     .then(

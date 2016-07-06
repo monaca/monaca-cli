@@ -70,14 +70,14 @@ SyncTask.load = function(action) {
     .then(
       function() {
         error = action.toUpperCase() + ' failed: ';
-        return monaca[action + 'Project'](cwd, options);
+        return monaca[action + 'Project'](cwd, options)
+          .progress(util.displayProgress);
       }
     )
     // Uploading/Downloading project to Monaca Cloud.
     .then(
       monaca.reportFinish.bind(monaca, report),
-      monaca.reportFail.bind(monaca, report),
-      util.displayProgress
+      monaca.reportFail.bind(monaca, report)
     )
     // Reporting analytics
     .then(
@@ -130,14 +130,14 @@ SyncTask.clone = function(saveCloudProjectID) {
     .then(
       function() {
         util.print((saveCloudProjectID ? 'Cloning' : 'Importing') + ' \'' + project.name + '\' to ' + project.absolutePath);
-        return monaca.cloneProject(project.projectId, project.destPath);
+        return monaca.cloneProject(project.projectId, project.destPath)
+          .progress(util.displayProgress);
       }
     )
     // Cloning project.
     .then(
       monaca.reportFinish.bind(monaca, report),
-      monaca.reportFail.bind(monaca, report),
-      util.displayProgress
+      monaca.reportFail.bind(monaca, report)
     )
     // Reporting analytics
     .then(
