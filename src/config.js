@@ -6,11 +6,10 @@ var path = require('path'),
   Monaca = require('monaca-lib').Monaca,
   util = require(path.join(__dirname, 'util'));
 
-var monaca = new Monaca();
+var ConfigTask = {}, monaca;
 
-var ConfigTask = {};
-
-ConfigTask.run = function(taskName) {
+ConfigTask.run = function(taskName, info) {
+  monaca = new Monaca(info);
   var command = argv._[1];
 
   if (command === 'set' && argv._[2]) {
@@ -36,7 +35,16 @@ ConfigTask.showProxy = function() {
 };
 
 ConfigTask.setProxy = function(proxyServer) {
-  monaca.setConfig('http_proxy', proxyServer).then(
+  var report = {
+    event: 'proxy'
+  };
+
+  monaca.setConfig('http_proxy', proxyServer)
+  .then(
+    monaca.reportAnalytics.bind(monaca, report),
+    monaca.reportFail.bind(monaca, report)
+  )
+  .then(
     function(proxyServer) {
       util.success('Proxy server set to "' + proxyServer + '".');
     },

@@ -29,6 +29,10 @@ fs.readdirSync(path.join(__dirname, docsPath)).forEach(function(filename) {
 });
 
 var VERSION = require(path.join(__dirname, '..', 'package.json')).version;
+var info = {
+  clientType: 'cli',
+  clientVersion: VERSION
+};
 
 var Monaca = {
   _getTask: function() {
@@ -81,13 +85,13 @@ var Monaca = {
     }
 
     var runner = function(task) {
-      var result = (require(path.join(__dirname, task.set))).run(task.name);
+      var result = (require(path.join(__dirname, task.set))).run(task.name, info);
       Promise.resolve(result).then(function(result) {
         if (result && result.nextTask) {
           runner(result.nextTask);
         }
       })
-    };    
+    };
     runner(task);
   },
   printVersion: function() {

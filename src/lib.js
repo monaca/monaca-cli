@@ -20,11 +20,7 @@ var findProjectDir = function(cwd, monaca) {
 };
 
 var assureMonacaProject = function(cwd, monaca) {
-  var deferred = Q.defer(),
-    resolve = deferred.resolve.bind(deferred),
-    reject = deferred.reject.bind(deferred);
-
-  monaca.getProjectId(cwd)
+  return monaca.getProjectId(cwd)
     .then(
       function(projectId) {
         if (typeof projectId === 'undefined') {
@@ -32,17 +28,20 @@ var assureMonacaProject = function(cwd, monaca) {
         } else {
           return projectId;
         }
-      },
-      util.fail
+      }
     )
     .then(
       function(projectId) {
-        resolve({
+        return Q.resolve({
           projectId: projectId
         });
       },
       function(error) {
-        monaca.getProjectInfo(cwd)
+        if (error) {
+          return Q.reject(error);
+        }
+
+        return monaca.getProjectInfo(cwd)
           .then(
             function(info) {
               return monaca.createProject({
@@ -50,20 +49,16 @@ var assureMonacaProject = function(cwd, monaca) {
                 description: info.description,
                 templateId: 'minimum'
               });
-            },
-            reject
+            }
           )
           .then(
             function(info) {
               return monaca.setProjectId(cwd, info.projectId)
-                .then(resolve.bind(null, info), reject);
-            },
-            reject
+                .then(Q.resolve.bind(null, info), Q.reject);
+            }
           );
       }
     );
-
-  return deferred.promise;
 };
 
 // Prompts a confirmation before overwriting files.
@@ -80,7 +75,7 @@ var confirmOverwrite = function(options) {
     message: 'Do you want to continue?',
     default: false
   }).then(function(answers) {
-    return answers.overwrite ? Q.resolve() : Q.reject();
+    return answers.overwrite ? Q.resolve() : Q.reject('Cancel');
   });
 };
 
