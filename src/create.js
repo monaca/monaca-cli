@@ -13,27 +13,37 @@ var fs = require('fs'),
   Monaca = require('monaca-lib').Monaca,
   util = require(path.join(__dirname, 'util'));
 
-var monaca = new Monaca();
+var CreateTask = {}, monaca, report = { event: 'create' };
 
-var CreateTask = {};
-
-CreateTask.run = function(taskName) {
+CreateTask.run = function(taskName, info) {
+  monaca = new Monaca(info);
   fs.exists(path.resolve(argv._[1]), function(exists) {
-    exists ? util.fail('Directory already exists.') : this.showTemplateQuestion();
+    if (exists) {
+      util.fail('Directory already exists.');
+    } else {
+      monaca.reportAnalytics(report);
+      this.showTemplateQuestion();
+    }
   }.bind(this));
 };
 
 CreateTask.createApp = function(template) {
   var dirName = argv._[1];
+  var error = 'Error occurred while creating project: ';
+  report.arg1 = template.name;
 
   monaca.downloadTemplate(template.resource, path.resolve(dirName))
     .then(
       function() {
         // Extract the project name if nested path is given before project name.
         // E.g. if command is 'create project Apps/Finance/myFinanceApp', then myFinanceApp will be taken as project name.
+        error = 'An error occurred while injecting project name in config.xml: ';
         return injectData(path.join(path.resolve(dirName), 'config.xml'), 'name', path.basename(dirName));
-      },
-      util.fail.bind(null, 'Error occurred while creating project: ')
+      }
+    )
+    .then(
+      monaca.reportFinish.bind(monaca, report),
+      monaca.reportFail.bind(monaca, report)
     )
     .then(
       function() {
@@ -48,7 +58,7 @@ CreateTask.createApp = function(template) {
           ].join("\n");
         util.print(message);
       }.bind(null),
-      util.fail.bind(null, 'An error occurred while injecting project name in config.xml: ')
+      util.fail.bind(null, error)
     );
 };
 

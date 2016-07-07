@@ -11,11 +11,10 @@ var inquirer = require('monaca-inquirer'),
   lib = require(path.join(__dirname, 'lib')),
   util = require(path.join(__dirname, 'util'));
 
-var monaca = new Monaca();
+var SyncTask = {}, monaca;
 
-var SyncTask = {};
-
-SyncTask.run = function(taskName) {
+SyncTask.run = function(taskName, info) {
+  monaca = new Monaca(info);
   if (taskName === 'debug') {
     return monaca.relogin().then(this.livesync.bind(this), function() {
       return util.displayLoginErrors();
@@ -37,48 +36,64 @@ SyncTask.run = function(taskName) {
 };
 
 SyncTask.load = function(action) {
-  var cwd, options = {};
+  var cwd, options = {}, error = '';
   options.dryrun = argv['dry-run'];
   options.delete = argv.delete;
   options.force = argv.force;
   options.action = action;
 
+  var report = {
+    event: action
+  };
+  monaca.reportAnalytics(report);
+
   lib.confirmOverwrite(options)
     // Waiting for user permission.
     .then(
       function() {
+        error = 'Unable to ' + action + ' project: ';
         return lib.findProjectDir(process.cwd(), monaca);
-      },
-      util.fail
+      }
     )
     // Checking project directory.
     .then(
       function(directory) {
+        error = 'Unable to create monaca project: ';
         cwd = directory;
+        
         if (action === 'upload') {
           return lib.assureMonacaProject(cwd, monaca);
         }
-      },
-      util.fail.bind(null, 'Unable to ' + action + ' project: ')
+      }
     )
     // Assuring this is a Monaca-like project (if uploading).
     .then(
       function() {
-        return monaca[action + 'Project'](cwd, options);
-      },
-      util.fail.bind(null, 'Unable to create monaca project: ')
+        error = action.toUpperCase() + ' failed: ';
+        return monaca[action + 'Project'](cwd, options)
+          .progress(util.displayProgress);
+      }
     )
     // Uploading/Downloading project to Monaca Cloud.
     .then(
+      monaca.reportFinish.bind(monaca, report),
+      monaca.reportFail.bind(monaca, report)
+    )
+    // Reporting analytics
+    .then(
       lib.printSuccessMessage.bind(null, options),
-      util.fail.bind(null, action.toUpperCase() + ' failed: '),
-      util.displayProgress
+      util.fail.bind(null, error)
     );
 };
 
 SyncTask.clone = function(saveCloudProjectID) {
   util.print('Fetching project list...');
   var project;
+
+  var report = {
+    event: 'clone'
+  };
+  monaca.reportAnalytics(report);
 
   monaca.getProjects()
     .then(
@@ -99,47 +114,60 @@ SyncTask.clone = function(saveCloudProjectID) {
             }
           }
         ]
-        ).then(function(answers) {
-          project = projects[answers.projectIndex];
-          project.destPath = answers.destPath;
-          project.absolutePath = path.resolve(answers.destPath);
-
-          return project;
-        });
+        ).then(
+          function(answers) {
+            project = projects[answers.projectIndex];
+            project.destPath = answers.destPath;
+            project.absolutePath = path.resolve(answers.destPath);
+            
+            report.arg1 = project.name;
+            return project;
+          }
+        );
       }
     )
     // Waiting for user input - Destination directory.
     .then(
       function() {
         util.print((saveCloudProjectID ? 'Cloning' : 'Importing') + ' \'' + project.name + '\' to ' + project.absolutePath);
-
-        return monaca.cloneProject(project.projectId, project.destPath);
-      },
-      util.fail
+        return monaca.cloneProject(project.projectId, project.destPath)
+          .progress(util.displayProgress);
+      }
     )
     // Cloning project.
+    .then(
+      monaca.reportFinish.bind(monaca, report),
+      monaca.reportFail.bind(monaca, report)
+    )
+    // Reporting analytics
     .then(
       function() {
         util.success('\nProject successfully ' + (saveCloudProjectID ? 'cloned' : 'imported') + ' from Monaca Cloud!');
 
         if (saveCloudProjectID) {
-          monaca.setProjectId(project.absolutePath, project.projectId).catch(function(error) {
+          return monaca.setProjectId(project.absolutePath, project.projectId).catch(function(error) {
             util.err('\nProject is cloned to given location but Cloud project ID for this project could not be saved. \nThis project is not linked with corresponding project on Monaca Cloud.');
           });
         }
       },
-      util.fail.bind(null, '\nClone failed: '),
-      util.displayProgress
+      util.fail.bind(null, '\nClone failed: ')
     );
 };
 
 SyncTask.livesync = function() {
   var localkit, nwError = false;
 
+  var report = {
+    event: 'debug'
+  };
+  monaca.reportAnalytics(report);
+
   try {
     localkit = new Localkit(monaca, false);
   } catch (error) {
-    util.fail('Unable to start debug: ', error);
+    return monaca
+      .reportFail(report, 'Unable to start debug: ' + util.parseError(error))
+      .catch(util.fail);
   }
 
   if (Object.keys(localkit.pairingKeys).length == 0) {
@@ -224,26 +252,26 @@ SyncTask.livesync = function() {
     projects.push('.');
   }
 
+  var error = 'Unable to add projects: ';
   localkit.setProjects(projects)
     // Adding projects.
     .then(
       function() {
         // Starting file watching
+        error = 'Unable to start file watching: ';
         return localkit.startWatch();
-      },
-      util.fail.bind(null, 'Unable to add projects: ')
+      }
     )
     .then(
       function() {
         // Starting HTTP server
+        error = 'Unable to start HTTP server: ';
         return localkit.startHttpServer({ httpPort: argv.port });
-      },
-      util.fail.bind(null, 'Unable to start file watching: ')
+      }
     )
     // Starting HTTP server.
     .then(
       function(server) {
-
         // Send "exit" event when program is terminated.
         process.on('SIGINT', function() {
           util.print('Stopping debug...');
@@ -252,9 +280,9 @@ SyncTask.livesync = function() {
         }.bind(localkit.projectEvents));
 
         util.print('Waiting for Monaca Debugger connecting to ' + server.address + ':' + server.port + '.');
+        error = 'Unable to start beacon transmitter: ';
         return localkit.startBeaconTransmitter();
-      },
-      util.fail.bind(null, 'Unable to start HTTP server: ')
+      }
     )
     // Starting beacon transmiter.
     .then(
@@ -262,9 +290,11 @@ SyncTask.livesync = function() {
         if (nwError) {
           util.warn('\nNode Webkit is not installed, so inspector capabilities will be disabled.\nPlease run "npm install nw" and restart the debug.\n');
         }
-
-      },
-      util.fail.bind(null, 'Unable to start beacon transmitter: ')
+      }
+    )
+    .then(
+      monaca.reportFinish.bind(monaca, report),
+      monaca.reportFail.bind(monaca, report)
     );
 
 };
