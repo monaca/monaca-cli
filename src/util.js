@@ -34,6 +34,7 @@ var fail = function() {
 };
 
 var parseError = function(error) {
+  error = error || '';
   switch (typeof error) {
     case 'object':
       return Array.isArray(error) ? error.join('\n') : error.message;
