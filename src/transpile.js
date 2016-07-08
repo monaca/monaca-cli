@@ -18,19 +18,8 @@ TranspileTask.isValidProject = function(projectPath) {
 };
 
 TranspileTask.run = function(taskName) {
-  var projectDir = process.cwd();
-
-  if(!this.isValidProject(projectDir)) {
-    util.fail('This directory does not contains a valid project.');
-  }
-
-  if(!monaca.requireTranspile(projectDir)) {
-    util.fail('This project can not be transpiled.');
-  }
-
-  util.print('Transpiling Project: ' + projectDir);
-  return monaca.transpile(projectDir).then(
-    util.success.bind(null, 'Project has successfully transpiled.'),
+  return monaca.transpile(process.cwd()).then(
+    util.success.bind(null),
     util.fail.bind(null, 'Project has failed to transpile.')
   );
 };

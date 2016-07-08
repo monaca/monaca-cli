@@ -66,11 +66,17 @@
             });
         };
 
+        var removeSpecialChars = function(msg) {
+          return msg.replace(/\u001b\[.*?m/g, '')
+            .replace(/[^\w\s%/]/gi, '')
+            .replace(/[\n\s\t\r]+/gi, '');
+        }
+
         var childProcessBin;
         var childProcess;
         var childProcessColor = 'cyan';
 
-        if (monaca.requireTranspile(process.cwd())) {
+        if (monaca.isTranspileEnabled(process.cwd())) {
           // Webpack Route
           childProcessBin = monaca.getWebpackDevServerBinPath();
           childProcess = exec(childProcessBin + ' --progress --config ' + path.join(process.cwd(), 'webpack.dev.config.js') + (argv.port ? ' --port ' + argv.port : ''));
@@ -85,9 +91,7 @@
 
         childProcess.stdout.on('data', function(data) {
           fixLog(data).forEach(function(log) {
-            var msg = log.error.replace(/\u001b\[.*?m/g, '').replace(/[^\w\s%/]/gi, '').replace(/[\n\s\t\r]+/gi, '');
-            
-            if(msg !== '' || msg.indexOf('Error') > -1) {
+            if(removeSpecialChars(log.info) !== '') {
               process.stdout.write(log.info);
             }
           });
@@ -95,9 +99,7 @@
 
         childProcess.stderr.on('data', function(data) {
           fixLog(data).forEach(function(log) {
-            var msg = log.error.replace(/\u001b\[.*?m/g, '').replace(/[^\w\s%/]/gi, '').replace(/[\n\s\t\r]+/gi, '');
-
-            if(msg !== '') {
+            if(removeSpecialChars(log.error) !== '') {
               process.stderr.write(log.error);
             }
           });
