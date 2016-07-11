@@ -6,10 +6,10 @@ var Q = require('q');
 var _print = function(type, items) {
   var msg = '';
   for (var i = 0; i < items.length; i++) {
-    msg += parseError(items[i]);
+    msg += parseItem(items[i]);
   }
 
-  process.stderr.write((type ? msg[type] : msg) + '\n');
+  process[type === 'error' ? 'stderr' : 'stdout'].write((type ? msg[type] : msg) + '\n');
 };
 
 var println = function() {
@@ -33,16 +33,15 @@ var fail = function() {
   process.exit(1);
 };
 
-var parseError = function(error) {
-  error = error || '';
-  switch (typeof error) {
+var parseItem = function(item) {
+  item = item || '';
+  switch (typeof item) {
     case 'object':
-      return Array.isArray(error) ? error.join('\n') : error.message;
+      return item.message || '';
     default:
-      return error;
+      return item;
   }
 };
-
 
 var displayObjectKeys = function(object) {
   println(
@@ -159,7 +158,7 @@ module.exports = {
   warn: printwarn,
   success: printsuccess,
   fail: fail,
-  parseError: parseError,
+  parseError: parseItem,
   displayProgress: displayProgress,
   displayObjectKeys: displayObjectKeys,
   displayLoginErrors: displayLoginErrors,

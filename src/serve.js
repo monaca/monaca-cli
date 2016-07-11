@@ -12,8 +12,7 @@
     .default('open', true)
     .argv;
 
-  var ServeTask = {};
-  var monaca = new Monaca();
+  var ServeTask = {}, monaca;
 
   /*
    * Checks that directory contains www.
@@ -52,68 +51,71 @@
     return deferred.promise;
   };
 
-  ServeTask.run = function(taskName) {
-    this.assureCordovaProject(process.cwd()).then(
-      function() {
-        var fixLog = function(data) {
-          return data.toString()
-            .split('\n')
-            .filter(function(item) {
-              return item !== '';
-            })
-            .map(function(item) {
-              return item + '\n';
+  ServeTask.run = function(taskName, info) {
+    monaca = new Monaca(info);
+
+    var report = {
+      event: 'preview'
+    };
+    monaca.reportAnalytics(report);
+
+    this.assureCordovaProject(process.cwd())
+      .then(
+        function() {
+
+          var childProcessBin, childProcess;
+
+          var isTranspileEnabled = monaca.isTranspileEnabled(process.cwd());
+
+          if (isTranspileEnabled) {
+            // Webpack Route
+            childProcessBin = monaca.getWebpackDevServerBinPath();
+            childProcess = exec(childProcessBin + ' --progress --config ' + path.join(process.cwd(), 'webpack.dev.config.js') + (argv.port ? ' --port ' + argv.port : ''));
+          } else {
+            console.log('Launching HTTP Server');
+            // HTTP Server Route
+            childProcessBin = path.join(__dirname, 'serve', 'node_modules', 'http-server', 'bin', 'http-server');
+            childProcess = exec('node' + ' ' + childProcessBin + ' ' + path.join(process.cwd(), 'www') + ' -c-1 ' + (argv.open ? ' -o ' : '') + ' -p ' + (argv.port || 8000), {
+              cwd: __dirname
             });
-        };
-
-        var removeSpecialChars = function(msg) {
-          return msg.replace(/\u001b\[.*?m/g, '')
-            .replace(/[^\w\s%/]/gi, '')
-            .replace(/[\n\s\t\r]+/gi, '');
-        }
-
-        var childProcessBin;
-        var childProcess;
-        var childProcessColor = 'cyan';
-
-        if (monaca.isTranspileEnabled(process.cwd())) {
-          // Webpack Route
-          childProcessBin = monaca.getWebpackDevServerBinPath();
-          childProcess = exec(childProcessBin + ' --progress --config ' + path.join(process.cwd(), 'webpack.dev.config.js') + (argv.port ? ' --port ' + argv.port : ''));
-        } else {
-          console.log('Launching HTTP Server');
-          // HTTP Server Route
-          childProcessBin = path.join(__dirname, 'serve', 'node_modules', 'http-server', 'bin', 'http-server');
-          childProcess = exec('node' + ' ' + childProcessBin + ' ' + path.join(process.cwd(), 'www') + ' -c-1 ' + (argv.open ? ' -o ' : '') + ' -p ' + (argv.port || 8000), {
-            cwd: __dirname
-          });
-        }
-
-        childProcess.stdout.on('data', function(data) {
-          fixLog(data).forEach(function(log) {
-            if(removeSpecialChars(log.info) !== '') {
-              process.stdout.write(log.info);
-            }
-          });
-        });
-
-        childProcess.stderr.on('data', function(data) {
-          fixLog(data).forEach(function(log) {
-            if(removeSpecialChars(log.error) !== '') {
-              process.stderr.write(log.error);
-            }
-          });
-        });
-
-        childProcess.on('exit', function(code) {
-          if (code !== 0) {
-            childProcess.kill();
-            process.exit(code);
           }
-        });
-      },
-      util.fail.bind(null, 'Failed serving project: ')
-    );
+
+          childProcess.stdout.on('data', function(data) {
+            var message = data.toString();
+            if (isTranspileEnabled || !/^\[.+?\]\s+".+?"\s+"/.test(message)) {
+              if (message.startsWith('http://')) {
+                process.stdout.write('\n');
+              }
+              process.stdout.write(message.info);
+            }
+          });
+
+          childProcess.stderr.on('data', function(data) {
+            process.stderr.write(data.toString().error);
+          });
+
+          childProcess.on('exit', function(code) {
+            if (code !== 0) {
+              childProcess.kill();
+              process.exit(code);
+            }
+          });
+
+          if (process.platform === 'win32') {
+            var rl = require('readline').createInterface({
+              input: process.stdin,
+              output: process.stdout
+            });
+
+            rl.on('SIGINT', function() {
+              util.print('\nStopping http server...'.info);
+              exec('taskkill /pid ' + process.pid + ' /T /F');
+            });
+          }
+        },
+        monaca.reportFail.bind(monaca)
+      )
+    .catch(util.fail.bind(null, 'Failed serving project: '));
   };
 
   module.exports = ServeTask;
