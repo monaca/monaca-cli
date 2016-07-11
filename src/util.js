@@ -5,13 +5,8 @@ var Q = require('q');
 
 var _print = function(type, items) {
   var msg = '';
-
   for (var i = 0; i < items.length; i++) {
-    if (typeof items[i] === 'string') {
-      msg += items[i];
-    } else if (items[i] && typeof items[i] === 'object' && items[i].message) {
-      msg += items[i].message;
-    }
+    msg += parseError(items[i]);
   }
 
   process.stderr.write((type ? msg[type] : msg) + '\n');
@@ -37,6 +32,17 @@ var fail = function() {
   _print('error', arguments);
   process.exit(1);
 };
+
+var parseError = function(error) {
+  error = error || '';
+  switch (typeof error) {
+    case 'object':
+      return Array.isArray(error) ? error.join('\n') : error.message;
+    default:
+      return error;
+  }
+};
+
 
 var displayObjectKeys = function(object) {
   println(
@@ -153,6 +159,7 @@ module.exports = {
   warn: printwarn,
   success: printsuccess,
   fail: fail,
+  parseError: parseError,
   displayProgress: displayProgress,
   displayObjectKeys: displayObjectKeys,
   displayLoginErrors: displayLoginErrors,

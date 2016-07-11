@@ -9,11 +9,10 @@ var inquirer = require('monaca-inquirer'),
   lib = require(path.join(__dirname, 'lib')),
   util = require(path.join(__dirname, 'util'));
 
-var monaca = new Monaca();
+var AuthTask = {}, monaca;
 
-var AuthTask = {};
-
-AuthTask.run = function(taskName) {
+AuthTask.run = function(taskName, info) {
+  monaca = new Monaca(info)
   if (taskName == 'login') {
     return this.login();
   } else if (taskName === 'signup') {
@@ -69,34 +68,42 @@ AuthTask.login = function() {
       util.print('You are already signed in. Please sign out with \'monaca logout\' in order to sign in with another user.');
     },
     function() {
+      var report = {
+        event: 'login'
+      };
+      monaca.reportAnalytics(report);
+
       util.print('Use "monaca signup" command if you need to sign up.');
       util.print();
-      return this.getCredentials(false)
-      .then(
-        function(credentials) {
-          var pkg = require(path.join(__dirname, '..', 'package.json'));
 
-          return monaca.login(credentials.email, credentials.password, {
-            version: 'monaca-cli ' + pkg.version
-          });
-        },
-        util.fail
-      )
-      .then(
-        function() {
-          var user = monaca.loginBody;
-          if (user.hasOwnProperty('localkitEvaluationDays')) {
-            // Under evaluation period.
-            util.warn('Monaca CLI is under the evaluation period. It will expire in ' + user.localkitEvaluationDays + ' days.');
-            util.warn('You need to upgrade the plan when the evaluation period ends.');
+      return this.getCredentials(false)
+        .then(
+          function(credentials) {
+            var pkg = require(path.join(__dirname, '..', 'package.json'));
+
+            return monaca.login(credentials.email, credentials.password, {
+              version: 'monaca-cli ' + pkg.version
+            });
           }
-          util.success('\nSuccessfully signed in as ' + user.username + '.');
-        },
-        function(error) {
-          return lib.loginErrorHandler(error);
-        }
-      )
-      ;
+        )
+        .then(
+          monaca.reportFinish.bind(monaca, report),
+          monaca.reportFail.bind(monaca, report)
+        )
+        .then(
+          function() {
+            var user = monaca.loginBody;
+            if (user.hasOwnProperty('localkitEvaluationDays')) {
+              // Under evaluation period.
+              util.warn('Monaca CLI is under the evaluation period. It will expire in ' + user.localkitEvaluationDays + ' days.');
+              util.warn('You need to upgrade the plan when the evaluation period ends.');
+            }
+            util.success('\nSuccessfully signed in as ' + user.username + '.');
+          },
+          function(error) {
+            return lib.loginErrorHandler(error);
+          }
+        );
     }.bind(this)
   );
 };
@@ -126,6 +133,11 @@ AuthTask.signup = function() {
       util.print('You are signed in. Please sign out with \'monaca logout\' before creating a new account.');
     },
     function() {
+      var report = {
+        event: 'signup'
+      };
+      monaca.reportAnalytics(report);
+
       var credentials;
       this.getCredentials(true)
       .then(
@@ -136,8 +148,11 @@ AuthTask.signup = function() {
           return monaca.signup(credentials.email, credentials.password, credentials.confirmPassword, {
             version: 'monaca-cli ' + pkg.version
           });
-        },
-        util.fail
+        }
+      )
+      .then(
+        monaca.reportFinish.bind(monaca, report),
+        monaca.reportFail.bind(monaca, report)
       )
       .then(
         function(token) {
@@ -152,12 +167,15 @@ AuthTask.signup = function() {
               .then(function() {
                 if (deferred.promise.inspect().state === 'pending') {
                   clearInterval(intervalHandle);
-                  deferred.resolve();
+                  monaca.reportAnalytics({
+                    event: 'signup-complete'
+                  })
+                  .then(deferred.resolve.bind(deferred))
                 }
               }, function(error) {
                 if (error) {
                   clearInterval(intervalHandle);
-                  util.fail(error, '\nLooks like something went wrong. Plase try again later.');
+                  deferred.reject(util.parseError(error) + '\nLooks like something went wrong. Plase try again later.');
                 }
               });
           }, 3000);
@@ -169,8 +187,7 @@ AuthTask.signup = function() {
           });
 
           return deferred.promise;
-        },
-        util.fail
+        }
       )
       .then(
         function() {
@@ -180,7 +197,7 @@ AuthTask.signup = function() {
             version: 'monaca-cli ' + pkg.version
           });
         },
-        util.fail
+        monaca.reportFail.bind(monaca, report)
       )
       .then(
         function() {
