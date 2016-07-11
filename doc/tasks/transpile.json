@@ -1,0 +1,16 @@
+{
+  "transpile": {
+    "order": 100,
+    "description": "transpile project source code.",
+    "longDescription": [
+      "Transpiles projects that are transpilable.",
+      "For example: React and Angular2 projects."
+    ],
+    "usage": "monaca transpile",
+    "examples": [
+      "monaca transpile"
+    ],
+    "options": [],
+    "showInHelp": true
+  }
+}
