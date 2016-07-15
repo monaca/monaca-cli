@@ -10,7 +10,12 @@
     "examples": [
       "monaca transpile"
     ],
-    "options": [],
+    "options": [
+      [
+        "--generate-configs",
+        "Creates transpile configs, if missing, for projects that can be transpiled."
+      ],
+    ],
     "showInHelp": true
   }
 }
