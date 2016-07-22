@@ -3,7 +3,8 @@ var path = require('path'),
   util = require(path.join(__dirname, 'util')),
   Monaca = require('monaca-lib').Monaca,
   argv = require('optimist')
-    .alias('gc', 'generate-configs')
+    .alias('gc', 'generate-config')
+    .alias('dep', 'install-dependencies')
     .argv;
 
 var TranspileTask = {}, monaca;
@@ -19,9 +20,6 @@ TranspileTask.isValidProject = function(projectPath) {
   }
 };
 
-/*
- * Check if valid project directory.
- */
 TranspileTask.transpile = function(monaca, projectDir) {
   var report = {
     event: 'transpile'
@@ -36,16 +34,13 @@ TranspileTask.transpile = function(monaca, projectDir) {
     )
     .then(
       util.success.bind(null),
-      util.fail.bind(null, 'Project has failed to transpile.')
+      util.fail.bind(null, 'Project has failed to transpile. ')
     );
 };
 
-/*
- * Check if valid project directory.
- */
-TranspileTask.generateWebpackConfigs = function(monaca, projectDir) {
+TranspileTask.generateBuildConfigs = function(monaca, projectDir) {
   var report = {
-    event: 'transpileGenerateConfigs'
+    event: 'transpile-config'
   };
 
   monaca.reportAnalytics(report);
@@ -56,12 +51,26 @@ TranspileTask.generateWebpackConfigs = function(monaca, projectDir) {
       monaca.reportFail.bind(monaca, report)
     )
     .then(
-      function() {
-        util.success('Successfully created transpile configs.');
-      },
-      function() {
-        util.fail('Failed to create transpile configs.');
-      }
+      util.success.bind(null, 'Successfully generated transpile configuration files. '),
+      util.fail.bind(null, 'Failed to generate transpile configuration files. ')
+    );
+};
+
+TranspileTask.installBuildDependencies = function(monaca, projectDir) {
+  var report = {
+    event: 'transpile-dependencies'
+  };
+
+  monaca.reportAnalytics(report);
+
+  return monaca.installBuildDependencies(projectDir)
+    .then(
+      monaca.reportFinish.bind(monaca, report),
+      monaca.reportFail.bind(monaca, report)
+    )
+    .then(
+      util.success.bind(null, 'Installation finished. '),
+      util.fail.bind(null, 'Something went wrong when installing dependencies. ')
     );
 };
 
@@ -73,12 +82,14 @@ TranspileTask.run = function(taskName, info) {
     util.fail('This directory does not contains a valid project.');
   }
 
-  if(argv.gc && !monaca.isTranspilable(projectDir)) {
-    util.fail('Transpile configs can not be created for this project type.');
+  if(!monaca.isTranspilable(projectDir)) {
+    util.fail('This project is not transpilable.');
   }
 
   if(argv.gc) {
-    return this.generateWebpackConfigs(monaca, projectDir);
+    return this.generateBuildConfigs(monaca, projectDir);
+  } else if (argv.dep) {
+    return this.installBuildDependencies(monaca, projectDir);
   } else {
     return this.transpile(monaca, projectDir);
   }

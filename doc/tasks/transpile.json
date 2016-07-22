@@ -12,9 +12,13 @@
     ],
     "options": [
       [
-        "--generate-configs",
-        "Creates transpile configs, if missing, for projects that can be transpiled."
+        "--generate-config",
+        "Creates transpile configuration files, if missing, for projects that can be transpiled."
       ],
+      [
+        "--install-dependencies",
+        "Installs the missing dependencies needed for transpiling."
+      ]
     ],
     "showInHelp": true
   }
