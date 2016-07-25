@@ -3,6 +3,7 @@
 
   var path = require('path'),
     exec = require('child_process').exec,
+    extend = require('extend'),
     fs = require('fs'),
     Q = require('q'),
     util = require(path.join(__dirname, 'util')),
@@ -80,10 +81,10 @@
             // Webpack Route
             childProcessBin = monaca.getWebpackDevServerBinPath();
             childProcess = exec(childProcessBin + (argv.open ? ' --open' : '') + ' --progress --config ' + path.join(process.cwd(), 'webpack.dev.config.js'), {
-              env: {
+              env: extend({}, process.env, {
                 WP_HOST: host,
                 WP_PORT: argv.port
-              }
+              })
             });
           } else {
             // HTTP Server Route

@@ -31,11 +31,12 @@
   "dependencies": {
     "colors": "^0.6.2",
     "cordova": "^5.0.0",
+    "extend": "^2.0.0",
+    "monaca-inquirer": "^1.0.4",
     "monaca-lib": "^2.0.7",
     "open": "0.0.5",
     "optimist": "^0.6.1",
     "q": "^1.1.2",
-    "monaca-inquirer": "^1.0.4",
     "shelljs": "^0.3.0",
     "xmldom": "^0.1.19"
   }
