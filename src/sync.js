@@ -157,11 +157,6 @@ SyncTask.clone = function(saveCloudProjectID) {
 SyncTask.livesync = function() {
   var localkit, nwError = false;
 
-  var report = {
-    event: 'debug'
-  };
-  monaca.reportAnalytics(report);
-
   try {
     localkit = new Localkit(monaca, false);
   } catch (error) {
@@ -252,6 +247,18 @@ SyncTask.livesync = function() {
     projects.push('.');
   }
 
+  var report = {
+    event: 'debug',
+    arg1: JSON.stringify(projects)
+  };
+  monaca.reportAnalytics(report);
+
+  if (projects.length > 1) {
+    projects = [projects.shift()];
+    util.err('Only one project can be served at the same time. Serving ', projects[0]);
+  }
+
+
   var error = 'Unable to add projects: ';
   localkit.setProjects(projects)
     // Adding projects.
@@ -295,6 +302,21 @@ SyncTask.livesync = function() {
     .then(
       monaca.reportFinish.bind(monaca, report),
       monaca.reportFail.bind(monaca, report)
+    )
+    .then(
+      function() {
+        var options = {
+          watch: true,
+          cache: true
+        };
+
+        var promises = [];
+        projects.forEach(function(project) {
+          promises.push(monaca.transpile(project, options))
+        });
+
+        return Q.all(promises);
+      }
     );
 
 };
