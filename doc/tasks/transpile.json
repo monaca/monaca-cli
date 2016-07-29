@@ -1,6 +1,6 @@
 {
   "transpile": {
-    "order": 100,
+    "order": 60,
     "description": "transpile project source code.",
     "longDescription": [
       "Transpiles projects that are transpilable.",

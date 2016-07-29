@@ -4,6 +4,7 @@
 var path = require('path'),
   argv = require('optimist').argv,
   Monaca = require('monaca-lib').Monaca,
+  Q = require('q'),
   util = require(path.join(__dirname, 'util'));
 
 var ConfigTask = {}, monaca;
@@ -12,13 +13,51 @@ ConfigTask.run = function(taskName, info) {
   monaca = new Monaca(info);
   var command = argv._[1];
 
-  if (command === 'set' && argv._[2]) {
-    this.setProxy(argv._[2]);
-  } else if (command === 'rm' || command === 'remove') {
-    this.removeProxy();
-  } else {
-    this.showProxy();
+  if (taskName === 'proxy') {
+    if (command === 'set' && argv._[2]) {
+      this.setProxy(argv._[2]);
+    } else if (command === 'rm' || command === 'remove') {
+      this.removeProxy();
+    } else {
+      this.showProxy();
+    }
+  } else if (taskName === 'reconfigure') {
+    this.reconfigure();
   }
+};
+
+ConfigTask.reconfigure = function() {
+  var rawArgv = process.argv.slice(3)
+  var report = {
+    event: 'reconfigure',
+    arg1: rawArgv
+  };
+  monaca.reportAnalytics(report);
+
+  var promises = [];
+  var projectDir = process.cwd();
+
+  var dict = {
+    transpile: 'generateBuildConfigs',
+    components: 'initComponents',
+    dependencies: 'installBuildDependencies'
+  };
+
+  Object.keys(dict).forEach(function(action) {
+    if (rawArgv.length === 0 || argv[action]) {
+      promises.push(monaca[dict[action]](projectDir));
+    }
+  });
+
+  return Q.all(promises)
+    .then(
+      monaca.reportFinish.bind(monaca, report),
+      monaca.reportFail.bind(monaca, report)
+    )
+    .then(
+      util.success.bind(null, '\nReconfiguration finished. '),
+      util.fail.bind(null, '\nSomething went wrong during reconfiguration. ')
+    );
 };
 
 ConfigTask.showProxy = function() {
