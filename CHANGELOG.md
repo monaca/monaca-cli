@@ -2,6 +2,48 @@
 CHANGELOG
 ====
 
+v2.0.6
+----
+* Updated monaca-lib to support Cordova 6.2.0.
+
+v2.0.5
+----
+* Improved `create` command to show a preview of the template.
+* Minor fixes.
+* Implemented command analytics.
+* Updated monaca-lib for an important bug fix.
+
+v2.0.4
+----
+* Updated monaca-lib.
+* Combine SampleApps category with templates in `create` command.
+
+v2.0.3
+----
+* Dependencies fix.
+* Added --no-open parameter for `preview` command.
+
+v2.0.2
+----
+* Improved UI prompt.
+
+v2.0.1
+----
+* Fix for transpiling and remote build.
+
+v2.0.0
+----
+* Code refactored and some major API changes.
+* Improved UI with better prompt.
+* Improved connection performance and responsiveness.
+* Added transpiling support for React and Angular2 projects.
+* Removed some dependencies to speed up installation.
+* Implemented Sign-up command.
+* Added --output parameter for `remote build` command.
+* Removed Gulp. Added simple http-server for `preview` command.
+* Enhanced error message handling.
+* Minor bugs fixed.
+
 v1.2.10
 ----
 * monaca-login: Added optional email parameter.
