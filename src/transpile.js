@@ -24,9 +24,14 @@ TranspileTask.run = function(taskName, info) {
     util.fail('This directory does not contains a valid project.');
   }
 
+  if(!monaca.isTranspilable(projectDir)) {
+    util.fail('This project is not transpilable.');
+  }
+
   var report = {
     event: 'transpile'
   };
+
   monaca.reportAnalytics(report);
 
   return monaca.transpile(projectDir)
@@ -36,7 +41,7 @@ TranspileTask.run = function(taskName, info) {
     )
     .then(
       util.success.bind(null),
-      util.fail.bind(null, 'Project has failed to transpile.')
+      util.fail.bind(null, 'Project has failed to transpile. ')
     );
 };
 

@@ -3,6 +3,7 @@
 
   var path = require('path'),
     exec = require('child_process').exec,
+    extend = require('extend'),
     fs = require('fs'),
     Q = require('q'),
     util = require(path.join(__dirname, 'util')),
@@ -62,6 +63,15 @@
     this.assureCordovaProject(process.cwd())
       .then(
         function() {
+          var deferred = Q.defer();
+          require('dns').lookup(require('os').hostname(), 4, function(err, address) {
+            deferred.resolve(address || '127.0.0.1');
+          });
+          return deferred.promise;
+        }
+      )
+      .then(
+        function(host) {
 
           var childProcessBin, childProcess;
 
@@ -70,14 +80,16 @@
           if (isTranspileEnabled) {
             // Webpack Route
             childProcessBin = monaca.getWebpackDevServerBinPath();
-            childProcess = exec(childProcessBin + ' --progress --config ' + path.join(process.cwd(), 'webpack.dev.config.js') + (argv.port ? ' --port ' + argv.port : ''));
+            childProcess = exec(childProcessBin + (argv.open ? ' --open' : '') + ' --progress --config ' + path.join(process.cwd(), 'webpack.dev.config.js'), {
+              env: extend({}, process.env, {
+                WP_HOST: host,
+                WP_PORT: argv.port
+              })
+            });
           } else {
-            console.log('Launching HTTP Server');
             // HTTP Server Route
             childProcessBin = path.join(__dirname, 'serve', 'node_modules', 'http-server', 'bin', 'http-server');
-            childProcess = exec('node' + ' ' + childProcessBin + ' ' + path.join(process.cwd(), 'www') + ' -c-1 ' + (argv.open ? ' -o ' : '') + ' -p ' + (argv.port || 8000), {
-              cwd: __dirname
-            });
+            childProcess = exec('node' + ' ' + childProcessBin + ' ' + path.join(process.cwd(), 'www') + ' -c-1 ' + (argv.open ? ' -o ' : '') + ' -p ' + (argv.port || 8000));
           }
 
           childProcess.stdout.on('data', function(data) {
@@ -87,6 +99,14 @@
                 process.stdout.write('\n');
               }
               process.stdout.write(message.info);
+
+              if (/bundle is now VALID/.test(message)) {
+                process.stderr.write('\nHTTP server available on:'.verbose);
+                var address = '\n  http://localhost:' + (argv.port || 8000) + '/webpack-dev-server/'
+                process.stderr.write(address.replace('localhost', host).info);
+                process.stderr.write(address.replace('localhost', '127.0.0.1').info);
+                process.stderr.write('\nHit CTRL-C to stop the server\n');
+              }
             }
           });
 
