@@ -80,7 +80,15 @@
           if (isTranspileEnabled) {
             // Webpack Route
             childProcessBin = monaca.getWebpackDevServerBinPath();
-            childProcess = exec(childProcessBin + (argv.open ? ' --open' : '') + ' --progress --config ' + path.join(process.cwd(), 'webpack.dev.config.js'), {
+
+            // Webpack config file path
+            try {
+              var webpackConfig = monaca.getWebpackConfigFile(process.cwd(), 'dev');
+            } catch(error) {
+              return Q.reject(error);
+            }
+
+            childProcess = exec(childProcessBin + (argv.open ? ' --open' : '') + ' --progress --config ' + webpackConfig, {
               env: extend({}, process.env, {
                 WP_HOST: host,
                 WP_PORT: argv.port
