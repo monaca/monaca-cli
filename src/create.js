@@ -2,7 +2,6 @@
 'use strict';
 
 var fs = require('fs'),
-  argv = require('optimist').argv,
   path = require('path'),
   open = require('open'),
   Q = require('q'),
@@ -13,11 +12,12 @@ var fs = require('fs'),
   Monaca = require('monaca-lib').Monaca,
   util = require(path.join(__dirname, 'util'));
 
-var CreateTask = {}, monaca, report = { event: 'create' };
+var CreateTask = {}, monaca, report = { event: 'create' },
+  dirName = process.argv[process.argv.indexOf('create') + 1];
 
 CreateTask.run = function(taskName, info) {
   monaca = new Monaca(info);
-  fs.exists(path.resolve(argv._[1]), function(exists) {
+  fs.exists(path.resolve(dirName), function(exists) {
     if (exists) {
       util.fail('Directory already exists.');
     } else {
@@ -28,7 +28,6 @@ CreateTask.run = function(taskName, info) {
 };
 
 CreateTask.createApp = function(template) {
-  var dirName = argv._[1];
   var error = 'Error occurred while creating project: ';
   report.arg1 = template.name;
 
