@@ -60,7 +60,7 @@ SyncTask.load = function(action) {
       function(directory) {
         error = 'Unable to create monaca project: ';
         cwd = directory;
-        
+
         if (action === 'upload') {
           return lib.assureMonacaProject(cwd, monaca);
         }
@@ -119,7 +119,7 @@ SyncTask.clone = function(saveCloudProjectID) {
             project = projects[answers.projectIndex];
             project.destPath = answers.destPath;
             project.absolutePath = path.resolve(answers.destPath);
-            
+
             report.arg1 = project.name;
             return project;
           }
@@ -281,7 +281,7 @@ SyncTask.livesync = function() {
       function(server) {
         // Send "exit" event when program is terminated.
         process.on('SIGINT', function() {
-          util.print('Stopping debug...');
+          util.print('\nStopping debug...');
           this.sendExitEvent();
           process.exit(0);
         }.bind(localkit.projectEvents));
@@ -317,6 +317,9 @@ SyncTask.livesync = function() {
 
         return Q.all(promises);
       }
+    )
+    .catch(
+      util.fail.bind(null, error, '\n')
     );
 
 };
