@@ -2,6 +2,12 @@
 CHANGELOG
 ====
 
+v2.1.0
+----
+* Support hot reloading of React templates.
+* Support WebPack configurations.
+* Major changes in React and Angular 2 templates.
+
 v2.0.6
 ----
 * Updated monaca-lib to support Cordova 6.2.0.

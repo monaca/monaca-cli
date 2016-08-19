@@ -1,6 +1,6 @@
 {
   "name": "monaca",
-  "version": "2.0.5",
+  "version": "2.1.0",
   "description": "Monaca Command Line Tool",
   "bin": {
     "monaca": "bin/monaca"
@@ -33,7 +33,7 @@
     "cordova": "^5.0.0",
     "extend": "^2.0.0",
     "monaca-inquirer": "^1.0.4",
-    "monaca-lib": "^2.0.7",
+    "monaca-lib": "2.1.1",
     "open": "0.0.5",
     "optimist": "^0.6.1",
     "q": "^1.1.2",
