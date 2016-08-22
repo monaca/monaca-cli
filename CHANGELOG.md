@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v2.1.1
+----
+* Update monaca-lib version.
+* Preview: Show all possible IPv4 addresses.
+
 v2.1.0
 ----
 * Support hot reloading of React templates.
