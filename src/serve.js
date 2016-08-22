@@ -64,14 +64,14 @@
       .then(
         function() {
           var deferred = Q.defer();
-          require('dns').lookup(require('os').hostname(), 4, function(err, address) {
-            deferred.resolve(address || '127.0.0.1');
+          require('dns').lookup(require('os').hostname(), { family: 4, all: true } , function(err, addresses) {
+            deferred.resolve(addresses || []);
           });
           return deferred.promise;
         }
       )
       .then(
-        function(host) {
+        function(hosts) {
 
           var childProcessBin, childProcess;
 
@@ -90,7 +90,6 @@
 
             childProcess = exec(childProcessBin + (argv.open ? ' --open' : '') + ' --progress --config ' + webpackConfig, {
               env: extend({}, process.env, {
-                WP_HOST: host,
                 WP_PORT: argv.port
               })
             });
@@ -111,8 +110,10 @@
               if (/bundle is now VALID/.test(message)) {
                 process.stderr.write('\nHTTP server available on:'.verbose);
                 var address = '\n  http://localhost:' + (argv.port || 8000) + '/webpack-dev-server/'
-                process.stderr.write(address.replace('localhost', host).info);
                 process.stderr.write(address.replace('localhost', '127.0.0.1').info);
+                hosts.forEach(function(host) {
+                  process.stderr.write(address.replace('localhost', host.address).info);
+                });
                 process.stderr.write('\nHit CTRL-C to stop the server\n');
               }
             }
