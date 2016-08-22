@@ -1,6 +1,9 @@
 
 CHANGELOG
 ====
+v2.1.2
+----
+* New optional paramenter `--url` for `monaca create`.
 
 v2.1.1
 ----

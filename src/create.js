@@ -6,6 +6,7 @@ var fs = require('fs'),
   open = require('open'),
   Q = require('q'),
   inquirer = require('monaca-inquirer'),
+  argv = require('optimist').argv,
   XMLDom = require('xmldom').DOMParser,
   XMLSerializer = require('xmldom').XMLSerializer,
   serializer = new XMLSerializer(),
@@ -13,7 +14,7 @@ var fs = require('fs'),
   util = require(path.join(__dirname, 'util'));
 
 var CreateTask = {}, monaca, report = { event: 'create' },
-  dirName = process.argv[process.argv.indexOf('create') + 1];
+  dirName = argv._[argv._.indexOf('create') + 1];
 
 CreateTask.run = function(taskName, info) {
   monaca = new Monaca(info);
@@ -22,7 +23,14 @@ CreateTask.run = function(taskName, info) {
       util.fail('Directory already exists.');
     } else {
       monaca.reportAnalytics(report);
-      this.showTemplateQuestion();
+      if (argv.url) {
+        this.createApp({
+          name: 'Custom Template',
+          resource: argv.url
+        });
+      } else {
+        this.showTemplateQuestion();
+      }
     }
   }.bind(this));
 };

@@ -12,9 +12,15 @@
       "The specified project will be created in a directory",
       "given by the user."
     ],
-    "options": [],
+    "options": [
+      [
+        "--url",
+        "URL of a zip file containing a Monaca template."
+      ]
+    ],
     "examples": [
-      "monaca create myproject"
+      "monaca create myproject",
+      "monaca create myproject --url http://github.com/me/myproject/archive/master.zip"
     ]
   }
 }
