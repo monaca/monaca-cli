@@ -1,9 +1,12 @@
 
 CHANGELOG
 ====
+
 v2.1.2
 ----
 * New optional paramenter `--url` for `monaca create`.
+* Fix path issues when using NVM or similar.
+* Improve WebPack output in development mode.
 
 v2.1.1
 ----

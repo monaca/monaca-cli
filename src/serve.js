@@ -2,8 +2,8 @@
   'use strict';
 
   var path = require('path'),
-    exec = require('child_process').exec,
     extend = require('extend'),
+    open = require('open'),
     fs = require('fs'),
     Q = require('q'),
     util = require(path.join(__dirname, 'util')),
@@ -15,43 +15,6 @@
 
   var ServeTask = {}, monaca;
 
-  /*
-   * Checks that directory contains www.
-   * If it does it will copy package.json and gulpfile.js from the templates folder
-   * if needed.
-   */
-  ServeTask.assureCordovaProject = function(projectPath) {
-    var deferred = Q.defer();
-
-    fs.exists(path.join(projectPath, 'www'), function(exists) {
-      if (!exists) {
-        deferred.reject('Directory doesn\'t contain a www/ folder.');
-      } else {
-        var httpServerBin = path.join(__dirname, 'serve', 'node_modules', '.bin', 'http-server');
-
-        fs.exists(httpServerBin, function(exists) {
-          if (exists) {
-            deferred.resolve();
-          } else {
-            util.print('Installing packages. Please wait. This might take a couple of minutes.\n');
-
-            var npmProcess = exec('npm install --loglevel error', {
-              cwd: path.join(__dirname, 'serve')
-            });
-
-            npmProcess.stdout.on('data', util.print);
-            npmProcess.stderr.on('data', util.err);
-            npmProcess.on('exit', function(code) {
-              code === 0 ? deferred.resolve() : deferred.reject('Failed installing packages.');
-            });
-          }
-        });
-      }
-    });
-
-    return deferred.promise;
-  };
-
   ServeTask.run = function(taskName, info) {
     monaca = new Monaca(info);
 
@@ -60,7 +23,7 @@
     };
     monaca.reportAnalytics(report);
 
-    this.assureCordovaProject(process.cwd())
+    monaca.isCordovaProject(process.cwd())
       .then(
         function() {
           var deferred = Q.defer();
@@ -71,79 +34,98 @@
         }
       )
       .then(
-        function(hosts) {
-
-          var childProcessBin, childProcess;
-
+        function(ifaces) {
+          var port;
           var isTranspileEnabled = monaca.isTranspileEnabled(process.cwd());
 
-          if (isTranspileEnabled) {
-            // Webpack Route
-            childProcessBin = monaca.getWebpackDevServerBinPath();
+          // Log information about IP addresses and opens browser if requested.
+          var logAndOpen = function() {
+            var canonicalHost = '127.0.0.1';
+            var address = 'http://' + canonicalHost + ':' + port
+              + (isTranspileEnabled ? '/webpack-dev-server/' : '');
 
-            // Webpack config file path
-            try {
-              var webpackConfig = monaca.getWebpackConfigFile(process.cwd(), 'dev');
-            } catch(error) {
-              return Q.reject(error);
-            }
+            process.stdout.write('HTTP server available on:'.yellow);
+            process.stdout.write('\n  ' + address.green);
 
-            childProcess = exec(childProcessBin + (argv.open ? ' --open' : '') + ' --progress --config ' + webpackConfig, {
-              env: extend({}, process.env, {
-                WP_PORT: argv.port
-              })
+            ifaces.forEach(function(iface) {
+              process.stdout.write('\n  ' + address.replace(canonicalHost, iface.address).green);
             });
-          } else {
-            // HTTP Server Route
-            childProcessBin = path.join(__dirname, 'serve', 'node_modules', 'http-server', 'bin', 'http-server');
-            childProcess = exec('node' + ' ' + childProcessBin + ' ' + path.join(process.cwd(), 'www') + ' -c-1 ' + (argv.open ? ' -o ' : '') + ' -p ' + (argv.port || 8000));
-          }
 
-          childProcess.stdout.on('data', function(data) {
-            var message = data.toString();
-            if (isTranspileEnabled || !/^\[.+?\]\s+".+?"\s+"/.test(message)) {
-              if (message.startsWith('http://')) {
+            process.stdout.write('\nHit CTRL-C to stop the server\n\n');
+
+            if (argv.open) {
+              open(address);
+            }
+          };
+
+          // Make sure the logs only appear at the end of the process.
+          var hookStdout = function() {
+            var originalWrite = process.stdout.write
+
+            process.stdout.write = function(string) {
+              originalWrite.apply(process.stdout, arguments)
+              if (/bundle is now VALID/.test(string)) {
+                process.stdout.write = originalWrite;
                 process.stdout.write('\n');
+                logAndOpen();
               }
-              process.stdout.write(message.info);
+            };
+          };
 
-              if (/bundle is now VALID/.test(message)) {
-                process.stderr.write('\nHTTP server available on:'.verbose);
-                var address = '\n  http://localhost:' + (argv.port || 8000) + '/webpack-dev-server/'
-                process.stderr.write(address.replace('localhost', '127.0.0.1').info);
-                hosts.forEach(function(host) {
-                  process.stderr.write(address.replace('localhost', host.address).info);
-                });
-                process.stderr.write('\nHit CTRL-C to stop the server\n');
+
+          if (isTranspileEnabled) {
+
+            // Webpack Dev Server
+            var webpack = require(path.join(monaca.userCordova, 'node_modules', 'webpack'));
+            var webpackConfig = require(monaca.getWebpackConfigFile(process.cwd(), 'dev'));
+            var webpackDevServer = require(path.join(monaca.userCordova, 'node_modules', 'webpack-dev-server'));
+
+            var server = new webpackDevServer(webpack(webpackConfig), webpackConfig.devServer);
+
+            port = argv.port || webpackConfig.devServer.port || 8000;
+            server.listen(port, '0.0.0.0', hookStdout);
+
+          } else {
+
+            // HTTP Server
+            var httpServer = require('http-server');
+
+            var server = httpServer.createServer({
+              root: path.join(process.cwd(), 'www'),
+              cache: -1,
+              logFn: function (req, res, error) {
+                if (error) {
+                  console.log(
+                    '[%s] "%s %s" Error (%s): "%s"',
+                    new Date(), req.method.red, req.url.red,
+                    error.status.toString().red, error.message.red
+                  );
+                }
               }
-            }
-          });
+            });
 
-          childProcess.stderr.on('data', function(data) {
-            process.stderr.write(data.toString().error);
-          });
-
-          childProcess.on('exit', function(code) {
-            if (code !== 0) {
-              childProcess.kill();
-              process.exit(code);
-            }
-          });
+            port = argv.port || 8000;
+            server.listen(port, '0.0.0.0', logAndOpen);
+          }
 
           if (process.platform === 'win32') {
-            var rl = require('readline').createInterface({
+            require('readline').createInterface({
               input: process.stdin,
               output: process.stdout
-            });
-
-            rl.on('SIGINT', function() {
-              util.print('\nStopping http server...'.info);
-              exec('taskkill /pid ' + process.pid + ' /T /F');
+            }).on('SIGINT', function() {
+              process.emit('SIGINT')
             });
           }
-        },
-        monaca.reportFail.bind(monaca)
+
+          var exitProcess = function() {
+            process.stdout.write('\nStopping http server...\n'.red);
+            process.exit();
+          };
+          process.on('SIGINT', exitProcess);
+          process.on('SIGTERM', exitProcess);
+        }
       )
+    .catch(monaca.reportFail.bind(monaca, report))
     .catch(util.fail.bind(null, 'Failed serving project: '));
   };
 
