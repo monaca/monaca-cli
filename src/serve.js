@@ -35,14 +35,13 @@
       )
       .then(
         function(ifaces) {
-          var childProcessBin, childProcess, port;
+          var port;
           var isTranspileEnabled = monaca.isTranspileEnabled(process.cwd());
 
           // Log information about IP addresses and opens browser if requested.
           var logAndOpen = function() {
-            var canonicalHost = '127.0.0.1',
-              protocol = 'http';
-            var address = protocol + '://' + canonicalHost + ':' + port
+            var canonicalHost = '127.0.0.1';
+            var address = 'http://' + canonicalHost + ':' + port
               + (isTranspileEnabled ? '/webpack-dev-server/' : '');
 
             process.stdout.write('HTTP server available on:'.yellow);
@@ -119,7 +118,7 @@
           }
 
           var exitProcess = function() {
-            process.stdout.write('Stopping http server...\n'.red);
+            process.stdout.write('\nStopping http server...\n'.red);
             process.exit();
           };
           process.on('SIGINT', exitProcess);
