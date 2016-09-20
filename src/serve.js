@@ -6,6 +6,7 @@
     open = require('open'),
     fs = require('fs'),
     Q = require('q'),
+    portfinder = require('portfinder'),
     util = require(path.join(__dirname, 'util')),
     Monaca = require('monaca-lib').Monaca,
     argv = require('optimist')
@@ -26,16 +27,34 @@
     monaca.isCordovaProject(process.cwd())
       .then(
         function() {
-          var deferred = Q.defer();
+          // ifaces
+          var deferredAddresses = Q.defer();
           require('dns').lookup(require('os').hostname(), { family: 4, all: true } , function(err, addresses) {
-            deferred.resolve(addresses || []);
+            if (err) {
+              util.warn(err);
+            }
+            deferredAddresses.resolve(addresses || []);
           });
-          return deferred.promise;
+
+          // port
+          var deferredPort = Q.defer();
+          portfinder.basePort = argv.port || 8000;
+          portfinder.getPort(function(err, port) {
+            if (err) {
+              return deferredPort.reject(err);
+            }
+            if (argv.port && argv.port !== port) {
+              util.warn('The specified port ' + argv.port + ' is already in use. Using available port ' + port + ' instead.\n');
+            }
+            deferredPort.resolve(port);
+          });
+
+          return Q.all([deferredAddresses.promise, deferredPort.promise]);
         }
       )
       .then(
-        function(ifaces) {
-          var port;
+        function(info) {
+          var ifaces = info[0], port = info[1];
           var isTranspileEnabled = monaca.isTranspileEnabled(process.cwd());
 
           // Log information about IP addresses and opens browser if requested.
@@ -78,11 +97,10 @@
             // Webpack Dev Server
             var webpack = require(path.join(monaca.userCordova, 'node_modules', 'webpack'));
             var webpackConfig = require(monaca.getWebpackConfigFile(process.cwd(), 'dev'));
-            var webpackDevServer = require(path.join(monaca.userCordova, 'node_modules', 'webpack-dev-server'));
+            var WebpackDevServer = require(path.join(monaca.userCordova, 'node_modules', 'webpack-dev-server'));
 
-            var server = new webpackDevServer(webpack(webpackConfig), webpackConfig.devServer);
+            var server = new WebpackDevServer(webpack(webpackConfig), webpackConfig.devServer);
 
-            port = argv.port || webpackConfig.devServer.port || 8000;
             server.listen(port, '0.0.0.0', hookStdout);
 
           } else {
@@ -104,7 +122,6 @@
               }
             });
 
-            port = argv.port || 8000;
             server.listen(port, '0.0.0.0', logAndOpen);
           }
 
