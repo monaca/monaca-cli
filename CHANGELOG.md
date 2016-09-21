@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.1.3
+----
+* Find another port when the first one is in use.
+
 v2.1.2
 ----
 * New optional paramenter `--url` for `monaca create`.
