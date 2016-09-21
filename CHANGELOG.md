@@ -5,6 +5,7 @@ CHANGELOG
 v2.1.3
 ----
 * Find another port when the first one is in use.
+* Added command aliases.
 
 v2.1.2
 ----

@@ -25,6 +25,7 @@
         "Do not open browser"
       ]
     ],
-    "showInHelp": true
+    "showInHelp": true,
+    "aliases": ["serve"]
   }
 }
