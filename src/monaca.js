@@ -46,8 +46,12 @@ var Monaca = {
       for (var taskSet in taskList) {
         if (taskList.hasOwnProperty(taskSet)) {
           for (var taskName in taskList[taskSet]) {
-            if (taskName === task.name && taskList[taskSet].hasOwnProperty(taskName)) {
+            if (taskList[taskSet].hasOwnProperty(taskName) && (taskName === task.name
+                || ((taskList[taskSet][taskName].aliases || []).indexOf(task.name) !== -1))
+              ) {
+
               task.set = taskSet;
+              task.name = taskName;
               return task;
             }
           }
@@ -109,15 +113,19 @@ var Monaca = {
     util.print('Usage: monaca command [args]\n');
   },
   printCommands: function(showAll) {
+    showAll = !!showAll;
     util.print('Commands: (use --all to show all)\n');
 
-    showAll = showAll || false;
-
+    var taskMaxLength = 0;
     var tasks = Object.keys(taskList)
       .map(function(taskSet) {
         return Object.keys(taskList[taskSet]).map(function(taskName) {
           var task = taskList[taskSet][taskName];
-          if (task.showInHelp !== false || showAll === true) {
+          if (task.showInHelp !== false || showAll) {
+            if (showAll && task.aliases) {
+              taskName += ' | ' + task.aliases.join(' | ');
+            }
+            taskMaxLength = Math.max(taskMaxLength, taskName.length + 3);
             return [taskName, task];
           } else {
             return ['', ''];
@@ -134,14 +142,14 @@ var Monaca = {
     tasks
       .sort(function(a, b) {
         var a_key = a[0];
-        if (a[1].order < b[1].order) return -1;         
+        if (a[1].order < b[1].order) return -1;
         if (a[1].order > b[1].order) return 1;
         return 0;
       })
     .forEach(function(task) {
       var cmd = task[0],
         desc = task[1].description,
-        dots = new Array(15 - cmd.length).join('.');
+        dots = new Array(Math.max(15, taskMaxLength) - cmd.length).join('.');
       util.print('  ' + cmd.bold.info + '  ' + dots.grey + '  ' + desc.bold);
     });
 

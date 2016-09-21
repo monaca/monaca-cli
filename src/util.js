@@ -102,13 +102,17 @@ var displayHelp = function(taskName, taskList) {
     process.exit(1);
   }
 
-  println('Usage: ' + task.usage + '\n');
+  println('Usage: '.info + task.usage + '\n');
+
+  if (task.aliases) {
+    println('Aliases: '.info + taskName + ' | ' + task.aliases.join(' | ') + '\n');
+  }
 
   if (task.longDescription) {
     var lines = [];
 
     desc = task.longDescription;
-    println('Description:\n');
+    println('Description:\n'.info);
 
     if (desc instanceof Array) {
       lines = desc;
@@ -126,7 +130,7 @@ var displayHelp = function(taskName, taskList) {
   }
 
   if (task.options) {
-    println('Options:\n');
+    println('Options:\n'.info);
     for (i = 0; i < task.options.length; i++) {
       var option = task.options[i],
         param = option[0],
@@ -140,7 +144,7 @@ var displayHelp = function(taskName, taskList) {
   }
 
   if (task.examples) {
-    println('Examples:\n');
+    println('Examples:\n'.info);
 
     for (i = 0; i < task.examples.length; i++) {
       var example = task.examples[i];
