@@ -5,6 +5,7 @@ var path = require('path'),
   argv = require('optimist').argv,
   Monaca = require('monaca-lib').Monaca,
   Q = require('q'),
+  lib = require(path.join(__dirname, 'lib')),
   util = require(path.join(__dirname, 'util'));
 
 var ConfigTask = {}, monaca;
@@ -34,22 +35,25 @@ ConfigTask.reconfigure = function() {
   };
   monaca.reportAnalytics(report);
 
-  var promises = [];
   var projectDir = process.cwd();
 
-  var dict = {
-    transpile: 'generateBuildConfigs',
-    components: 'initComponents',
-    dependencies: 'installBuildDependencies'
-  };
+  return lib.assureMonacaProject(projectDir, monaca)
+    .then(function() {
+      var promises = [];
+      var dict = {
+        transpile: 'generateBuildConfigs',
+        components: 'initComponents',
+        dependencies: 'installBuildDependencies'
+      };
 
-  Object.keys(dict).forEach(function(action) {
-    if (rawArgv.length === 0 || argv[action]) {
-      promises.push(monaca[dict[action]](projectDir));
-    }
-  });
+      Object.keys(dict).forEach(function(action) {
+        if (rawArgv.length === 0 || argv[action]) {
+          promises.push(monaca[dict[action]](projectDir));
+        }
+      });
 
-  return Q.all(promises)
+      return Q.all(promises);
+    })
     .then(
       monaca.reportFinish.bind(monaca, report),
       monaca.reportFail.bind(monaca, report)
