@@ -37,7 +37,7 @@ ConfigTask.reconfigure = function() {
 
   var projectDir = process.cwd();
 
-  return lib.assureMonacaProject(projectDir, monaca)
+  return monaca.isCordovaProject(projectDir, ['.monaca'])
     .then(function() {
       var promises = [];
       var dict = {
