@@ -2,6 +2,15 @@
 CHANGELOG
 ====
 
+v2.1.5
+----
+* Update monaca-lib version.
+* Assure Monaca project before reconfigure to handle errors.
+
+v2.1.4
+----
+* Update monaca-lib version.
+
 v2.1.3
 ----
 * Find another port when the first one is in use.
