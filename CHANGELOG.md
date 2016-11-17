@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v2.1.6
+----
+* Update monaca-lib version.
+* Fixed Monaca project check issue.
+
 v2.1.5
 ----
 * Update monaca-lib version.
