@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.1.7
+----
+* Update monaca-lib version.
+
 v2.1.6
 ----
 * Update monaca-lib version.
