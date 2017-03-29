@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v2.2.0
+----
+* Update monaca-lib version in order to support new templates.
+* Fix template dependencies.
+
 v2.1.7
 ----
 * Update monaca-lib version.
