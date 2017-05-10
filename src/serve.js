@@ -79,7 +79,7 @@
 
           // Make sure the logs only appear at the end of the process.
           var hookStdout = function() {
-            var originalWrite = process.stdout.write
+            var originalWrite = process.stdout.write;
 
             process.stdout.write = function(string) {
               originalWrite.apply(process.stdout, arguments)
@@ -93,16 +93,39 @@
 
 
           if (isTranspileEnabled) {
+            var webpack, webpackConfig, modulesPath, server;
 
-            // Webpack Dev Server
-            var webpack = require(path.join(monaca.userCordova, 'node_modules', 'webpack'));
-            var webpackConfig = require(monaca.getWebpackConfigFile(process.cwd(), 'dev'));
-            var WebpackDevServer = require(path.join(monaca.userCordova, 'node_modules', 'webpack-dev-server'));
+            if(monaca.isEjected(process.cwd())){
+              modulesPath = process.cwd();
+            } else {
+              process.env.modulesPath = '.cordova';
+              modulesPath = monaca.userCordova;
+            }
 
-            var server = new WebpackDevServer(webpack(webpackConfig), webpackConfig.devServer);
+            var WebpackDevServer = require(path.join(modulesPath, 'node_modules', 'webpack-dev-server'));
 
+            if(monaca.webpackVersion() == 2) {
+              process.env.NODE_ENV = 'development';
+              webpack = require(path.join(modulesPath, 'node_modules', 'webpack'));
+              if(fs.existsSync(path.join(modulesPath, 'webpack.config.js'))) {
+                webpackConfig = require(path.join(modulesPath, 'webpack.config.js'));
+              } else {
+                webpackConfig = require(monaca.getWebpackPath());
+              }
+            } else {
+              if (monaca.isEjected(process.cwd())) {
+                webpack = require(path.join(modulesPath, 'node_modules', 'webpack'));
+                webpackConfig = require(monaca.getWebpackConfigFile(process.cwd(), 'dev'));
+              } else {
+                var errorMessage = 'This version of webpack can be used only with dependencies stored locally.\n' +
+                                   'Please use monaca eject command in order to continue.\n'+
+                                   'You can find more information at migration guide';
+                throw new Error(errorMessage);
+              }
+            }
+
+            server = new WebpackDevServer(webpack(webpackConfig), webpackConfig.devServer);
             server.listen(port, '0.0.0.0', hookStdout);
-
           } else {
 
             // HTTP Server
