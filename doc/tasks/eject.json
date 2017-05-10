@@ -1,0 +1,18 @@
+{
+  "eject": {
+    "order": 71,
+    "description": "move all dependencies and webpack configuration to project directory",
+    "longDescription": [
+      "Moving and installing webpack specific dependencies into",
+      "project directory, generate webpack config and modify package.json"
+    ],
+    "usage": [
+      "ejecting project"
+    ],
+    "options": [
+    ],
+    "examples": [
+      "monaca eject"
+    ]
+  }
+}
