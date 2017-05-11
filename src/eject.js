@@ -30,7 +30,7 @@
       var promises = [];
       var actions = [];
 
-      if(monaca.webpackVersion() == 2) {
+      if(monaca.getWebpackVersion(process.cwd()) === 2) {
         actions.push('generateBuildConfig');
       }
 
@@ -39,7 +39,7 @@
       actions.push('markAsEjected');
 
       actions.forEach(function(action) {
-        promises.push(monaca[dict[action]](projectDir));
+        promises.push(monaca[action](projectDir));
       });
 
       return Q.all(promises);
@@ -50,7 +50,7 @@
     )
     .then(
       util.success.bind(null, '\nProject is ejected. '),
-      util.fail.bind(null, '\nSomething went wrong during ejectction. ')
+      util.fail.bind(null, '\nSomething went wrong during ejection. ')
     );
   }
   module.exports = EjectTask;

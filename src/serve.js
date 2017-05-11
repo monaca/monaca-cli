@@ -98,19 +98,20 @@
             if(monaca.isEjected(process.cwd())){
               modulesPath = process.cwd();
             } else {
-              process.env.modulesPath = '.cordova';
+              process.env.MODULES_PATH = '.cordova';
               modulesPath = monaca.userCordova;
             }
 
             var WebpackDevServer = require(path.join(modulesPath, 'node_modules', 'webpack-dev-server'));
 
-            if(monaca.webpackVersion() == 2) {
+            if(monaca.getWebpackVersion(process.cwd()) === 2) {
               process.env.NODE_ENV = 'development';
               webpack = require(path.join(modulesPath, 'node_modules', 'webpack'));
-              if(fs.existsSync(path.join(modulesPath, 'webpack.config.js'))) {
-                webpackConfig = require(path.join(modulesPath, 'webpack.config.js'));
+
+              if(monaca.isEjected(process.cwd())) {
+                webpackConfig = require(path.join(process.cwd(), 'webpack.config.js'));
               } else {
-                webpackConfig = require(monaca.getWebpackPath());
+                webpackConfig = require(monaca.getWebpack2ConfigFile(process.cwd()));
               }
             } else {
               if (monaca.isEjected(process.cwd())) {
