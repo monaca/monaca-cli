@@ -83,7 +83,7 @@
 
             process.stdout.write = function(string) {
               originalWrite.apply(process.stdout, arguments)
-              if (/bundle is now VALID/.test(string)) {
+              if (/bundle is now VALID|webpack: Compiled successfully/.test(string)) {
                 process.stdout.write = originalWrite;
                 process.stdout.write('\n');
                 logAndOpen();
