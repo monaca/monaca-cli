@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.2.1
+----
+* Fixed missing information log on project preview.
+
 v2.2.0
 ----
 * Update monaca-lib version in order to support new templates.
