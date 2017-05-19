@@ -4,7 +4,7 @@ CHANGELOG
 
 v2.2.1
 ----
-* Fixed missing information log on project preview.
+* Fixed automatic browser opening and missing log on project preview.
 
 v2.2.0
 ----
