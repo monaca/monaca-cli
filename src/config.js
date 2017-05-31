@@ -127,29 +127,29 @@ ConfigTask.removeProxy = function() {
 
 ConfigTask.setAPIEndpoint = function(APIEndpoint) {
   var report = {
-    event: 'apiEndpoint'
+    event: 'api_endpoint'
   };
 
-  monaca.setConfig('apiEndpoint', APIEndpoint)
+  monaca.setConfig('api_endpoint', APIEndpoint)
   .then(
     monaca.reportAnalytics.bind(monaca, report),
     monaca.reportFail.bind(monaca, report)
   )
   .then(
     function(result) {
-      util.success('API Endpoint set to "' + result + '".');
+      util.success('API endpoint set to "' + result + '".');
     },
-    util.fail.bind(null, 'Unable to set API Endpoint: ')
+    util.fail.bind(null, 'Unable to set API endpoint: ')
   );
 };
 
 ConfigTask.removeAPIEndpoint = function() {
-  monaca.removeConfig('apiEndpoint').then(
+  monaca.removeConfig('api_endpoint').then(
     function(result) {
       if (result) {
-        util.print('Removed API Endpoint "' + result + '".');
+        util.print('Removed API endpoint "' + result + '".');
       } else {
-        util.print('No API Endpoint configured.');
+        util.print('No API endpoint configured.');
       }
     },
     util.fail.bind(null, 'Unable to remove API Endpoint: ')
@@ -157,12 +157,12 @@ ConfigTask.removeAPIEndpoint = function() {
 };
 
 ConfigTask.showAPIEndpoint = function() {
-  monaca.getConfig('apiEndpoint').then(
+  monaca.getConfig('api_endpoint').then(
     function(result) {
       if (!result) {
-        util.print('No custom API Endpoint configured. Set an API Endpoint with "monaca config endpoint my.endpoint.com".');
+        util.print('No custom API endpoint configured. Set an API endpoint with "monaca config endpoint my.endpoint.com".');
       } else {
-        util.print('Current API Endpoint is "' + result + '".');
+        util.print('Current API endpoint is "' + result + '".');
       }
     },
     util.fail.bind(null, 'Unable to get configuration: ')
