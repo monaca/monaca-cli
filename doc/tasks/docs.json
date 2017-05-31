@@ -1,16 +1,11 @@
 {
   "docs": {
     "order": 90,
-    "description": "Displays documentation of CLI and Onsen UI",
+    "description": "Displays documentation of Monaca CLI and Onsen UI",
     "longDescription": [
-      "Displays website with documentation of monaca CLI,",
-      "main website and tutorial of Onsen UI framework"
+      "Displays docs for MonacaLCLI, Onsen UI and Tutorials"
     ],
-    "usage": [
-      "monaca docs onsen",
-      " monaca docs tutorial",
-      " monaca docs usage"
-    ],
+    "usage": "monaca docs <options>",
 
     "examples": [
       "monaca docs onsen",
@@ -20,7 +15,7 @@
     "options": [
       [
         "onsen",
-        "Open Onsen UI website in the browser window"
+        "Open Onsen UI documentation in the browser window"
       ],
       [
         "tutorial",
@@ -28,7 +23,7 @@
       ],
       [
         "usage",
-        "Open monaca CLI documentation in the browser window"
+        "Open Monaca CLI documentation in the browser window"
       ]
     ],
     "showInHelp": true
