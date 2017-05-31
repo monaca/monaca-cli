@@ -94,7 +94,7 @@ RemoteTask.build = function() {
     .then(
       function() {
         if (argv.browser) {
-          var url = 'https://ide.monaca.mobi/project/' + projectInfo.projectId + '/' + (argv['debugger'] ? 'debugger' : 'build');
+          var url = monaca.apiRoot.match(/https(.*)\//)[0] + '/project/' + projectInfo.projectId + '/' + (argv['debugger'] ? 'debugger' : 'build');
           return monaca.getSessionUrl(url)
             .then(
               function(url) {
