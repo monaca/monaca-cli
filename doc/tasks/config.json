@@ -1,21 +1,44 @@
 {
-  "proxy": {
+  "config": {
     "order": 50,
-    "description": "configure proxy to use when connecting to Monaca Cloud",
+    "description": "manage Monaca configuration",
     "longDescription": [
-      "Configure a proxy server.",
-      "",
-      "The proxy server is defined as \"http://my.proxy.com:8080\"."
+      "Manage proxy and API endpoint configuration"
     ],
     "usage": [
-      "monaca proxy"
+      "monaca config [<options>]"
+    ],
+    "options": [
+      [
+        "proxy <url>",
+        "If <url> is unset, the current proxy server will be displayed"
+      ],
+      [
+        "endpoint <url>",
+        "If <url> is unset, the current API endpoint will be displayed"
+      ],
+      [
+        "",
+        ""
+      ],
+      [
+        "--help",
+        "Display config helper"
+      ],
+      [ "--reset",
+        "Reset to the default value"
+      ]
     ],
     "examples": [
-      "monaca proxy set http://my.proxy.com:8080",
-      "monaca proxy rm"
+      "monaca config --help\n",
+      "monaca config proxy",
+      "monaca config proxy http://my.proxy.com:8080",
+      "monaca config proxy --reset\n",
+      "monaca config endpoint",
+      "monaca config endpoint my.endpoint.com",
+      "monaca config endpoint --reset"
     ]
   },
-
   "reconfigure": {
     "order": 70,
     "description": "generate default project configurations",
