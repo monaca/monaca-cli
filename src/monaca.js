@@ -85,7 +85,6 @@ var Monaca = {
       || (task.name === 'docs' && argv._.length < 2)
       || (task.name === 'remote build' && !argv.browser && argv._.length < 3)
       || (task.name === 'config' && !argv.reset && argv._.length < 2)) {
-
       util.displayHelp(task.name, taskList[task.set]);
       process.exit(0);
     }
