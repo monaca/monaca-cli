@@ -14,13 +14,30 @@ ConfigTask.run = function(taskName, info) {
   monaca = new Monaca(info);
   var command = argv._[1];
 
-  if (taskName === 'proxy') {
-    if (command === 'set' && argv._[2]) {
+    var params = {};
+
+   ['reset']
+  .forEach(function(property) {
+    if (argv.hasOwnProperty(property)) {
+      params[property] = argv[property];
+    }
+  });
+
+  if (taskName === 'config' && command === 'proxy') {
+    if (argv._[2] && !Object.keys(params).length) {
       this.setProxy(argv._[2]);
-    } else if (command === 'rm' || command === 'remove') {
+    } else if (!argv._[2] && params.reset) {
       this.removeProxy();
     } else {
       this.showProxy();
+    }
+  } else if (taskName === 'config' && command === 'endpoint') {
+    if (argv._[2] && !Object.keys(params).length) {
+      this.setAPIEndpoint(argv._[2]);
+    } else if (!argv._[2] && params.reset) {
+      this.removeAPIEndpoint();
+    } else {
+      this.showAPIEndpoint();
     }
   } else if (taskName === 'reconfigure') {
     this.reconfigure();
@@ -105,6 +122,50 @@ ConfigTask.removeProxy = function() {
       }
     },
     util.fail.bind(null, 'Unable to remove proxy server: ')
+  );
+};
+
+ConfigTask.setAPIEndpoint = function(APIEndpoint) {
+  var report = {
+    event: 'api_endpoint'
+  };
+
+  monaca.setConfig('api_endpoint', APIEndpoint)
+  .then(
+    monaca.reportAnalytics.bind(monaca, report),
+    monaca.reportFail.bind(monaca, report)
+  )
+  .then(
+    function(result) {
+      util.success('API endpoint set to "' + result + '".');
+    },
+    util.fail.bind(null, 'Unable to set API endpoint: ')
+  );
+};
+
+ConfigTask.removeAPIEndpoint = function() {
+  monaca.removeConfig('api_endpoint').then(
+    function(result) {
+      if (result) {
+        util.print('Removed API endpoint "' + result + '".');
+      } else {
+        util.print('No API endpoint configured.');
+      }
+    },
+    util.fail.bind(null, 'Unable to remove API Endpoint: ')
+  );
+};
+
+ConfigTask.showAPIEndpoint = function() {
+  monaca.getConfig('api_endpoint').then(
+    function(result) {
+      if (!result) {
+        util.print('No custom API endpoint configured. Set an API endpoint with "monaca config endpoint my.endpoint.com".');
+      } else {
+        util.print('Current API endpoint is "' + result + '".');
+      }
+    },
+    util.fail.bind(null, 'Unable to get configuration: ')
   );
 };
 
