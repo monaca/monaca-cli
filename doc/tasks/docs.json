@@ -3,7 +3,7 @@
     "order": 90,
     "description": "Displays documentation of Monaca CLI and Onsen UI",
     "longDescription": [
-      "Displays docs for MonacaLCLI, Onsen UI and Tutorials"
+      "Displays docs for Monaca CLI, Onsen UI and Tutorials"
     ],
     "usage": "monaca docs <options>",
 
