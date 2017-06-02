@@ -156,6 +156,13 @@ var displayHelp = function(taskName, taskList) {
   println('');
 };
 
+var checkNodeRequirement = function() {
+  if (Number(process.version.match(/^v(\d+\.\d+)/)[1]) < 6) {
+    printwarn('\nWarning: your current Node version may not be compatible with the transpiling feature.');
+    printwarn('Please consider updating your Node to version 6 or higher.\n');
+  }
+}
+
 module.exports = {
   print: println,
   err: printerr,
@@ -166,6 +173,7 @@ module.exports = {
   displayProgress: displayProgress,
   displayObjectKeys: displayObjectKeys,
   displayLoginErrors: displayLoginErrors,
-  displayHelp: displayHelp
+  displayHelp: displayHelp,
+  checkNodeRequirement: checkNodeRequirement
 };
 })();

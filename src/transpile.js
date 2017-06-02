@@ -34,6 +34,12 @@ TranspileTask.run = function(taskName, info) {
 
   monaca.reportAnalytics(report);
 
+  var isTranspileEnabled = monaca.isTranspileEnabled(process.cwd());
+
+  if (isTranspileEnabled) {
+    util.checkNodeRequirement();
+  }
+
   return monaca.transpile(projectDir)
     .then(
       monaca.reportFinish.bind(monaca, report),
