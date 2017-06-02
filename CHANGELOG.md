@@ -2,6 +2,13 @@
 CHANGELOG
 ====
 
+v2.2.2
+----
+* Fixed transpiling issue on Vue templates.
+* Added `monaca config` command with API endpoint and proxy management.
+* Added `monaca docs` command.
+* Added Node version compatibility check.
+
 v2.2.1
 ----
 * Fixed automatic browser opening and missing log on project preview.
