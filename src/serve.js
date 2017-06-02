@@ -57,6 +57,10 @@
           var ifaces = info[0], port = info[1];
           var isTranspileEnabled = monaca.isTranspileEnabled(process.cwd());
 
+          if (isTranspileEnabled) {
+            util.checkNodeRequirement();
+          }
+
           // Log information about IP addresses and opens browser if requested.
           var logAndOpen = function() {
             var canonicalHost = '127.0.0.1';
