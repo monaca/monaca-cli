@@ -6,7 +6,6 @@ var argv = require('optimist').argv,
   fs = require('fs'),
   path = require('path'),
   util = require(path.join(__dirname, 'util')),
-  Nedb = require('nedb'),
   monaca = require('monaca-lib').Monaca,
   compareVersions = require('compare-versions'),
   Q = require('q');
@@ -38,10 +37,6 @@ var info = {
   clientVersion: VERSION
 };
 var m = new monaca(info);
-var preferences = new Nedb({
-  filename: path.join(m.userCordova, 'localkit.db', 'preferences.db'),
-  autoload: true
-});
 
 var Monaca = {
   _getTask: function() {
@@ -194,39 +189,6 @@ var Monaca = {
 
     util.print('');
   },
-  setUpdateDisplayTimestamp: function() {
-    var timestamp = new Date().getTime();
-    var deferred = Q.defer();
-    preferences.update({type:'CLI'}, {
-      $set: {
-        type: 'CLI',
-        value: 'updateMessage',
-        showedAt: timestamp
-      }
-    }, {upsert:true}, function(err, docs) {
-      if (err) {
-        deferred.reject(err);
-      }
-      else {
-        deferred.resolve();
-      }
-    });
-    return deferred.promise;
-  },
-  getUpdateDisplayTimestamp: function() {
-    var deferred = Q.defer();
-    preferences.findOne({
-      type: 'CLI'
-    }, function(err, timestamp) {
-      if (err) {
-        deferred.reject(err);
-      }
-      else {
-        deferred.resolve(timestamp);
-      }
-    });
-    return deferred.promise;
-  },
   printUpdateInfo: function(newVersion) {
     var currentTime = new Date();
     var printUpdate = function() {
@@ -239,15 +201,15 @@ var Monaca = {
     var deferred = Q.defer();
     try {
       if (newVersion !== undefined) {
-        return this.getUpdateDisplayTimestamp()
+        return util.getCLIUpdate(m.userCordova, 'lastShown')
           .then(function(lastUpdate) {
-            if(lastUpdate === null || currentTime.setHours(currentTime.getHours() + 6) > lastUpdate.showedAt) {
+            if(lastUpdate === undefined || currentTime.setHours(currentTime.getHours() + 6) > lastUpdate.showedAt) {
               printUpdate();
-              deferred.resolve(this.setUpdateDisplayTimestamp());
+              return util.setCLIUpdate(m.userCordova, 'lastShown', currentTime.getTime());
             } else {
               deferred.resolve();
             }
-          }.bind(this))
+          });
       } else {
         deferred.resolve();
       }
@@ -270,7 +232,7 @@ var Monaca = {
 
       return getCurrentCLIVersion()
         .then(function(version) {
-          var latestVersion = info.result.monacaCli.replace(/"/g,'').split('/').pop()
+          var latestVersion = info.result.monacaCli.replace(/"/g,'').split('/').pop();
           var result = compareVersions(version, latestVersion);
 
           if(result === -1) {
