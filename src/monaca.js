@@ -6,7 +6,8 @@ var argv = require('optimist').argv,
   fs = require('fs'),
   path = require('path'),
   util = require(path.join(__dirname, 'util')),
-  Monaca = require('monaca-lib').Monaca,
+  Nedb = require('nedb'),
+  monaca = require('monaca-lib').Monaca,
   compareVersions = require('compare-versions'),
   Q = require('q');
 
@@ -24,7 +25,6 @@ colors.setTheme({
   success: ['green', 'bold']
 });
 
-var m = new Monaca(info);
 var taskList = {};
 
 var docsPath = '../doc/tasks/';
@@ -37,6 +37,11 @@ var info = {
   clientType: 'cli',
   clientVersion: VERSION
 };
+var m = new monaca(info);
+var preferences = new Nedb({
+  filename: path.join(m.userCordova, 'localkit.db', 'preferences.db'),
+  autoload: true
+});
 
 var Monaca = {
   _getTask: function() {
@@ -65,56 +70,50 @@ var Monaca = {
     return task;
   },
   run: function() {
-    this.checkCLIUpdate()
-      .then(function(newVersion) {
-        //Update info
-        if (newVersion !== undefined && (!argv._[0] || argv._[0] === 'help')) {
-          this.printVersionUpdate(newVersion);
-        }
-        return Q.resolve();
-      }.bind(this))
-      .catch(
-        function(e){
-          return Q.resolve();
-       })
-      .then(function() {
-        // Version.
-        if (argv._[0] === 'version' || argv.version || argv.v) {
-          this.printVersion();
-          process.exit(0);
-        }
+    m.getLatestVersionInfo()
+    .then(this.compareCLIVersion.bind(this))
+    .then(this.printUpdateInfo.bind(this))
+    .catch(function(error) {
+      return Q.resolve();
+    })
+    .then(function() {
+      // Version.
+      if (argv._[0] === 'version' || argv.version || argv.v) {
+        this.printVersion();
+        process.exit(0);
+      }
 
-        // Help.
-        if (!argv._[0] || argv._[0] === 'help') {
-          this.printHelp(argv.all);
-          process.exit(0);
-        }
+      // Help.
+      if (!argv._[0] || argv._[0] === 'help') {
+        this.printHelp(argv.all);
+        process.exit(0);
+      }
 
-        var task = this._getTask();
+      var task = this._getTask();
 
-        if (!task.set) {
-          util.fail('Error: ' + task.name + ' is not a valid task.');
-        }
+      if (!task.set) {
+        util.fail('Error: ' + task.name + ' is not a valid task.');
+      }
 
-        if (argv.help || argv.h
-          || (task.name === 'create' && argv._.length < 2)
-          || (task.name === 'docs' && argv._.length < 2)
-          || (task.name === 'remote build' && !argv.browser && argv._.length < 3)
-          || (task.name === 'config' && !argv.reset && argv._.length < 2)) {
-          util.displayHelp(task.name, taskList[task.set]);
-          process.exit(0);
-        }
+      if (argv.help || argv.h
+        || (task.name === 'create' && argv._.length < 2)
+        || (task.name === 'docs' && argv._.length < 2)
+        || (task.name === 'remote build' && !argv.browser && argv._.length < 3)
+        || (task.name === 'config' && !argv.reset && argv._.length < 2)) {
+        util.displayHelp(task.name, taskList[task.set]);
+        process.exit(0);
+      }
 
-        var runner = function(task) {
-          var result = (require(path.join(__dirname, task.set))).run(task.name, info);
-          Promise.resolve(result).then(function(result) {
-            if (result && result.nextTask) {
-              runner(result.nextTask);
-            }
-          })
-        };
-        runner(task);
-      }.bind(this));
+      var runner = function(task) {
+        var result = (require(path.join(__dirname, task.set))).run(task.name, info);
+        Promise.resolve(result).then(function(result) {
+          if (result && result.nextTask) {
+            runner(result.nextTask);
+          }
+        })
+      };
+      runner(task);
+    }.bind(this));
   },
   printVersion: function() {
     util.print(VERSION.info.bold);
@@ -195,43 +194,93 @@ var Monaca = {
 
     util.print('');
   },
-  printVersionUpdate: function(version) {
-    util.print('-----------------------------------------------------------------------------------------'.help);
-    util.print('Version '.help + version.help.bold + ' of Monaca CLI is now available. To update it run:'.help);
-    util.print('               npm install monaca@latest -g '.success);
-    util.print('-----------------------------------------------------------------------------------------'.help);
+  setUpdateDisplayTimestamp: function() {
+    var timestamp = new Date().getTime();
+    var deferred = Q.defer();
+    preferences.update({type:'CLI'}, {
+      $set: {
+        type: 'CLI',
+        value: 'updateMessage',
+        showedAt: timestamp
+      }
+    }, {upsert:true}, function(err, docs) {
+      if (err) {
+        deferred.reject(err);
+      }
+      else {
+        deferred.resolve();
+      }
+    });
+    return deferred.promise;
   },
-  checkCLIUpdate: function() {
+  getUpdateDisplayTimestamp: function() {
+    var deferred = Q.defer();
+    preferences.findOne({
+      type: 'CLI'
+    }, function(err, timestamp) {
+      if (err) {
+        deferred.reject(err);
+      }
+      else {
+        deferred.resolve(timestamp);
+      }
+    });
+    return deferred.promise;
+  },
+  printUpdateInfo: function(newVersion) {
+    var currentTime = new Date();
+    var printUpdate = function() {
+      util.print('-----------------------------------------------------------------------------------------'.help);
+      util.print('Version '.help + newVersion.help.bold + ' of Monaca CLI is now available. To update it run:'.help);
+      util.print('               npm install -g monaca '.success);
+      util.print('-----------------------------------------------------------------------------------------'.help);
+    };
+
+    var deferred = Q.defer();
     try {
-      return m.getLatestVersionInfo()
-        .then(function(info) {
-
-            var getCLIPackageJSON =  function() {
-              var deferred = Q.defer();
-              try {
-                var cliPackageJSONPath = path.resolve(path.join(__dirname, '..', 'package.json')),
-                  cliPackageJSONFile = require(cliPackageJSONPath);
-                return Q.resolve(cliPackageJSONFile);
-              } catch (error) {
-                return Q.reject(error);
-              }
-            };
-
-            return getCLIPackageJSON()
-              .then(function(packageJSON) {
-
-                var latestVersion = info.result.monacaCli.replace(/"/g,'').split('/').pop()
-                var result = compareVersions(packageJSON.version, latestVersion);
-
-                if(result === -1) {
-                  return Q.resolve(latestVersion);
-                } else {
-                  return Q.resolve();
-                }
-              });
-          });
+      if (newVersion !== undefined) {
+        return this.getUpdateDisplayTimestamp()
+          .then(function(lastUpdate) {
+            if(lastUpdate === null || currentTime.setHours(currentTime.getHours() + 6) > lastUpdate.showedAt) {
+              printUpdate();
+              deferred.resolve(this.setUpdateDisplayTimestamp());
+            } else {
+              deferred.resolve();
+            }
+          }.bind(this))
+      } else {
+        deferred.resolve();
+      }
     } catch (error) {
-      return Q.reject();
+      return deferred.reject(error);
+    }
+    return deferred.promise;
+  },
+  compareCLIVersion: function(info) {
+    try {
+      var getCurrentCLIVersion =  function() {
+        try {
+          var cliPackageJSONPath = path.resolve(path.join(__dirname, '..', 'package.json')),
+            version = require(cliPackageJSONPath).version;
+          return Q.resolve(version);
+        } catch (error) {
+          return Q.reject(error);
+        }
+      };
+
+      return getCurrentCLIVersion()
+        .then(function(version) {
+          var latestVersion = info.result.monacaCli.replace(/"/g,'').split('/').pop()
+          var result = compareVersions(version, latestVersion);
+
+          if(result === -1) {
+            return Q.resolve(latestVersion);
+          } else {
+            return Q.resolve();
+          }
+        });
+    } catch (error) {
+      return Q.reject(error);
     }
   }
 };
