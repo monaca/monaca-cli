@@ -36,6 +36,7 @@
     "http-server": "0.9.0",
     "monaca-inquirer": "^1.0.4",
     "monaca-lib": "2.2.9",
+    "nedb": "^1.1.1",
     "open": "0.0.5",
     "optimist": "^0.6.1",
     "portfinder": "^1.0.7",
