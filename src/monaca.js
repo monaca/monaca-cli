@@ -5,7 +5,10 @@ var argv = require('optimist').argv,
   colors = require('colors'),
   fs = require('fs'),
   path = require('path'),
-  util = require(path.join(__dirname, 'util'));
+  util = require(path.join(__dirname, 'util')),
+  monaca = require('monaca-lib').Monaca,
+  compareVersions = require('compare-versions'),
+  Q = require('q');
 
 colors.setTheme({
   silly: 'rainbow',
@@ -33,6 +36,7 @@ var info = {
   clientType: 'cli',
   clientVersion: VERSION
 };
+var m = new monaca(info);
 
 var Monaca = {
   _getTask: function() {
@@ -61,43 +65,50 @@ var Monaca = {
     return task;
   },
   run: function() {
+    m.getLatestVersionInfo()
+    .then(this.compareCLIVersion.bind(this))
+    .then(this.printUpdateInfo.bind(this))
+    .catch(function(error) {
+      return Q.resolve();
+    })
+    .then(function() {
+      // Version.
+      if (argv._[0] === 'version' || argv.version || argv.v) {
+        this.printVersion();
+        process.exit(0);
+      }
 
-    // Version.
-    if (argv._[0] === 'version' || argv.version || argv.v) {
-      this.printVersion();
-      process.exit(0);
-    }
+      // Help.
+      if (!argv._[0] || argv._[0] === 'help') {
+        this.printHelp(argv.all);
+        process.exit(0);
+      }
 
-    // Help.
-    if (!argv._[0] || argv._[0] === 'help') {
-      this.printHelp(argv.all);
-      process.exit(0);
-    }
+      var task = this._getTask();
 
-    var task = this._getTask();
+      if (!task.set) {
+        util.fail('Error: ' + task.name + ' is not a valid task.');
+      }
 
-    if (!task.set) {
-      util.fail('Error: ' + task.name + ' is not a valid task.');
-    }
+      if (argv.help || argv.h
+        || (task.name === 'create' && argv._.length < 2)
+        || (task.name === 'docs' && argv._.length < 2)
+        || (task.name === 'remote build' && !argv.browser && argv._.length < 3)
+        || (task.name === 'config' && !argv.reset && argv._.length < 2)) {
+        util.displayHelp(task.name, taskList[task.set]);
+        process.exit(0);
+      }
 
-    if (argv.help || argv.h
-      || (task.name === 'create' && argv._.length < 2)
-      || (task.name === 'docs' && argv._.length < 2)
-      || (task.name === 'remote build' && !argv.browser && argv._.length < 3)
-      || (task.name === 'config' && !argv.reset && argv._.length < 2)) {
-      util.displayHelp(task.name, taskList[task.set]);
-      process.exit(0);
-    }
-
-    var runner = function(task) {
-      var result = (require(path.join(__dirname, task.set))).run(task.name, info);
-      Promise.resolve(result).then(function(result) {
-        if (result && result.nextTask) {
-          runner(result.nextTask);
-        }
-      })
-    };
-    runner(task);
+      var runner = function(task) {
+        var result = (require(path.join(__dirname, task.set))).run(task.name, info);
+        Promise.resolve(result).then(function(result) {
+          if (result && result.nextTask) {
+            runner(result.nextTask);
+          }
+        })
+      };
+      runner(task);
+    }.bind(this));
   },
   printVersion: function() {
     util.print(VERSION.info.bold);
@@ -177,6 +188,62 @@ var Monaca = {
     this.printExamples();
 
     util.print('');
+  },
+  printUpdateInfo: function(newVersion) {
+    var currentTime = new Date();
+    var printUpdate = function() {
+      util.print('-----------------------------------------------------------------------------------------'.help);
+      util.print('Version '.help + newVersion.help.bold + ' of Monaca CLI is now available. To update it run:'.help);
+      util.print('               npm install -g monaca '.success);
+      util.print('-----------------------------------------------------------------------------------------'.help);
+    };
+
+    var deferred = Q.defer();
+    try {
+      if (newVersion !== undefined) {
+        return util.getCLIUpdate(m.userCordova, 'lastShown')
+          .then(function(lastUpdate) {
+            if(lastUpdate === undefined || currentTime.setHours(currentTime.getHours() + 6) > lastUpdate.showedAt) {
+              printUpdate();
+              return util.setCLIUpdate(m.userCordova, 'lastShown', currentTime.getTime());
+            } else {
+              deferred.resolve();
+            }
+          });
+      } else {
+        deferred.resolve();
+      }
+    } catch (error) {
+      return deferred.reject(error);
+    }
+    return deferred.promise;
+  },
+  compareCLIVersion: function(info) {
+    try {
+      var getCurrentCLIVersion =  function() {
+        try {
+          var cliPackageJSONPath = path.resolve(path.join(__dirname, '..', 'package.json')),
+            version = require(cliPackageJSONPath).version;
+          return Q.resolve(version);
+        } catch (error) {
+          return Q.reject(error);
+        }
+      };
+
+      return getCurrentCLIVersion()
+        .then(function(version) {
+          var latestVersion = info.result.monacaCli.replace(/"/g,'').split('/').pop();
+          var result = compareVersions(version, latestVersion);
+
+          if(result === -1) {
+            return Q.resolve(latestVersion);
+          } else {
+            return Q.resolve();
+          }
+        });
+    } catch (error) {
+      return Q.reject(error);
+    }
   }
 };
 
