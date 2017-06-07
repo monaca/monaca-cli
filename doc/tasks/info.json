@@ -1,0 +1,14 @@
+{
+  "info": {
+    "order": 92,
+    "description": "displays system and environment info ",
+    "longDescription": [
+      "Displays system and environment info"
+    ],
+    "usage": "monaca info",
+    "examples": [
+      "monaca info"
+    ],
+    "showInHelp": true
+  }
+}
