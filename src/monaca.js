@@ -61,43 +61,46 @@ var Monaca = {
     return task;
   },
   run: function() {
+    util.checkUpdate(VERSION, info)
+    .then(function(result) {
 
-    // Version.
-    if (argv._[0] === 'version' || argv.version || argv.v) {
-      this.printVersion();
-      process.exit(0);
-    }
+      // Version.
+      if (argv._[0] === 'version' || argv.version || argv.v) {
+        this.printVersion();
+        process.exit(0);
+      }
 
-    // Help.
-    if (!argv._[0] || argv._[0] === 'help') {
-      this.printHelp(argv.all);
-      process.exit(0);
-    }
+      // Help.
+      if (!argv._[0] || argv._[0] === 'help') {
+        this.printHelp(argv.all);
+        process.exit(0);
+      }
 
-    var task = this._getTask();
+      var task = this._getTask();
 
-    if (!task.set) {
-      util.fail('Error: ' + task.name + ' is not a valid task.');
-    }
+      if (!task.set) {
+        util.fail('Error: ' + task.name + ' is not a valid task.');
+      }
 
-    if (argv.help || argv.h
-      || (task.name === 'create' && argv._.length < 2)
-      || (task.name === 'docs' && argv._.length < 2)
-      || (task.name === 'remote build' && !argv.browser && argv._.length < 3)
-      || (task.name === 'config' && !argv.reset && argv._.length < 2)) {
-      util.displayHelp(task.name, taskList[task.set]);
-      process.exit(0);
-    }
+      if (argv.help || argv.h
+        || (task.name === 'create' && argv._.length < 2)
+        || (task.name === 'docs' && argv._.length < 2)
+        || (task.name === 'remote build' && !argv.browser && argv._.length < 3)
+        || (task.name === 'config' && !argv.reset && argv._.length < 2)) {
+        util.displayHelp(task.name, taskList[task.set]);
+        process.exit(0);
+      }
 
-    var runner = function(task) {
-      var result = (require(path.join(__dirname, task.set))).run(task.name, info);
-      Promise.resolve(result).then(function(result) {
-        if (result && result.nextTask) {
-          runner(result.nextTask);
-        }
-      })
-    };
-    runner(task);
+      var runner = function(task) {
+        var result = (require(path.join(__dirname, task.set))).run(task.name, info);
+        Promise.resolve(result).then(function(result) {
+          if (result && result.nextTask) {
+            runner(result.nextTask);
+          }
+        })
+      };
+      runner(task);
+    }.bind(this));
   },
   printVersion: function() {
     util.print(VERSION.info.bold);
