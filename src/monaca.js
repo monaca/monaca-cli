@@ -62,7 +62,7 @@ var Monaca = {
   },
   run: function() {
     util.checkUpdate(VERSION, info)
-    .then(function(result) {
+    .then(function() {
 
       // Version.
       if (argv._[0] === 'version' || argv.version || argv.v) {
