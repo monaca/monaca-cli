@@ -1,7 +1,12 @@
 (function() {
 'use strict';
 
-var Q = require('q');
+var Q = require('q'),
+  Monaca = require('monaca-lib').Monaca,
+  compareVersions = require('compare-versions'),
+  colors  =require('colors');
+
+var monaca;
 
 var _print = function(type, items) {
   var msg = '';
@@ -161,7 +166,49 @@ var checkNodeRequirement = function() {
     printwarn('\nWarning: your current Node version may not be compatible with the transpiling feature.');
     printwarn('Please consider updating your Node to version 6 or higher.\n');
   }
-}
+};
+
+var printUpdate = function(newVersion) {
+  println('------------------------------------------------------------------------------------'.help);
+  println('Version '.help + newVersion.help.bold + ' of Monaca CLI is now available. To update it run:'.help);
+  println('                  npm install -g monaca '.success);
+  println('------------------------------------------------------------------------------------'.help);
+};
+
+var checkUpdate = function(version, info) {
+  var currentTime = new Date();
+  monaca = new Monaca(info);
+
+  return monaca.getLatestVersionInfo()
+  .then(
+    function(versionInfo) {
+      var latestVersion = versionInfo.result.monacaCli.replace(/"/g,'').split('/').pop();
+      var result = compareVersions(version, latestVersion);
+
+      if (result === -1) {
+        return monaca.getConfig('update_show_time')
+        .then(
+          function(lastUpdate) {
+            if(!lastUpdate || currentTime.setHours(currentTime.getHours() - 6) > lastUpdate) {
+              printUpdate(latestVersion);
+              var newTime = currentTime.getTime().toString();
+              return Q.resolve(monaca.setConfig('update_show_time', newTime));
+            } else {
+              return Q.resolve();
+            }
+          }
+        );
+      } else {
+        return Q.resolve();
+      }
+    }
+  )
+  .catch(
+    function(error) {
+      return Q.resolve();
+    }
+  );
+};
 
 module.exports = {
   print: println,
@@ -174,6 +221,7 @@ module.exports = {
   displayObjectKeys: displayObjectKeys,
   displayLoginErrors: displayLoginErrors,
   displayHelp: displayHelp,
-  checkNodeRequirement: checkNodeRequirement
+  checkNodeRequirement: checkNodeRequirement,
+  checkUpdate: checkUpdate
 };
 })();
