@@ -5,6 +5,7 @@ var argv = require('optimist').argv,
   colors = require('colors'),
   fs = require('fs'),
   path = require('path'),
+  https = require('https'),
   util = require(path.join(__dirname, 'util'));
 
 colors.setTheme({
@@ -22,6 +23,14 @@ colors.setTheme({
 });
 
 var taskList = {};
+var latestVersion;
+
+https.get('https://ide.monaca.mobi/api/public/versions', function(res) {
+  res.on('data', function (data) {
+     data = JSON.parse(data);
+     latestVersion = data.result.monacaCli.replace(/"/g,'').split('/').pop();
+   });
+});
 
 var docsPath = '../doc/tasks/';
 fs.readdirSync(path.join(__dirname, docsPath)).forEach(function(filename) {
@@ -33,6 +42,12 @@ var info = {
   clientType: 'cli',
   clientVersion: VERSION
 };
+
+var USER_CORDOVA = path.join(
+  process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'],
+  '.cordova'
+);
+var CONFIG_FILE = path.join(USER_CORDOVA, 'monaca_config.json');
 
 var Monaca = {
   _getTask: function() {
@@ -61,46 +76,42 @@ var Monaca = {
     return task;
   },
   run: function() {
-    util.checkUpdate(VERSION, info)
-    .then(function() {
+    // Version.
+    if (argv._[0] === 'version' || argv.version || argv.v) {
+      this.printVersion();
+      process.exit(0);
+    }
 
-      // Version.
-      if (argv._[0] === 'version' || argv.version || argv.v) {
-        this.printVersion();
-        process.exit(0);
-      }
+    // Help.
+    if (!argv._[0] || argv._[0] === 'help') {
+      this.printHelp(argv.all);
+      process.exit(0);
+    }
 
-      // Help.
-      if (!argv._[0] || argv._[0] === 'help') {
-        this.printHelp(argv.all);
-        process.exit(0);
-      }
+    var task = this._getTask();
 
-      var task = this._getTask();
+    if (!task.set) {
+      util.fail('Error: ' + task.name + ' is not a valid task.');
+    }
 
-      if (!task.set) {
-        util.fail('Error: ' + task.name + ' is not a valid task.');
-      }
+    if (argv.help || argv.h
+      || (task.name === 'create' && argv._.length < 2)
+      || (task.name === 'docs' && argv._.length < 2)
+      || (task.name === 'remote build' && !argv.browser && argv._.length < 3)
+      || (task.name === 'config' && !argv.reset && argv._.length < 2)) {
+      util.displayHelp(task.name, taskList[task.set]);
+      process.exit(0);
+    }
 
-      if (argv.help || argv.h
-        || (task.name === 'create' && argv._.length < 2)
-        || (task.name === 'docs' && argv._.length < 2)
-        || (task.name === 'remote build' && !argv.browser && argv._.length < 3)
-        || (task.name === 'config' && !argv.reset && argv._.length < 2)) {
-        util.displayHelp(task.name, taskList[task.set]);
-        process.exit(0);
-      }
-
-      var runner = function(task) {
-        var result = (require(path.join(__dirname, task.set))).run(task.name, info);
-        Promise.resolve(result).then(function(result) {
-          if (result && result.nextTask) {
-            runner(result.nextTask);
-          }
-        })
-      };
-      runner(task);
-    }.bind(this));
+    var runner = function(task) {
+      var result = (require(path.join(__dirname, task.set))).run(task.name, info);
+      Promise.resolve(result).then(function(result) {
+        if (result && result.nextTask) {
+          runner(result.nextTask);
+        }
+      })
+    };
+    runner(task);
   },
   printVersion: function() {
     util.print(VERSION.info.bold);
@@ -182,6 +193,16 @@ var Monaca = {
     util.print('');
   }
 };
+
+process.on('exit', function() {
+  var data = {
+    currentVersion: VERSION,
+    latestVersion: latestVersion,
+    config: CONFIG_FILE
+  };
+
+  util.updateCheck(data);
+});
 
 exports.Monaca = Monaca;
 })();
