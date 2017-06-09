@@ -171,7 +171,7 @@ var checkNodeRequirement = function() {
 
 var printUpdate = function(newVersion) {
   println('\n------------------------------------------------------------------------------------'.help);
-  println('Version '.help + newVersion.help.bold + ' of Monaca CLI is now available. To update it run:'.help);
+  println('Monaca CLI '.help + newVersion.help.bold + ' is now available. In order to update, run:'.help);
   println('                  npm install -g monaca '.success);
   println('------------------------------------------------------------------------------------\n'.help);
 };
