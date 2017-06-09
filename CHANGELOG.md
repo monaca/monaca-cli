@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v2.2.3
+----
+* Fixed upload issue for Cordova projects.
+* Added update checker.
+
 v2.2.2
 ----
 * Fixed transpiling issue on Vue templates.
