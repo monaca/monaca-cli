@@ -4,9 +4,10 @@
 var Q = require('q'),
   Monaca = require('monaca-lib').Monaca,
   compareVersions = require('compare-versions'),
+  fs = require('fs'),
   colors  =require('colors');
 
-var monaca;
+var UPDATE_INTERVAL = 21600; //6 hours
 
 var _print = function(type, items) {
   var msg = '';
@@ -169,45 +170,28 @@ var checkNodeRequirement = function() {
 };
 
 var printUpdate = function(newVersion) {
-  println('------------------------------------------------------------------------------------'.help);
-  println('Version '.help + newVersion.help.bold + ' of Monaca CLI is now available. To update it run:'.help);
+  println('\n------------------------------------------------------------------------------------'.help);
+  println('Monaca CLI '.help + newVersion.help.bold + ' is now available. In order to update, run:'.help);
   println('                  npm install -g monaca '.success);
-  println('------------------------------------------------------------------------------------'.help);
+  println('------------------------------------------------------------------------------------\n'.help);
 };
 
-var checkUpdate = function(version, info) {
-  var currentTime = new Date();
-  monaca = new Monaca(info);
+var updateCheck = function(data) {
+  var currentDate = new Date();
+  var newTime = currentDate.getTime().toString();
+  var content = JSON.parse(fs.readFileSync(data.config, 'utf8'));
+  var lastUpdate = content['update_check_time'];
 
-  return monaca.getLatestVersionInfo()
-  .then(
-    function(versionInfo) {
-      var latestVersion = versionInfo.result.monacaCli.replace(/"/g,'').split('/').pop();
-      var result = compareVersions(version, latestVersion);
+  content['update_check_time'] = newTime;
 
-      if (result === -1) {
-        return monaca.getConfig('update_show_time')
-        .then(
-          function(lastUpdate) {
-            if(!lastUpdate || currentTime.setHours(currentTime.getHours() - 6) > lastUpdate) {
-              printUpdate(latestVersion);
-              var newTime = currentTime.getTime().toString();
-              return Q.resolve(monaca.setConfig('update_show_time', newTime));
-            } else {
-              return Q.resolve();
-            }
-          }
-        );
-      } else {
-        return Q.resolve();
-      }
+  if ((!lastUpdate || currentDate.getTime()  > (lastUpdate + UPDATE_INTERVAL)) && data.latestVersion) {
+    var result = compareVersions(data.currentVersion, data.latestVersion);
+
+    if (result === -1 && content) {
+      printUpdate(data.latestVersion);
+      fs.writeFileSync(data.config, JSON.stringify(content), 'utf-8');
     }
-  )
-  .catch(
-    function(error) {
-      return Q.resolve();
-    }
-  );
+  }
 };
 
 module.exports = {
@@ -222,6 +206,6 @@ module.exports = {
   displayLoginErrors: displayLoginErrors,
   displayHelp: displayHelp,
   checkNodeRequirement: checkNodeRequirement,
-  checkUpdate: checkUpdate
+  updateCheck: updateCheck
 };
 })();
