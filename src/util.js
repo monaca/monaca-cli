@@ -1,7 +1,9 @@
 (function() {
 'use strict';
 
-var Q = require('q');
+var Q = require('q'),
+  fs = require('fs'),
+  path = require('path');
 
 var _print = function(type, items) {
   var msg = '';
@@ -50,6 +52,36 @@ var displayObjectKeys = function(object) {
     })
     .join('\n')
   );
+};
+
+var fileExists = function (filePath) {
+  try {
+    return fs.statSync(filePath).isFile();
+  } catch (err) {
+    return false;
+  }
+};
+
+var determineFramework = function() {
+  var projectInfoPath = path.join(process.cwd(), '.monaca', 'project_info.json');
+  var libDir = path.join(process.cwd(), 'www', 'lib')
+  var ionicPath = path.join(libDir, 'ionic', 'version.json');
+  var onsen1Path = path.join(libDir, 'onsenui', 'package.json');
+  var angular1Path = path.join(libDir, 'angular', 'package.json');
+
+  if(fileExists(projectInfoPath) && require(projectInfoPath)['template-type']) {
+    return require(projectInfoPath)['template-type'];
+  } else if(fileExists(onsen1Path)) {
+    if(fileExists(angular1Path)) {
+      return 'angular';
+    } else {
+      return 'onsenui';
+    }
+  } if(fileExists(ionicPath)) {
+    return 'ionic';
+  } else  {
+    return 'blank';
+  }
 };
 
 var displayProgress = function(progress) {
@@ -174,6 +206,8 @@ module.exports = {
   displayObjectKeys: displayObjectKeys,
   displayLoginErrors: displayLoginErrors,
   displayHelp: displayHelp,
-  checkNodeRequirement: checkNodeRequirement
+  checkNodeRequirement: checkNodeRequirement,
+  determineFramework: determineFramework,
+  fileExists: fileExists
 };
 })();
