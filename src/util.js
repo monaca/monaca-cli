@@ -62,7 +62,7 @@ var fileExists = function (filePath) {
   }
 };
 
-var determineFramework = function() {
+var getTemplateFramework = function() {
   var projectInfoPath = path.join(process.cwd(), '.monaca', 'project_info.json');
   var libDir = path.join(process.cwd(), 'www', 'lib')
   var ionicPath = path.join(libDir, 'ionic', 'version.json');
@@ -207,7 +207,7 @@ module.exports = {
   displayLoginErrors: displayLoginErrors,
   displayHelp: displayHelp,
   checkNodeRequirement: checkNodeRequirement,
-  determineFramework: determineFramework,
+  getTemplateFramework: getTemplateFramework,
   fileExists: fileExists
 };
 })();
