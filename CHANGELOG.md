@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v2.2.4
+----
+* Fixed critical sync bug for projects containing special characters in the path.
+* General performance improvement due to leak fix.
+
 v2.2.3
 ----
 * Fixed upload issue for Cordova projects.
