@@ -183,7 +183,7 @@ var updateCheck = function(data) {
 
   content['update_check_time'] = newTime;
 
-  if ((!lastUpdate || currentDate.getTime()  > (lastUpdate + UPDATE_INTERVAL)) && data.latestVersion) {
+  if ((!lastUpdate || currentDate.getTime() > (lastUpdate + UPDATE_INTERVAL)) && data.latestVersion) {
     var result = compareVersions(data.currentVersion, data.latestVersion);
 
     if (result === -1 && content) {

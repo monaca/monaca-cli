@@ -13,7 +13,7 @@
     "options": [
       [
         "--generate-config",
-        "Creates transpile configuration files, if missing, for projects that can be transpiled."
+        "Creates transpile configuration files, if missing, for projects that can be transpiled"
       ],
       [
         "--install-dependencies",
