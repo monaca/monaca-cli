@@ -1,7 +1,7 @@
 {
   "transpile": {
     "order": 60,
-    "description": "transpile project source code.",
+    "description": "transpile project source code",
     "longDescription": [
       "Transpiles projects that are transpilable.",
       "For example: React and Angular2 projects."
@@ -13,7 +13,7 @@
     "options": [
       [
         "--generate-config",
-        "Creates transpile configuration files, if missing, for projects that can be transpiled"
+        "Creates transpile configuration files, if missing, for projects that can be transpiled."
       ],
       [
         "--install-dependencies",
