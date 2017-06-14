@@ -1,17 +1,4 @@
 {
-  "info": {
-    "order": 32,
-    "description": "show info about Cordova environment",
-    "usage": "monaca info",
-    "longDescription": [
-      "Prints out information about the Cordova environment.",
-      "Also creates a file, info.txt, at the base of the project."
-    ],
-    "examples": [
-      "monaca info"
-    ],
-    "showInHelp": false
-  },
   "platform": {
     "order": 31,
     "description": "add, update and remove platforms",
