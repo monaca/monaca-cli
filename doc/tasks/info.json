@@ -1,9 +1,9 @@
 {
   "info": {
     "order": 2,
-    "description": "displays system and environment info ",
+    "description": "displays project and environment info",
     "longDescription": [
-      "Displays system and environment info"
+      "Displays information about monaca dependencies, system, project dependencies and connection to Monaca Cloud"
     ],
     "usage": "monaca info",
     "examples": [
