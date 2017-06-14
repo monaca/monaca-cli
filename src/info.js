@@ -2,16 +2,12 @@
 'use strict';
 
   var path = require('path'),
-    argv = require('optimist').argv,
     Monaca = require('monaca-lib').Monaca,
-    Q = require('q'),
     util = require(path.join(__dirname, 'util')),
     os = require('os'),
-    opn = require('open'),
-    colors = require('colors'),
-    fs = require('fs'),
-    path = require('path'),
-    compareVersions = require('compare-versions');
+    compareVersions = require('compare-versions'),
+    ip = require('ip'),
+    rp = require('request-promise');
 
   var ConfigTask = {}, monaca;
 
@@ -32,18 +28,22 @@
     var leftIndent = '      ';
     var middleSpace = '  ';
 
+    var returnWithSpace = function(str) {
+      return str +  Array(17 - str.length).join(' ');
+    };
+
     var mapOSX = function() {
       var darwinVersion = os.release();
       if(compareVersions(darwinVersion, '16.0.0') >= 0 && compareVersions(darwinVersion, '17.0.0') < 0) {
         return 'macOS Sierra';
       } else if(compareVersions(darwinVersion, '15.0.0') >= 0 && compareVersions(darwinVersion, '16.0.0') < 0) {
-       return 'OS X El Capitan';
+        return 'OS X El Capitan';
       } else if(compareVersions(darwinVersion, '14.0.0') >= 0 && compareVersions(darwinVersion, '15.0.0') < 0) {
-       return 'OS X Yosemite';
+        return 'OS X Yosemite';
       } else if(compareVersions(darwinVersion, '13.0.0') >= 0 && compareVersions(darwinVersion, '14.0.0') < 0) {
-       return 'OS X Maverics';
+        return 'OS X Maverics';
       } else if(compareVersions(darwinVersion, '12.0.0') >= 0 && compareVersions(darwinVersion, '13.0.0') < 0) {
-       return 'OS X Mountain Lion';
+        return 'OS X Mountain Lion';
       } else {
         return 'macOS';
       }
@@ -54,7 +54,7 @@
       if(process.platform === 'darwin') {
         osInfo = mapOSX();
       } else if(process.platform === 'win32') {
-        osInfo = 'Windows ' + os.release()[0]
+        osInfo = 'Windows ' + os.release()[0];
       } else {
         osInfo = 'linux';
       }
@@ -63,11 +63,11 @@
 
     var getOnsenVersion = function(framework) {
       var onsenVersion;
-      if(framework === 'angular2' || framework === 'react' || framework === 'vue') {
-        var onsenVersion = require(path.join(process.cwd(), 'node_modules', 'onsenui', 'package.json')).version;
+      if(monaca.isTranspilable(process.cwd())) {
+        onsenVersion = require(path.join(process.cwd(), 'node_modules', 'onsenui', 'package.json')).version;
       } else if(framework === 'onsenui' || framework === 'angular') {
         var libDir = path.join(process.cwd(), 'www', 'lib')
-        var onsenVersion = require(path.join(libDir, 'onsenui', 'package.json')).version;
+        onsenVersion = require(path.join(libDir, 'onsenui', 'package.json')).version;
       }
       return onsenVersion;
     };
@@ -89,81 +89,119 @@
 
     var getBindingVersion = function(framework) {
       var version;
-      if(framework === 'angular2' || framework === 'react' || framework === 'vue') {
+      if(monaca.isTranspilable(process.cwd())) {
         version = require(path.join(process.cwd(), 'node_modules', framework + '-onsenui' , 'package.json')).version;
       }
       return version;
     };
 
     var displaySystem = function() {
-      var os = getOperatingSystem(),
-        nodeVersion = process.versions.node,
-        npmVersion = require('global-npm').version;
-
       util.print('System'.blue.bold);
-      if(os) {
-        util.print(leftIndent + 'os              :' + middleSpace + os.grey);
-      }
-      if(nodeVersion) {
-        util.print(leftIndent + 'node            :' + middleSpace + nodeVersion.grey);
-      }
-      if(npmVersion) {
-        util.print(leftIndent + 'npm             :' + middleSpace + npmVersion.grey + '\n');
+      try {
+        var os = getOperatingSystem(),
+          nodeVersion = process.versions.node,
+          npmVersion = require('global-npm').version;
+
+        if(os) {
+          util.print(leftIndent + 'os              :' + middleSpace + os.grey);
+        }
+        if(nodeVersion) {
+          util.print(leftIndent + 'node            :' + middleSpace + nodeVersion.grey);
+        }
+        if(npmVersion) {
+          util.print(leftIndent + 'npm             :' + middleSpace + npmVersion.grey + '\n');
+        }
+      } catch(err) {
+        util.print('There was problem when displaying framework info'.red);
       }
     };
 
     var displayGlobal = function() {
-      var cliPackage = require(path.join(__dirname, '..', 'package.json'));
-      util.print('Global dependencies'.blue.bold);
-      util.print(leftIndent + 'monaca-lib      :' + middleSpace + cliPackage.dependencies['monaca-lib'].grey);
-      util.print(leftIndent + 'monaca-cli      :' + middleSpace + cliPackage.version.grey + '\n');
+      try {
+        var cliPackage = require(path.join(__dirname, '..', 'package.json'));
+        util.print('Monaca dependencies'.blue.bold);
+        util.print(leftIndent + 'monaca-lib      :' + middleSpace + cliPackage.dependencies['monaca-lib'].grey);
+        util.print(leftIndent + 'monaca-cli      :' + middleSpace + cliPackage.version.grey + '\n');
+      } catch(err) {
+        util.print('Problem occured during displaying Monaca dependencies'.red);
+      }
     };
 
     var displayFrameworkInfo = function() {
-      var framework = util.determineFramework(),
-        projectInfo = require(path.join(process.cwd(), '.monaca', 'project_info.json')),
-        onsenVersion = getOnsenVersion(framework),
-        supportedFrameworkVersion = getSupportedFrameworkVersion(framework),
-        onsenBindingVersion = getBindingVersion(framework);
-
       util.print('Framework info'.blue.bold);
-      util.print(leftIndent + 'cordova         :' + middleSpace + projectInfo['cordova_version'].grey);
-      if(onsenVersion) {
-        util.print(leftIndent + 'onsenui' + Array(17 - 'onsenui'.length).join(' ') + ':' + middleSpace + onsenVersion.grey);
-      }
-      if(supportedFrameworkVersion) {
-        util.print(leftIndent + framework + Array(17 - framework.length).join(' ') + ':' + middleSpace + supportedFrameworkVersion.grey);
-        if(onsenBindingVersion) {
-          util.print(leftIndent + framework + '-onsenui' + Array(16 - (framework + '-onsenui').length).join(' ') + ':' + middleSpace  + onsenBindingVersion.grey);
+      try {
+        var framework = util.getTemplateFramework(),
+          projectInfo = require(path.join(process.cwd(), '.monaca', 'project_info.json')),
+          onsenVersion = getOnsenVersion(framework),
+          supportedFrameworkVersion = getSupportedFrameworkVersion(framework),
+          onsenBindingVersion = getBindingVersion(framework);
+
+        util.print(leftIndent + 'cordova         :' + middleSpace + projectInfo['cordova_version'].grey);
+
+        if(onsenVersion) {
+          util.print(leftIndent + returnWithSpace('onsenui') + ':' + middleSpace + onsenVersion.grey);
         }
+        if(supportedFrameworkVersion) {
+          util.print(leftIndent + returnWithSpace(framework) + ':' + middleSpace + supportedFrameworkVersion.grey);
+        }
+        if(onsenBindingVersion) {
+          util.print(leftIndent + returnWithSpace(framework + '-onsenui') + ':' + middleSpace  + onsenBindingVersion.grey);
+        }
+        util.print('');
+
+      } catch(error) {
+        util.print('There was problem when displaying framework info'.red);
       }
     };
 
-    return monaca.isCordovaProject(process.cwd())
-    .then(
-      function() {
-        try {
+
+    var getConnectionInfo = function() {
+      var options = {
+        method: 'POST',
+        url: 'https://ide.monaca.mobi/server_check',
+        body: {},
+        json: true
+      };
+
+      var start = new Date().getTime();
+      rp(options).then(function(res) {
+        var end = new Date().getTime();
+        var time = end - start;
+        util.print('Monaca cloud connection'.blue.bold);
+        util.print(leftIndent +'status          :' + middleSpace + 'successful'.green);
+        util.print(leftIndent +'time            :' + middleSpace + (time + ' ms').grey);
+        util.print(leftIndent +'local ip        :' + middleSpace + ip.address().grey);
+      },
+      function(err) {
+      util.print('Connection problem occured'.red);
+      });
+    };
+
+    monaca.isCordovaProject(process.cwd())
+      .then(
+        function() {
           displayGlobal();
           displaySystem();
           displayFrameworkInfo();
-        } catch(error) {}
-      },
-      function() {
-        util.print('Not cordova project: missing project context'.yellow);
-        displayGlobal();
-        displaySystem();
-      }
-    )
-    .then(
-      monaca.reportFinish.bind(monaca, report),
-      monaca.reportFail.bind(monaca, report)
-    )
-    .then(
-      function() {
-        util.success('\nInfo displayed');
-      }.bind(null),
+          getConnectionInfo();
+        },
+        function() {
+          util.print('Not cordova project: missing project context'.yellow);
+          displayGlobal();
+          displaySystem();
+          getConnectionInfo();
+        }
+      )
+      .then(
+        monaca.reportFinish.bind(monaca, report),
+        monaca.reportFail.bind(monaca, report)
+      )
+      .then(
+        function() {
+          util.success('\nInfo displayed');
+        }.bind(null),
         util.fail.bind(null, '\nSomething went wrong')
-    );
+      );
   };
 
   module.exports = ConfigTask;
