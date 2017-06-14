@@ -2,7 +2,6 @@
 'use strict';
 
 var Q = require('q'),
-  Monaca = require('monaca-lib').Monaca,
   compareVersions = require('compare-versions'),
   fs = require('fs'),
   colors  =require('colors');
