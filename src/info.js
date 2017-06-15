@@ -112,7 +112,7 @@
           util.print(leftIndent + 'npm             :' + middleSpace + npmVersion.grey + '\n');
         }
       } catch(err) {
-        util.print('There was problem when displaying framework info'.red);
+        util.print('Problem occurred during displaying system info'.red);
       }
     };
 
@@ -123,7 +123,7 @@
         util.print(leftIndent + 'monaca-lib      :' + middleSpace + cliPackage.dependencies['monaca-lib'].grey);
         util.print(leftIndent + 'monaca-cli      :' + middleSpace + cliPackage.version.grey + '\n');
       } catch(err) {
-        util.print('Problem occured during displaying Monaca dependencies'.red);
+        util.print('Problem occurred during displaying Monaca dependencies'.red);
       }
     };
 
@@ -150,7 +150,7 @@
         util.print('');
 
       } catch(error) {
-        util.print('There was problem when displaying framework info'.red);
+        util.print('Problem occurred during displaying framework info'.red);
       }
     };
 
@@ -162,17 +162,17 @@
         json: true
       };
 
+      util.print('Monaca cloud connection'.blue.bold);
       var start = new Date().getTime();
       rp(requestContent).then(function(res) {
         var end = new Date().getTime();
         var time = end - start;
-        util.print('Monaca cloud connection'.blue.bold);
         util.print(leftIndent +'status          :' + middleSpace + 'successful'.green);
         util.print(leftIndent +'time            :' + middleSpace + (time + ' ms').grey);
         util.print(leftIndent +'local ip        :' + middleSpace + ip.address().grey);
       },
       function(err) {
-        util.print('Connection problem occured'.red);
+        util.print(leftIndent +'status          :' + middleSpace + 'no connection'.red);
       });
     };
 
