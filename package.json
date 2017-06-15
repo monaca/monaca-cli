@@ -1,6 +1,6 @@
 {
   "name": "monaca",
-  "version": "2.2.2",
+  "version": "2.2.4",
   "description": "Monaca Command Line Tool",
   "bin": {
     "monaca": "bin/monaca"
@@ -30,11 +30,12 @@
   "preferGlobal": true,
   "dependencies": {
     "colors": "^0.6.2",
+    "compare-versions": "3.0.1",
     "cordova": "^5.0.0",
     "extend": "^2.0.0",
     "http-server": "0.9.0",
     "monaca-inquirer": "^1.0.4",
-    "monaca-lib": "2.2.9",
+    "monaca-lib": "2.2.11",
     "open": "0.0.5",
     "optimist": "^0.6.1",
     "portfinder": "^1.0.7",

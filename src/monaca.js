@@ -5,6 +5,7 @@ var argv = require('optimist').argv,
   colors = require('colors'),
   fs = require('fs'),
   path = require('path'),
+  https = require('https'),
   util = require(path.join(__dirname, 'util'));
 
 colors.setTheme({
@@ -22,6 +23,14 @@ colors.setTheme({
 });
 
 var taskList = {};
+var latestVersion;
+
+https.get('https://ide.monaca.mobi/api/public/versions', function(res) {
+  res.on('data', function (data) {
+     data = JSON.parse(data);
+     latestVersion = data.result.monacaCli.replace(/"/g,'').split('/').pop();
+   });
+});
 
 var docsPath = '../doc/tasks/';
 fs.readdirSync(path.join(__dirname, docsPath)).forEach(function(filename) {
@@ -33,6 +42,12 @@ var info = {
   clientType: 'cli',
   clientVersion: VERSION
 };
+
+var USER_CORDOVA = path.join(
+  process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'],
+  '.cordova'
+);
+var CONFIG_FILE = path.join(USER_CORDOVA, 'monaca_config.json');
 
 var Monaca = {
   _getTask: function() {
@@ -61,7 +76,6 @@ var Monaca = {
     return task;
   },
   run: function() {
-
     // Version.
     if (argv._[0] === 'version' || argv.version || argv.v) {
       this.printVersion();
@@ -179,6 +193,16 @@ var Monaca = {
     util.print('');
   }
 };
+
+process.on('exit', function() {
+  var data = {
+    currentVersion: VERSION,
+    latestVersion: latestVersion,
+    config: CONFIG_FILE
+  };
+
+  util.updateCheck(data);
+});
 
 exports.Monaca = Monaca;
 })();

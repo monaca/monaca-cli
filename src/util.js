@@ -2,8 +2,13 @@
 'use strict';
 
 var Q = require('q'),
+  colors  =require('colors'),
+  compareVersions = require('compare-versions'),
   fs = require('fs'),
   path = require('path');
+
+var UPDATE_INTERVAL = 21600; //6 hours
+>>>>>>> master
 
 var _print = function(type, items) {
   var msg = '';
@@ -193,7 +198,32 @@ var checkNodeRequirement = function() {
     printwarn('\nWarning: your current Node version may not be compatible with the transpiling feature.');
     printwarn('Please consider updating your Node to version 6 or higher.\n');
   }
-}
+};
+
+var printUpdate = function(newVersion) {
+  println('\n------------------------------------------------------------------------------------'.help);
+  println('Monaca CLI '.help + newVersion.help.bold + ' is now available. In order to update, run:'.help);
+  println('                  npm install -g monaca '.success);
+  println('------------------------------------------------------------------------------------\n'.help);
+};
+
+var updateCheck = function(data) {
+  var currentDate = new Date();
+  var newTime = currentDate.getTime().toString();
+  var content = JSON.parse(fs.readFileSync(data.config, 'utf8'));
+  var lastUpdate = content['update_check_time'];
+
+  content['update_check_time'] = newTime;
+
+  if ((!lastUpdate || currentDate.getTime() > (lastUpdate + UPDATE_INTERVAL)) && data.latestVersion) {
+    var result = compareVersions(data.currentVersion, data.latestVersion);
+
+    if (result === -1 && content) {
+      printUpdate(data.latestVersion);
+      fs.writeFileSync(data.config, JSON.stringify(content), 'utf-8');
+    }
+  }
+};
 
 module.exports = {
   print: println,
@@ -207,7 +237,11 @@ module.exports = {
   displayLoginErrors: displayLoginErrors,
   displayHelp: displayHelp,
   checkNodeRequirement: checkNodeRequirement,
+<<<<<<< HEAD
   getTemplateFramework: getTemplateFramework,
   fileExists: fileExists
+=======
+  updateCheck: updateCheck
+>>>>>>> master
 };
 })();
