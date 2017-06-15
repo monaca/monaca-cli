@@ -2,10 +2,9 @@
 'use strict';
 
 var Q = require('q'),
-  colors  =require('colors'),
   compareVersions = require('compare-versions'),
   fs = require('fs'),
-  path = require('path');
+  colors  =require('colors');
 
 var UPDATE_INTERVAL = 21600; //6 hours
 
@@ -49,6 +48,10 @@ var parseItem = function(item) {
   }
 };
 
+var returnWithSpace = function(str) {
+  return str + Array(17 - str.length).join(' ');
+};
+
 var displayObjectKeys = function(object) {
   println(
     Object.keys(object).map(function(file, index) {
@@ -56,36 +59,6 @@ var displayObjectKeys = function(object) {
     })
     .join('\n')
   );
-};
-
-var fileExists = function (filePath) {
-  try {
-    return fs.statSync(filePath).isFile();
-  } catch (err) {
-    return false;
-  }
-};
-
-var getTemplateFramework = function() {
-  var projectInfoPath = path.join(process.cwd(), '.monaca', 'project_info.json');
-  var libDir = path.join(process.cwd(), 'www', 'lib')
-  var ionicPath = path.join(libDir, 'ionic', 'version.json');
-  var onsen1Path = path.join(libDir, 'onsenui', 'package.json');
-  var angular1Path = path.join(libDir, 'angular', 'package.json');
-
-  if(fileExists(projectInfoPath) && require(projectInfoPath)['template-type']) {
-    return require(projectInfoPath)['template-type'];
-  } else if(fileExists(onsen1Path)) {
-    if(fileExists(angular1Path)) {
-      return 'angular';
-    } else {
-      return 'onsenui';
-    }
-  } if(fileExists(ionicPath)) {
-    return 'ionic';
-  } else  {
-    return 'blank';
-  }
 };
 
 var displayProgress = function(progress) {
@@ -236,8 +209,7 @@ module.exports = {
   displayLoginErrors: displayLoginErrors,
   displayHelp: displayHelp,
   checkNodeRequirement: checkNodeRequirement,
-  getTemplateFramework: getTemplateFramework,
-  fileExists: fileExists,
-  updateCheck: updateCheck
+  updateCheck: updateCheck,
+  returnWithSpace: returnWithSpace
 };
 })();

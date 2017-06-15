@@ -1,6 +1,6 @@
 {
   "name": "monaca",
-  "version": "2.2.1",
+  "version": "2.2.4",
   "description": "Monaca Command Line Tool",
   "bin": {
     "monaca": "bin/monaca"
@@ -41,7 +41,6 @@
     "optimist": "^0.6.1",
     "portfinder": "^1.0.7",
     "q": "^1.1.2",
-    "request-promise": "4.2.1",
     "shelljs": "^0.3.0",
     "xmldom": "^0.1.19"
   }
