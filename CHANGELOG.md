@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v2.2.5
+----
+* Fixed local debug bug. Fixed #92.
+* Fixed project path on Monaca Debugger.
+
 v2.2.4
 ----
 * Fixed critical sync bug for projects containing special characters in the path.
