@@ -8,7 +8,6 @@ var Q = require('q'),
   path = require('path');
 
 var UPDATE_INTERVAL = 21600; //6 hours
->>>>>>> master
 
 var _print = function(type, items) {
   var msg = '';
@@ -237,11 +236,8 @@ module.exports = {
   displayLoginErrors: displayLoginErrors,
   displayHelp: displayHelp,
   checkNodeRequirement: checkNodeRequirement,
-<<<<<<< HEAD
   getTemplateFramework: getTemplateFramework,
-  fileExists: fileExists
-=======
+  fileExists: fileExists,
   updateCheck: updateCheck
->>>>>>> master
 };
 })();
