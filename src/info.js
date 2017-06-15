@@ -128,7 +128,7 @@
     };
 
     var displayFrameworkInfo = function() {
-      util.print('Framework info'.blue.bold);
+      util.print('Framework'.blue.bold);
       try {
         var framework = util.getTemplateFramework(),
           projectInfo = require(path.join(process.cwd(), '.monaca', 'project_info.json')),
@@ -154,9 +154,8 @@
       }
     };
 
-
     var getConnectionInfo = function() {
-      var options = {
+      var requestContent = {
         method: 'POST',
         url: 'https://ide.monaca.mobi/server_check',
         body: {},
@@ -164,7 +163,7 @@
       };
 
       var start = new Date().getTime();
-      rp(options).then(function(res) {
+      rp(requestContent).then(function(res) {
         var end = new Date().getTime();
         var time = end - start;
         util.print('Monaca cloud connection'.blue.bold);
@@ -173,7 +172,7 @@
         util.print(leftIndent +'local ip        :' + middleSpace + ip.address().grey);
       },
       function(err) {
-      util.print('Connection problem occured'.red);
+        util.print('Connection problem occured'.red);
       });
     };
 
