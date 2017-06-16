@@ -110,7 +110,7 @@
           } else {
 
             // HTTP Server
-            var httpServer = require('http-server');
+            var httpServer = require('watch-http-server');
 
             var server = httpServer.createServer({
               root: path.join(process.cwd(), 'www'),
