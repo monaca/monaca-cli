@@ -39,7 +39,7 @@
           });
 
           var checkPort = function(port, strict) {
-            //clear cach to distinguish multiple istances of pathfinder
+            //clear cach to distinguish multiple istances of portfinder
             delete require.cache[require.resolve('portfinder')];
 
             var deferred = Q.defer();
@@ -143,7 +143,7 @@
 
           if (taskName == 'demo') {
             // HTTP Server
-            var httpServer = require('watch-http-server');
+            var httpServer = require('http-server');
 
             var demoServer = httpServer.createServer({
               root: path.resolve(__dirname, '../pages/demo'),
@@ -169,7 +169,7 @@
           } else {
 
             // HTTP Server
-            var httpServer = require('watch-http-server');
+            var httpServer = require('http-server');
 
             var server = httpServer.createServer({
               root: path.join(process.cwd(), 'www'),

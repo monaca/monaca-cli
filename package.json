@@ -1,4 +1,4 @@
- {
+{
   "name": "monaca",
   "version": "2.2.5",
   "description": "Monaca Command Line Tool",
@@ -33,7 +33,7 @@
     "compare-versions": "3.0.1",
     "cordova": "^5.0.0",
     "extend": "^2.0.0",
-    "watch-http-server": "0.7.6",
+    "http-server": "0.9.0",
     "monaca-inquirer": "^1.0.4",
     "monaca-lib": "2.2.12",
     "open": "0.0.5",
