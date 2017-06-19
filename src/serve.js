@@ -6,7 +6,6 @@
     open = require('open'),
     fs = require('fs'),
     Q = require('q'),
-    portfinder = require('portfinder'),
     util = require(path.join(__dirname, 'util')),
     Monaca = require('monaca-lib').Monaca,
     argv = require('optimist')
@@ -15,6 +14,9 @@
     .argv;
 
   var ServeTask = {}, monaca;
+  var DEFAULT_DEMO_PORT = 8200,
+    DEFAULT_CONTENT_PORT = 8550,
+    DEFAULT_PREVIEW_PORT = 8000;
 
   ServeTask.run = function(taskName, info) {
     monaca = new Monaca(info);
@@ -36,25 +38,54 @@
             deferredAddresses.resolve(addresses || []);
           });
 
-          // port
-          var deferredPort = Q.defer();
-          portfinder.basePort = argv.port || 8000;
-          portfinder.getPort(function(err, port) {
-            if (err) {
-              return deferredPort.reject(err);
-            }
-            if (argv.port && argv.port !== port) {
-              util.warn('The specified port ' + argv.port + ' is already in use. Using available port ' + port + ' instead.\n');
-            }
-            deferredPort.resolve(port);
-          });
+          var checkPort = function(port, strict) {
+            //clear cach to distinguish multiple istances of portfinder
+            delete require.cache[require.resolve('portfinder')];
 
-          return Q.all([deferredAddresses.promise, deferredPort.promise]);
+            var deferred = Q.defer();
+            var portfinder = require('portfinder');
+
+            portfinder.basePort = port;
+            portfinder.getPort(function(err, freePort) {
+              if (err) {
+                deferred.reject(err);
+              } else {
+                if (port && port !== freePort) {
+                  if (strict) {
+                    deferred.reject(new Error('the content port ' + DEFAULT_CONTENT_PORT + ' is occupied.\nPlease free it and try again.\n'));
+                  } else {
+                    util.warn('The specified port ' + port + ' is already in use. Using available port ' + freePort + ' instead.\n');
+                    deferred.resolve(freePort);
+                  }
+                } else {
+                  deferred.resolve(port);
+                }
+              }
+            });
+
+            return deferred.promise;
+          };
+
+          // port
+          if (taskName !== 'demo') {
+            var contentPort = argv.port || DEFAULT_PREVIEW_PORT;
+            return Q.all([deferredAddresses.promise, checkPort(contentPort)]);
+          } else {
+            var contentPort = DEFAULT_CONTENT_PORT,
+              demoPort = argv.port || DEFAULT_DEMO_PORT;
+            if (contentPort == demoPort) {
+              return Q.reject(new Error("the demo port cannot be " + DEFAULT_CONTENT_PORT + ".\nPlease free it and try again.\n"));
+            }
+            return Q.all([deferredAddresses.promise, checkPort(contentPort, true), checkPort(demoPort)]);
+          }
         }
       )
       .then(
         function(info) {
-          var ifaces = info[0], port = info[1];
+          var ifaces = info[0],
+            contentPort = info[1],
+            demoPort = info[2];
+
           var isTranspileEnabled = monaca.isTranspileEnabled(process.cwd());
 
           if (isTranspileEnabled) {
@@ -64,15 +95,22 @@
           // Log information about IP addresses and opens browser if requested.
           var logAndOpen = function() {
             var canonicalHost = '127.0.0.1';
-            var address = 'http://' + canonicalHost + ':' + port
-              + (isTranspileEnabled ? '/webpack-dev-server/' : '');
+
+            if (taskName !== 'demo') {
+              var address = 'http://' + canonicalHost + ':' + contentPort
+                + (isTranspileEnabled ? '/webpack-dev-server/' : '');
+            } else {
+              var address = 'http://' + canonicalHost + ':' + demoPort;
+            }
 
             process.stdout.write('HTTP server available on:'.yellow);
             process.stdout.write('\n  ' + address.green);
 
-            ifaces.forEach(function(iface) {
-              process.stdout.write('\n  ' + address.replace(canonicalHost, iface.address).green);
-            });
+            if (taskName !== 'demo') {
+              ifaces.forEach(function(iface) {
+                process.stdout.write('\n  ' + address.replace(canonicalHost, iface.address).green);
+              });
+            }
 
             process.stdout.write('\nHit CTRL-C to stop the server\n\n');
 
@@ -95,6 +133,29 @@
             };
           };
 
+          var logFn = function (req, res, error) {
+            if (error) {
+              console.log(
+                '[%s] "%s %s" Error (%s): "%s"',
+                new Date(), req.method.red, req.url.red,
+                error.status.toString().red, error.message.red
+              );
+            }
+          };
+
+          if (taskName == 'demo') {
+            // HTTP Server
+            var httpServer = require('http-server');
+
+            var demoServer = httpServer.createServer({
+              root: path.resolve(__dirname, '../pages/demo'),
+              cache: -1,
+              logFn: logFn
+            });
+
+            demoServer.listen(demoPort, '0.0.0.0', logAndOpen);
+          }
+
 
           if (isTranspileEnabled) {
 
@@ -105,7 +166,7 @@
 
             var server = new WebpackDevServer(webpack(webpackConfig), webpackConfig.devServer);
 
-            server.listen(port, '0.0.0.0', hookStdout);
+            server.listen(contentPort, '0.0.0.0', taskName !== 'demo' ? hookStdout : '');
 
           } else {
 
@@ -115,18 +176,10 @@
             var server = httpServer.createServer({
               root: path.join(process.cwd(), 'www'),
               cache: -1,
-              logFn: function (req, res, error) {
-                if (error) {
-                  console.log(
-                    '[%s] "%s %s" Error (%s): "%s"',
-                    new Date(), req.method.red, req.url.red,
-                    error.status.toString().red, error.message.red
-                  );
-                }
-              }
+              logFn: logFn
             });
 
-            server.listen(port, '0.0.0.0', logAndOpen);
+            server.listen(contentPort, '0.0.0.0', taskName !== 'demo' ? logAndOpen : '');
           }
 
           if (process.platform === 'win32') {
@@ -147,7 +200,7 @@
         }
       )
     .catch(monaca.reportFail.bind(monaca, report))
-    .catch(util.fail.bind(null, 'Failed serving project: '));
+    .catch(util.fail.bind(null, 'Project ' + taskName + ' failed: '));
   };
 
   module.exports = ServeTask;
