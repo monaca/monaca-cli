@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.2.6
+----
+* Added `monaca demo` command.
+
 v2.2.5
 ----
 * Fixed local debug bug. Fixed #92.
