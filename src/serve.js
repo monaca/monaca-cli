@@ -106,9 +106,11 @@
             process.stdout.write('HTTP server available on:'.yellow);
             process.stdout.write('\n  ' + address.green);
 
-            ifaces.forEach(function(iface) {
-              process.stdout.write('\n  ' + address.replace(canonicalHost, iface.address).green);
-            });
+            if (taskName !== 'demo') {
+              ifaces.forEach(function(iface) {
+                process.stdout.write('\n  ' + address.replace(canonicalHost, iface.address).green);
+              });
+            }
 
             process.stdout.write('\nHit CTRL-C to stop the server\n\n');
 
