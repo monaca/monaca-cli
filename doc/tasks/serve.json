@@ -42,12 +42,12 @@
     "usage": "monaca demo",
     "examples": [
       "monaca demo",
-      "monaca demo -p 8002"
+      "monaca demo -p 8001"
     ],
     "options": [
       [
         "--port, -p",
-        "Port. Defaults to 8200"
+        "Port. Defaults to 8000"
       ]
     ],
     "showInHelp": true
