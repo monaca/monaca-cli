@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v2.2.7
+----
+* Fixed auto-reloading in `monaca preview/serve/demo`.
+* New HTTP Server support.
+
 v2.2.6
 ----
 * Added `monaca demo` command.
