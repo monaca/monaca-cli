@@ -1,5 +1,5 @@
 (function() {
-'use strict';
+  'use strict';
 
   var path = require('path'),
     Monaca = require('monaca-lib').Monaca,
@@ -7,27 +7,29 @@
     os = require('os'),
     compareVersions = require('compare-versions'),
     ip = require('ip'),
-    fs = require('fs');
+    npm = require('global-npm'),
+    fs = require('fs'),
+    Q = require('q');
 
   var ConfigTask = {}, monaca;
 
   ConfigTask.run = function(taskName, info) {
     monaca = new Monaca(info);
 
-    this.showInfo();
+    this.showInfo(info);
   };
 
-  ConfigTask.showInfo = function() {
+  ConfigTask.showInfo = function(info) {
     var report = {
       event: 'info'
     };
 
     monaca.reportAnalytics(report);
+
     var leftIndent = '      ';
-    var middleSpace = '  ';
+    var middleSpace = ':  ';
 
-
-    var fileExists = function (filePath) {
+    var fileExists = function(filePath) {
       try {
         return fs.statSync(filePath).isFile();
       } catch (err) {
@@ -54,7 +56,7 @@
 
     var getTemplateVersions = function() {
       var result = {};
-      var libDir = path.join(process.cwd(), 'www/lib');
+      var libDir = path.join(process.cwd(), 'www', 'lib');
 
       var onsenPaths = [
         path.join(libDir, 'onsenui', 'package.json'),
@@ -62,15 +64,19 @@
       ];
 
       var versionsPaths = {
-       'ionic' : path.join(libDir, 'ionic', 'version.json'),
-       'angular' : path.join(libDir, 'angular', 'package.json'),
-       'vue' : path.join(process.cwd(), 'node_modules', 'vue' , 'package.json'),
-       'react' : path.join(process.cwd(), 'node_modules', 'react' , 'package.json'),
-       'angular2' : path.join(process.cwd(), 'node_modules', '@angular', 'core', 'package.json'),
-       'vue-onsenui' : path.join(process.cwd(), 'node_modules', 'vue-onsenui' , 'package.json'),
-       'react-onsenui' : path.join(process.cwd(), 'node_modules', 'react-onsenui' , 'package.json'),
-       'angular2-onsenui' : path.join(process.cwd(), 'node_modules', 'angular2-onsenui', 'package.json')
+        'ionic' : path.join(libDir, 'ionic', 'version.json'),
+        'angular' : path.join(libDir, 'angular', 'package.json'),
+        'vue' : path.join(process.cwd(), 'node_modules', 'vue' , 'package.json'),
+        'react' : path.join(process.cwd(), 'node_modules', 'react' , 'package.json'),
+        'angular2' : path.join(process.cwd(), 'node_modules', '@angular', 'core', 'package.json'),
+        'vue-onsenui' : path.join(process.cwd(), 'node_modules', 'vue-onsenui' , 'package.json'),
+        'react-onsenui' : path.join(process.cwd(), 'node_modules', 'react-onsenui' , 'package.json'),
+        'angular2-onsenui' : path.join(process.cwd(), 'node_modules', 'angular2-onsenui', 'package.json')
       };
+
+      if(fileExists(path.join(process.cwd(), '.monaca','project_info.json'))) {
+        result.cordova = require(path.join(process.cwd(), '.monaca','project_info.json'))['cordova_version'];
+      }
 
       for (var i in onsenPaths) {
         if (fileExists(onsenPaths[i])) {
@@ -100,86 +106,90 @@
     };
 
     var displaySystem = function() {
-      util.print('System'.blue.bold);
+      util.success('System');
       try {
         var os = getOperatingSystem(),
           nodeVersion = process.versions.node,
-          npmVersion = require('global-npm').version;
+          npmVersion = npm.version;
 
         if (os) {
-          util.print(leftIndent + 'os              :' + middleSpace + os.grey);
+          util.print(leftIndent + util.alignContent('os') + middleSpace + os.grey);
         }
         if (nodeVersion) {
-          util.print(leftIndent + 'node            :' + middleSpace + nodeVersion.grey);
+          util.print(leftIndent + util.alignContent('node') + middleSpace + nodeVersion.grey);
         }
         if (npmVersion) {
-          util.print(leftIndent + 'npm             :' + middleSpace + npmVersion.grey + '\n');
+          util.print(leftIndent + util.alignContent('npm') + middleSpace + npmVersion.grey + '\n');
         }
       } catch (err) {
-        util.print('Problem occurred during displaying system info'.red);
+        util.err('Failed displaying system info: ' + err);
       }
     };
 
-    var displayGlobal = function() {
+    var displayMonacaInfo = function() {
       try {
         var cliPackage = require(path.join(__dirname, '..', 'package.json'));
-        util.print('Monaca dependencies'.blue.bold);
-        util.print(leftIndent + 'monaca-lib      :' + middleSpace + cliPackage.dependencies['monaca-lib'].grey);
-        util.print(leftIndent + 'monaca-cli      :' + middleSpace + cliPackage.version.grey + '\n');
+        util.success('\nMonaca dependencies');
+        util.print(leftIndent + util.alignContent('monaca-lib') + middleSpace + cliPackage.dependencies['monaca-lib'].grey);
+        util.print(leftIndent + util.alignContent('monaca-cli') + middleSpace + info.clientVersion.grey + '\n');
       } catch (err) {
-        util.print('Problem occurred during displaying Monaca dependencies'.red);
+        util.err('Failed displaying monaca info: ' + err);
       }
     };
 
 
-    var displayFrameworkInfo = function() {
-      util.print('Framework'.blue.bold);
+    var displayProjectInfo = function() {
+      util.success('Project info');
       var versions = getTemplateVersions();
 
       for (var i in versions) {
-        util.print(leftIndent + util.returnWithSpace(i) + ':' + middleSpace + versions[i].grey);
+        util.print(leftIndent + util.alignContent(i) + middleSpace + versions[i].grey);
       }
       util.print('');
     };
 
     var displayConnectionInfo = function() {
-      util.print('Monaca cloud connection'.blue.bold);
-
-      monaca.getConnectionInfo()
+      util.success('Monaca cloud connection');
+      return monaca.getConnectionInfo()
       .then(
         function(info) {
-          util.print(leftIndent + util.returnWithSpace('status') + ':' + middleSpace + info['status'].green);
-          util.print(leftIndent +'local ip        :' + middleSpace + ip.address().grey);
+          util.print(leftIndent + util.alignContent('status') + middleSpace + info['status'].grey);
+          util.print(leftIndent + util.alignContent('local ip') + middleSpace + ip.address().grey + '\n');
+          return Q.resolve();
         },
         function(err) {
-          util.print(leftIndent +'status          :' + middleSpace + 'not available'.red);
+          util.print(leftIndent + util.alignContent('status') + middleSpace + 'not available'.grey + '\n');
+          return Q.resolve();
         }
       );
     };
 
-    monaca.isCordovaProject(process.cwd())
+
+    displayMonacaInfo();
+    displaySystem();
+
+    displayConnectionInfo()
     .then(
       function() {
-        displayGlobal();
-        displaySystem();
-        displayFrameworkInfo();
-        displayConnectionInfo();
-      },
+        return monaca.isCordovaProject(process.cwd());
+      }
+    )
+    .then(
       function() {
-        util.print('Not cordova project: missing project context'.yellow);
-        displayGlobal();
-        displaySystem();
-        displayConnectionInfo();
+        displayProjectInfo();
+      },
+      function(err) {
+        util.warn('Missing project context: ' + err);
       }
     )
     .then(
       monaca.reportFinish.bind(monaca, report),
       monaca.reportFail.bind(monaca, report)
     )
-    .then(
-      function() {
-      }.bind(null),
-      util.fail.bind(null, '\nSomething went wrong')
+    .catch(
+      function(error) {
+        util.fail.bind(null, '\nSomething went wrong: ' + error);
+      }.bind(null)
     );
   };
 

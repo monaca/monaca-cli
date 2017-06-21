@@ -48,7 +48,7 @@ var parseItem = function(item) {
   }
 };
 
-var returnWithSpace = function(str) {
+var alignContent = function(str) {
   return str + Array(17 - str.length).join(' ');
 };
 
@@ -210,6 +210,6 @@ module.exports = {
   displayHelp: displayHelp,
   checkNodeRequirement: checkNodeRequirement,
   updateCheck: updateCheck,
-  returnWithSpace: returnWithSpace
+  alignContent: alignContent
 };
 })();
