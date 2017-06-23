@@ -12,7 +12,7 @@
     Q = require('q');
 
   var ConfigTask = {}, monaca;
-
+f
   ConfigTask.run = function(taskName, info) {
     monaca = new Monaca(info);
 
@@ -71,7 +71,7 @@
         'angular2-onsenui' : path.join(process.cwd(), 'node_modules', 'angular2-onsenui', 'package.json')
       };
 
-      if(fileExists(path.join(process.cwd(), '.monaca','project_info.json'))) {
+      if (fileExists(path.join(process.cwd(), '.monaca','project_info.json'))) {
         result.cordova = require(path.join(process.cwd(), '.monaca','project_info.json'))['cordova_version'];
       }
 
@@ -174,20 +174,12 @@
     .then(
       function() {
         displayProjectInfo();
-      },
-      function(err) {
-        util.warn('Missing project context: ' + err);
       }
     )
     .then(
       monaca.reportFinish.bind(monaca, report),
       monaca.reportFail.bind(monaca, report)
     )
-    .catch(
-      function(error) {
-        util.fail.bind(null, '\nSomething went wrong: ' + error);
-      }.bind(null)
-    );
   };
 
   module.exports = ConfigTask;
