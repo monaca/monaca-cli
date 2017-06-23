@@ -49,7 +49,9 @@ var parseItem = function(item) {
 };
 
 var alignContent = function(str) {
-  return str + Array(17 - str.length).join(' ');
+  var indent = '     ';
+  var middleSpace = ':    ';
+  return indent + str + Array(17 - str.length).join(' ') + middleSpace;
 };
 
 var displayObjectKeys = function(object) {

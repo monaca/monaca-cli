@@ -26,9 +26,6 @@
 
     monaca.reportAnalytics(report);
 
-    var leftIndent = '      ';
-    var middleSpace = ':  ';
-
     var fileExists = function(filePath) {
       try {
         return fs.statSync(filePath).isFile();
@@ -113,13 +110,13 @@
           npmVersion = npm.version;
 
         if (os) {
-          util.print(leftIndent + util.alignContent('os') + middleSpace + os.grey);
+          util.print(util.alignContent('os') + os.grey);
         }
         if (nodeVersion) {
-          util.print(leftIndent + util.alignContent('node') + middleSpace + nodeVersion.grey);
+          util.print(util.alignContent('node') + nodeVersion.grey);
         }
         if (npmVersion) {
-          util.print(leftIndent + util.alignContent('npm') + middleSpace + npmVersion.grey + '\n');
+          util.print(util.alignContent('npm') + npmVersion.grey + '\n');
         }
       } catch (err) {
         util.err('Failed displaying system info: ' + err);
@@ -130,8 +127,8 @@
       try {
         var cliPackage = require(path.join(__dirname, '..', 'package.json'));
         util.success('\nMonaca dependencies');
-        util.print(leftIndent + util.alignContent('monaca-lib') + middleSpace + cliPackage.dependencies['monaca-lib'].grey);
-        util.print(leftIndent + util.alignContent('monaca-cli') + middleSpace + info.clientVersion.grey + '\n');
+        util.print(util.alignContent('monaca-lib') + cliPackage.dependencies['monaca-lib'].grey);
+        util.print(util.alignContent('monaca-cli') + info.clientVersion.grey + '\n');
       } catch (err) {
         util.err('Failed displaying monaca info: ' + err);
       }
@@ -143,7 +140,7 @@
       var versions = getTemplateVersions();
 
       for (var i in versions) {
-        util.print(leftIndent + util.alignContent(i) + middleSpace + versions[i].grey);
+        util.print(util.alignContent(i) + versions[i].grey);
       }
       util.print('');
     };
@@ -153,12 +150,12 @@
       return monaca.getConnectionInfo()
       .then(
         function(info) {
-          util.print(leftIndent + util.alignContent('status') + middleSpace + info['status'].grey);
-          util.print(leftIndent + util.alignContent('local ip') + middleSpace + ip.address().grey + '\n');
+          util.print(util.alignContent('status') + info['status'].grey);
+          util.print(util.alignContent('local ip') + ip.address().grey + '\n');
           return Q.resolve();
         },
         function(err) {
-          util.print(leftIndent + util.alignContent('status') + middleSpace + 'not available'.grey + '\n');
+          util.print(util.alignContent('status') + 'not available'.grey + '\n');
           return Q.resolve();
         }
       );
