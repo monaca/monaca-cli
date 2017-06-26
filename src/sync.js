@@ -250,7 +250,7 @@ SyncTask.livesync = function() {
   var projects = argv._.slice(1);
 
   if (projects.length === 0) {
-    projects.push('.');
+    projects.push(process.cwd());
   }
 
   var report = {
@@ -266,6 +266,7 @@ SyncTask.livesync = function() {
 
 
   var error = 'Unable to add projects: ';
+
   localkit.setProjects(projects)
     // Adding projects.
     .then(

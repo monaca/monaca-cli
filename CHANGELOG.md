@@ -2,6 +2,20 @@
 CHANGELOG
 ====
 
+v2.2.7
+----
+* Fixed auto-reloading in `monaca preview/serve/demo`.
+* New HTTP Server support.
+
+v2.2.6
+----
+* Added `monaca demo` command.
+
+v2.2.5
+----
+* Fixed local debug bug. Fixed #92.
+* Fixed project path on Monaca Debugger.
+
 v2.2.4
 ----
 * Fixed critical sync bug for projects containing special characters in the path.

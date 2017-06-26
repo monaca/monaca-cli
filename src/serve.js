@@ -15,71 +15,46 @@
     .argv;
 
   var ServeTask = {}, monaca;
+  var DEFAULT_PORT = 8000
 
   ServeTask.run = function(taskName, info) {
     monaca = new Monaca(info);
 
     var report = {
-      event: 'preview'
+      event: taskName
     };
     monaca.reportAnalytics(report);
 
     monaca.isCordovaProject(process.cwd())
       .then(
         function() {
-          // ifaces
-          var deferredAddresses = Q.defer();
-          require('dns').lookup(require('os').hostname(), { family: 4, all: true } , function(err, addresses) {
-            if (err) {
-              util.warn(err);
-            }
-            deferredAddresses.resolve(addresses || []);
-          });
 
-          // port
-          var deferredPort = Q.defer();
-          portfinder.basePort = argv.port || 8000;
-          portfinder.getPort(function(err, port) {
-            if (err) {
-              return deferredPort.reject(err);
-            }
-            if (argv.port && argv.port !== port) {
-              util.warn('The specified port ' + argv.port + ' is already in use. Using available port ' + port + ' instead.\n');
-            }
-            deferredPort.resolve(port);
-          });
+          var checkPort = function() {
+            var deferredPort = Q.defer();
+            portfinder.basePort = argv.port || DEFAULT_PORT;
+            portfinder.getPort(function(err, port) {
+              if (err) {
+                return deferredPort.reject(err);
+              }
+              if (argv.port && argv.port !== port) {
+                util.warn('The specified port ' + argv.port + ' is already in use. Using available port ' + port + ' instead.\n');
+              }
+              deferredPort.resolve(port);
+            });
+            return deferredPort.promise;
+          }
 
-          return Q.all([deferredAddresses.promise, deferredPort.promise]);
+          return checkPort();
         }
       )
       .then(
-        function(info) {
-          var ifaces = info[0], port = info[1];
-          var isTranspileEnabled = monaca.isTranspileEnabled(process.cwd());
+        function(port) {
+          var port = port,
+            isTranspileEnabled = monaca.isTranspileEnabled(process.cwd());
 
           if (isTranspileEnabled) {
             util.checkNodeRequirement();
           }
-
-          // Log information about IP addresses and opens browser if requested.
-          var logAndOpen = function() {
-            var canonicalHost = '127.0.0.1';
-            var address = 'http://' + canonicalHost + ':' + port
-              + (isTranspileEnabled ? '/webpack-dev-server/' : '');
-
-            process.stdout.write('HTTP server available on:'.yellow);
-            process.stdout.write('\n  ' + address.green);
-
-            ifaces.forEach(function(iface) {
-              process.stdout.write('\n  ' + address.replace(canonicalHost, iface.address).green);
-            });
-
-            process.stdout.write('\nHit CTRL-C to stop the server\n\n');
-
-            if (argv.open) {
-              open(address);
-            }
-          };
 
           // Make sure the logs only appear at the end of the process.
           var hookStdout = function() {
@@ -90,11 +65,14 @@
               if (/bundle is now VALID|webpack: Compiled successfully/.test(string)) {
                 process.stdout.write = originalWrite;
                 process.stdout.write('\n');
-                logAndOpen();
+                if (taskName == 'demo') {
+                  open('http://127.0.0.1:' + port + '/monaca-demo/');
+                } else {
+                  open('http://127.0.0.1:' + port + '/webpack-dev-server/');
+                }
               }
             };
           };
-
 
           if (isTranspileEnabled) {
 
@@ -109,24 +87,22 @@
 
           } else {
 
-            // HTTP Server
-            var httpServer = require('http-server');
+            var server = require("live-server");
 
-            var server = httpServer.createServer({
+            var params = {
+              port: port,
+              host: "0.0.0.0",
               root: path.join(process.cwd(), 'www'),
-              cache: -1,
-              logFn: function (req, res, error) {
-                if (error) {
-                  console.log(
-                    '[%s] "%s %s" Error (%s): "%s"',
-                    new Date(), req.method.red, req.url.red,
-                    error.status.toString().red, error.message.red
-                  );
-                }
-              }
-            });
+              open: (taskName === 'demo') ? false : true,
+              mount: [['/monaca-demo', path.resolve(__dirname, '..', 'pages', 'demo')]],
+              logLevel: 3
+            }
 
-            server.listen(port, '0.0.0.0', logAndOpen);
+            server.start(params);
+
+            if (taskName == 'demo') {
+              open('http://127.0.0.1:' + port + '/monaca-demo/');
+            }
           }
 
           if (process.platform === 'win32') {
@@ -147,7 +123,7 @@
         }
       )
     .catch(monaca.reportFail.bind(monaca, report))
-    .catch(util.fail.bind(null, 'Failed serving project: '));
+    .catch(util.fail.bind(null, 'Project ' + taskName + ' failed: '));
   };
 
   module.exports = ServeTask;
