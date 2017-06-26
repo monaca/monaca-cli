@@ -48,6 +48,12 @@ var parseItem = function(item) {
   }
 };
 
+var alignContent = function(str) {
+  var indent = '    ';
+  var middleSpace = ':    ';
+  return indent + str + Array(17 - str.length).join(' ') + middleSpace;
+};
+
 var displayObjectKeys = function(object) {
   println(
     Object.keys(object).map(function(file, index) {
@@ -205,6 +211,7 @@ module.exports = {
   displayLoginErrors: displayLoginErrors,
   displayHelp: displayHelp,
   checkNodeRequirement: checkNodeRequirement,
-  updateCheck: updateCheck
+  updateCheck: updateCheck,
+  alignContent: alignContent
 };
 })();
