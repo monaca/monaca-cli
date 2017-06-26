@@ -33,7 +33,6 @@
     "compare-versions": "3.0.1",
     "cordova": "^5.0.0",
     "extend": "^2.0.0",
-    "http-server": "0.9.0",
     "ip": "^1.1.5",
     "live-server": "1.2.0",
     "monaca-inquirer": "^1.0.4",
