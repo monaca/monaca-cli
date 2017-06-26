@@ -58,7 +58,7 @@ ConfigTask.reconfigure = function() {
     .then(function() {
       var promises = [];
       var dict = {
-        transpile: 'generateBuildConfigs',
+        transpile: 'generateBuildConfig',
         components: 'initComponents',
         dependencies: 'installBuildDependencies'
       };
