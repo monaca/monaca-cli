@@ -103,20 +103,20 @@
     };
 
     var displaySystem = function() {
-      util.success('Systemn\n');
+      util.success('System\n');
       try {
         var os = getOperatingSystem(),
           nodeVersion = process.versions.node,
           npmVersion = npm.version;
 
         if (os) {
-          util.print(util.alignContent('os') + os.grey);
+          util.print(util.alignContent('os') + os);
         }
         if (nodeVersion) {
-          util.print(util.alignContent('node') + nodeVersion.grey);
+          util.print(util.alignContent('node') + nodeVersion);
         }
         if (npmVersion) {
-          util.print(util.alignContent('npm') + npmVersion.grey + '\n');
+          util.print(util.alignContent('npm') + npmVersion + '\n');
         }
       } catch (err) {
         util.err('Failed displaying system info: ' + err);
@@ -127,8 +127,8 @@
       try {
         var cliPackage = require(path.join(__dirname, '..', 'package.json'));
         util.success('\nMonaca dependencies\n');
-        util.print(util.alignContent('monaca-lib') + cliPackage.dependencies['monaca-lib'].grey);
-        util.print(util.alignContent('monaca-cli') + info.clientVersion.grey + '\n');
+        util.print(util.alignContent('monaca-lib') + cliPackage.dependencies['monaca-lib']);
+        util.print(util.alignContent('monaca-cli') + info.clientVersion + '\n');
       } catch (err) {
         util.err('Failed displaying monaca info: ' + err);
       }
@@ -140,18 +140,18 @@
       var versions = getTemplateVersions();
 
       for (var i in versions) {
-        util.print(util.alignContent(i) + versions[i].grey);
+        util.print(util.alignContent(i) + versions[i]);
       }
       util.print('');
     };
 
     var displayConnectionInfo = function() {
-      util.success('Monaca cloud connection\n');
-      util.print(util.alignContent('local ip') + ip.address().grey);
+      util.success('Monaca Cloud connection\n');
+      util.print(util.alignContent('local ip') + ip.address());
       return monaca.getConnectionStatus()
       .then(
         function(status) {
-          util.print(util.alignContent('status') + status.grey + '\n');
+          util.print(util.alignContent('status') + status + '\n');
           return Q.resolve();
         }
       );
