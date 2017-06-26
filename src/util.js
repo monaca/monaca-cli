@@ -49,7 +49,7 @@ var parseItem = function(item) {
 };
 
 var alignContent = function(str) {
-  var indent = '     ';
+  var indent = '    ';
   var middleSpace = ':    ';
   return indent + str + Array(17 - str.length).join(' ') + middleSpace;
 };

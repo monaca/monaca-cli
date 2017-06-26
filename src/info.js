@@ -12,7 +12,7 @@
     Q = require('q');
 
   var ConfigTask = {}, monaca;
-  
+
   ConfigTask.run = function(taskName, info) {
     monaca = new Monaca(info);
 
@@ -77,7 +77,7 @@
 
       for (var i in onsenPaths) {
         if (fileExists(onsenPaths[i])) {
-          result.onsen = require(onsenPaths[i]).version;
+          result.onsenui = require(onsenPaths[i]).version;
         }
       }
 
@@ -103,7 +103,7 @@
     };
 
     var displaySystem = function() {
-      util.success('System');
+      util.success('Systemn\n');
       try {
         var os = getOperatingSystem(),
           nodeVersion = process.versions.node,
@@ -126,7 +126,7 @@
     var displayMonacaInfo = function() {
       try {
         var cliPackage = require(path.join(__dirname, '..', 'package.json'));
-        util.success('\nMonaca dependencies');
+        util.success('\nMonaca dependencies\n');
         util.print(util.alignContent('monaca-lib') + cliPackage.dependencies['monaca-lib'].grey);
         util.print(util.alignContent('monaca-cli') + info.clientVersion.grey + '\n');
       } catch (err) {
@@ -136,7 +136,7 @@
 
 
     var displayProjectInfo = function() {
-      util.success('Project info');
+      util.success('Project info\n');
       var versions = getTemplateVersions();
 
       for (var i in versions) {
@@ -146,7 +146,7 @@
     };
 
     var displayConnectionInfo = function() {
-      util.success('Monaca cloud connection');
+      util.success('Monaca cloud connection\n');
       return monaca.getConnectionInfo()
       .then(
         function(info) {
