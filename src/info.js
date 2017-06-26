@@ -147,10 +147,10 @@
 
     var displayConnectionInfo = function() {
       util.success('Monaca cloud connection\n');
-      return monaca.getConnectionInfo()
+      return monaca.getConnectionStatus()
       .then(
-        function(info) {
-          util.print(util.alignContent('status') + info['status'].grey);
+        function(status) {
+          util.print(util.alignContent('status') + status.grey);
           util.print(util.alignContent('local ip') + ip.address().grey + '\n');
           return Q.resolve();
         },
