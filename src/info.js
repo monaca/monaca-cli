@@ -12,7 +12,7 @@
     Q = require('q');
 
   var ConfigTask = {}, monaca;
-f
+  
   ConfigTask.run = function(taskName, info) {
     monaca = new Monaca(info);
 
