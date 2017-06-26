@@ -170,12 +170,10 @@
     .then(
       function() {
         displayProjectInfo();
-      }
-    )
-    .then(
-      monaca.reportFinish.bind(monaca, report),
+        monaca.reportFinish.bind(monaca, report);
+      },
       monaca.reportFail.bind(monaca, report)
-    )
+    );
   };
 
   module.exports = ConfigTask;
