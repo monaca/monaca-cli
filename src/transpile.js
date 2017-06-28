@@ -5,26 +5,11 @@ var path = require('path'),
 
 var TranspileTask = {}, monaca;
 
-/*
- * Check if valid project directory.
- */
-TranspileTask.isValidProject = function(projectPath) {
-  try {
-    return fs.statSync(path.join(projectPath, 'www')).isDirectory();
-  } catch (e) {
-    return false;
-  }
-};
-
 TranspileTask.run = function(taskName, info) {
+  var projectDir = process.cwd();
   monaca = new Monaca(info);
 
-  var projectDir = process.cwd();
-  if(!this.isValidProject(projectDir)) {
-    util.fail('This directory does not contains a valid project.');
-  }
-
-  if(!monaca.isTranspilable(projectDir)) {
+  if (!monaca.isTranspilable(projectDir)) {
     util.fail('This project is not transpilable.');
   }
 
