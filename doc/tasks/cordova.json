@@ -34,7 +34,7 @@
     "showInHelp": false
   },
   "plugin": {
-    "order": 30,
+    "order": 70,
     "description": "manage Cordova Plugin",
     "longDescription": [
       "Manage installed plugins",

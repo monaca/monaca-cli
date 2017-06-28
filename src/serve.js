@@ -79,6 +79,7 @@
             // Webpack Dev Server
             var webpack = require(path.join(monaca.userCordova, 'node_modules', 'webpack'));
             var webpackConfig = require(monaca.getWebpackConfigFile(process.cwd(), 'dev'));
+            webpackConfig.entry.unshift("webpack-dev-server/client?http://localhost:" + port + "/");
             var WebpackDevServer = require(path.join(monaca.userCordova, 'node_modules', 'webpack-dev-server'));
 
             var server = new WebpackDevServer(webpack(webpackConfig), webpackConfig.devServer);

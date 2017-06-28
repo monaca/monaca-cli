@@ -1,7 +1,7 @@
 {
   "preview": {
-    "order": 2,
-    "description": "runs a local web server for preview",
+    "order": 30,
+    "description": "run a local web server for preview",
     "longDescription": [
       "Starts a local web server that serves the www assets.",
       "",
@@ -29,8 +29,8 @@
     "aliases": ["serve"]
   },
   "demo": {
-    "order": 3,
-    "description": "displays the app appereance on iOS and Android",
+    "order": 31,
+    "description": "display the app appereance on iOS and Android",
     "longDescription": [
       "Starts a local web server that serves the www assets",
       "on special views for Android and iOS",

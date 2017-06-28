@@ -1,7 +1,7 @@
 {
   "info": {
-    "order": 80,
-    "description": "displays project and environment info",
+    "order": 100,
+    "description": "display project and environment info",
     "longDescription": [
       "Displays information about monaca dependencies, system, project dependencies and connection to Monaca Cloud"
     ],

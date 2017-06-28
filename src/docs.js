@@ -28,13 +28,13 @@
     var openDocs = function(docsType) {
       try {
         if (docsType === 'onsen') {
-          opn('https://onsen.io/');
+          opn('https://onsen.io/v2/guide/');
         } else if (docsType === 'tutorial') {
           opn('http://tutorial.onsen.io/');
         } else if (docsType === 'usage') {
           opn('http://docs.monaca.io/en/manual/development/monaca_cli/');
         } else {
-          return Q.reject(docsType + ' is not a valid argument of monaca docs command');
+          return Q.reject(docsType + ' is not a valid argument of monaca docs command.');
         }
         return Q.resolve();
       } catch (error) {
@@ -50,10 +50,8 @@
       monaca.reportFail.bind(monaca, report)
     )
     .then(
-      function() {
-        util.success('\nDocumentation displayed in the browser window.');
-      }.bind(null),
-        util.fail.bind(null, '\nSomething went wrong during displaying documentation: ')
+      util.success.bind(null, '\nDocumentation displayed in the browser window.'),
+      util.fail.bind(null, '\nSomething went wrong while opening the documentation: ')
     );
   };
 
