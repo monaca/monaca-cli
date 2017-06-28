@@ -32,19 +32,24 @@ $ monaca
 to see a list of available commands:
 
 ```
-create  ........  create a new Monaca project
-preview ........  runs a local web server for preview
-debug ..........  run app on device using Monaca Debugger
-remote build  ..  build project on Monaca Cloud
 login  .........  sign in to Monaca Cloud
 logout  ........  sign out from Monaca Cloud
 signup  ........  register a new Monaca account
-clone  .........  clone project from the Monaca Cloud
-import  ........  import project from the Monaca Cloud
-upload  ........  upload project to Monaca Cloud
-download  ......  download project from Monaca Cloud
-plugin  ........  manage installed plugins
-proxy  .........  configure proxy to use when connecting to Monaca Cloud
+create  ........  create a new local Monaca project from a template
+clone  .........  clone a project from Monaca Cloud
+import  ........  import a project from Monaca Cloud
+download  ......  download a project from Monaca Cloud
+upload  ........  upload a project to Monaca Cloud
+remote build  ..  build a project on Monaca Cloud
+preview  .......  run a local web server for preview
+demo  ..........  display the app appereance on iOS and Android
+debug  .........  run app on device using Monaca Debugger
+transpile  .....  transpile project source code
+config  ........  manage Monaca configuration
+reconfigure  ...  generate default project configurations
+plugin  ........  manage Cordova Plugin
+docs  ..........  display docs for Monaca CLI, Onsen UI and Tutorials
+info  ..........  display project and environment info
 ```
 
 You can run `monaca <command_name> --help` to get in-depth information about a single command:
@@ -70,12 +75,11 @@ Examples:
 It also supports the command line options from Cordova CLI. The following options exactly follows the same behavior to Cordova, and Monaca Cloud is not used in this case.
 
 ```
-info  ..........  show info about Cordova environment
 platform  ......  add, update and remove platforms
 prepare  .......  prepare project for build
 compile  .......  build the project
-run  ...........  deploys project on a device / emulator
+run  ...........  deploy project on a device / emulator
 build  .........  shortcut for compile, then prepare
 emulate  .......  run project in emulator
-serve  .........  runs a local web server for assets
+serve  .........  run a local web server for assets
 ```
