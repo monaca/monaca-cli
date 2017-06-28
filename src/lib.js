@@ -14,7 +14,7 @@ var findProjectDir = function(cwd, monaca) {
     },
     function(error) {
       var newPath = path.join(cwd, '..');
-      return newPath === cwd ? Q.reject('Directory is not a Monaca project.') : findProjectDir(newPath, monaca);
+      return newPath === cwd ? Q.reject('Directory is not a Monaca project: ' + error.message) : findProjectDir(newPath, monaca);
     }
   );
 };
