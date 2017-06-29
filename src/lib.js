@@ -14,7 +14,7 @@ var findProjectDir = function(cwd, monaca) {
     },
     function(error) {
       var newPath = path.join(cwd, '..');
-      return newPath === cwd ? Q.reject('Directory is not a Monaca project: ' + error.message) : findProjectDir(newPath, monaca);
+      return newPath === cwd ? Q.reject("Directory is not a Monaca project: 'config.xml' file or 'www' folder may be missing.\nPlease visit http://docs.monaca.io/en/monaca_cli/manual/troubleshooting/#incomplete-files-and-folder-structure") : findProjectDir(newPath, monaca);
     }
   );
 };
