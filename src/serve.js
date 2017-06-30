@@ -79,9 +79,16 @@
             // Webpack Dev Server
             var webpack = require(path.join(monaca.userCordova, 'node_modules', 'webpack'));
             var webpackConfig = require(monaca.getWebpackConfigFile(process.cwd(), 'dev'));
-            webpackConfig.entry.unshift("webpack-dev-server/client?http://localhost:" + port + "/");
-            var WebpackDevServer = require(path.join(monaca.userCordova, 'node_modules', 'webpack-dev-server'));
 
+            if (webpackConfig.devServer.inline) {
+              if (webpackConfig.entry.app && webpackConfig.entry.app instanceof Array) {
+                webpackConfig.entry.app.unshift("webpack-dev-server/client?http://localhost:" + port + "/");
+              } else if (webpackConfig.entry && webpackConfig.entry instanceof Array) {
+                webpackConfig.entry.unshift("webpack-dev-server/client?http://localhost:" + port + "/");
+              }
+            }
+
+            var WebpackDevServer = require(path.join(monaca.userCordova, 'node_modules', 'webpack-dev-server'));
             var server = new WebpackDevServer(webpack(webpackConfig), webpackConfig.devServer);
 
             server.listen(port, '0.0.0.0', hookStdout);
