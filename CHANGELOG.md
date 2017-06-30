@@ -2,6 +2,16 @@
 CHANGELOG
 ====
 
+v2.3.0
+----
+* Added support to the latest Vue.js 2 and ReactJS templates with Onsen UI 2.4.0.
+* Fixed debug for the new transpilable projecs when `monaca preview` is executed.
+* Added `monaca info` command.
+* Bumped up built-in Cordova CLI to version 6.2
+* Improved task organization and documentation.
+* Updated Onsen UI reference in `monaca docs`.
+* Improved various error messages with docs references.
+
 v2.2.7
 ----
 * Fixed auto-reloading in `monaca preview/serve/demo`.
