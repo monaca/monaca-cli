@@ -95,7 +95,7 @@ var Monaca = {
     }
 
     if (argv.help || argv.h
-      || (task.name === 'create' && argv._.length < 2)
+      || (task.name === 'create' && argv._.length < 2 && !argv['template-list'])
       || (task.name === 'docs' && argv._.length < 2)
       || (task.name === 'remote build' && !argv.browser && argv._.length < 3)
       || (task.name === 'config' && !argv.reset && argv._.length < 2)) {
