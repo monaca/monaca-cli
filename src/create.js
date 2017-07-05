@@ -121,7 +121,8 @@ CreateTask.getTemplateURL = function(requiredTemplate) {
       for (var key in this.categories) {
         var categoryContent = this.categories[key];
         for (var template in categoryContent) {
-          if (categoryContent[template].name === requiredTemplate) {
+          var currentTemplate = categoryContent[template];
+          if (currentTemplate['repo_name'] === requiredTemplate) {
             return this.createApp({
               name: requiredTemplate,
               resource: categoryContent[template].resource
@@ -131,7 +132,8 @@ CreateTask.getTemplateURL = function(requiredTemplate) {
       }
 
       for (var key in this.samples) {
-        if (this.samples[key].name === requiredTemplate) {
+        var currentTemplate = this.samples[key];
+        if (currentTemplate['repo_name'] === requiredTemplate) {
           return this.createApp({
             name: requiredTemplate,
             resource: this.samples[key].resource
@@ -163,14 +165,16 @@ CreateTask.displayTemplates = function(argv) {
           var categoryContent = this.categories[key];
           util.success(key);
           for (var template in categoryContent) {
-            util.print('    ' + categoryContent[template].name);
+            var currentTemplate = categoryContent[template];
+            util.print('    ' + currentTemplate['repo_name']);
           }
           util.print('');
         }
 
         util.success('Samples');
         for (var key in this.samples) {
-          util.print('    ' + this.samples[key].name);
+          var currentTemplate = this.samples[key];
+          util.print('    ' + currentTemplate['repo_name']);
         }
         util.print('');
       } else {

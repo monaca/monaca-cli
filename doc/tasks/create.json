@@ -23,13 +23,13 @@
       ],
       [
         "--template",
-        "String. Name of the chosen template for the project creation."
+        "Name of the chosen template for the project creation."
       ]
     ],
     "examples": [
       "monaca create myproject",
       "monaca create --template-list",
-      "monaca create myproject --template \"templateName\"",
+      "monaca create myproject --template blank",
       "monaca create myproject --url http://github.com/me/myproject/archive/master.zip"
     ]
   }
