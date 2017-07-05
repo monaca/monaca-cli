@@ -18,21 +18,33 @@ var CreateTask = {}, monaca, report = { event: 'create' },
 
 CreateTask.run = function(taskName, info) {
   monaca = new Monaca(info);
-  fs.exists(path.resolve(dirName), function(exists) {
-    if (exists) {
-      util.fail('Directory already exists.');
-    } else {
-      monaca.reportAnalytics(report);
-      if (argv.url) {
-        this.createApp({
-          name: 'Custom Template',
-          resource: argv.url
-        });
+
+  if (argv && argv['template-list']) {
+    util.print("The following templates can be installed by executing\n\nmonaca create [projectName] --template [templateName]\n");
+    this.displayTemplates(argv);
+  } else {
+    fs.exists(path.resolve(dirName), function(exists) {
+      if (exists) {
+        util.fail('Directory already exists.');
       } else {
-        this.showTemplateQuestion();
+        monaca.reportAnalytics(report);
+        if (argv.url) {
+          this.createApp({
+            name: 'Custom Template',
+            resource: argv.url
+          });
+        } else if (argv.template) {
+          this.getTemplateURL(argv.template);
+        } else {
+          if (process.platform === 'win32') {
+            util.warn("\nSome Windows terminals may not work correctly with the interactive template creation.\n" +
+              "If that's the case, please execute `monaca create --help` for an alternative solution.\n")
+          }
+          this.displayTemplates();
+        }
       }
-    }
-  }.bind(this));
+    }.bind(this));
+  }
 };
 
 CreateTask.createApp = function(template) {
@@ -94,7 +106,7 @@ function injectData(path, node, value) {
   return deferred.promise;
 }
 
-CreateTask.showTemplateQuestion = function() {
+CreateTask.getTemplateURL = function(requiredTemplate) {
 
   monaca.getTemplates().then(
     function(result) {
@@ -106,8 +118,68 @@ CreateTask.showTemplateQuestion = function() {
       this.samples = result.sample;
       this.categories = categories;
 
-      inquiry.categories.call(this);
+      for (var key in this.categories) {
+        var categoryContent = this.categories[key];
+        for (var template in categoryContent) {
+          var currentTemplate = categoryContent[template];
+          if (currentTemplate['repo_name'] === requiredTemplate) {
+            return this.createApp({
+              name: requiredTemplate,
+              resource: categoryContent[template].resource
+            });
+          }
+        }
+      }
 
+      for (var key in this.samples) {
+        var currentTemplate = this.samples[key];
+        if (currentTemplate['repo_name'] === requiredTemplate) {
+          return this.createApp({
+            name: requiredTemplate,
+            resource: this.samples[key].resource
+          });
+        }
+      }
+
+      util.fail("Could not find the specified template.\nPlease run `monaca create --template-list` to see all the available templates.");
+
+    }.bind(this),
+    util.fail.bind(null, 'Error in getting project templates list: ')
+  );
+}
+
+CreateTask.displayTemplates = function(argv) {
+
+  monaca.getTemplates().then(
+    function(result) {
+      var categories = {};
+      result.template.forEach(function(category) {
+        categories[category.type] = category.list;
+      });
+
+      this.samples = result.sample;
+      this.categories = categories;
+
+      if (argv && argv['template-list']) {
+        for (var key in this.categories) {
+          var categoryContent = this.categories[key];
+          util.success(key);
+          for (var template in categoryContent) {
+            var currentTemplate = categoryContent[template];
+            util.print('    ' + currentTemplate['repo_name']);
+          }
+          util.print('');
+        }
+
+        util.success('Samples');
+        for (var key in this.samples) {
+          var currentTemplate = this.samples[key];
+          util.print('    ' + currentTemplate['repo_name']);
+        }
+        util.print('');
+      } else {
+        inquiry.categories.call(this);
+      }
     }.bind(this),
     util.fail.bind(null, 'Error in getting project templates list: ')
   );
