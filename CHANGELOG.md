@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v2.3.1
+----
+* Improved `monaca create` command with new options.
+* Bug fix for Vue templates.
+
 v2.3.0
 ----
 * Added support to the latest Vue.js 2 and ReactJS templates with Onsen UI 2.4.0.
