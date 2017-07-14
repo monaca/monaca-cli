@@ -11,13 +11,16 @@ var fs = require('fs'),
   XMLSerializer = require('xmldom').XMLSerializer,
   serializer = new XMLSerializer(),
   Monaca = require('monaca-lib').Monaca,
-  util = require(path.join(__dirname, 'util'));
+  util = require(path.join(__dirname, 'util')),
+  sync = require(path.join(__dirname, 'sync'));
 
 var CreateTask = {}, monaca, report = { event: 'create' },
-  dirName = argv._[argv._.indexOf('create') + 1];
+  dirName = argv._[argv._.indexOf('create') + 1],
+  monacaInfo;
 
 CreateTask.run = function(taskName, info) {
-  monaca = new Monaca(info);
+  monaca = new Monaca(info),
+  monacaInfo = info;
 
   if (argv && argv['template-list']) {
     util.print("The following templates can be installed by executing\n\nmonaca create [projectName] --template [templateName]\n");
@@ -73,12 +76,22 @@ CreateTask.createApp = function(template) {
             '  > ' + 'monaca preview'.info + '      => Run app in the browser',
             '  > ' + 'monaca debug'.info + '        => Run app in the device using Monaca Debugger',
             '  > ' + 'monaca remote build'.info + ' => Start remote build for iOS/Android/Windows',
-            '  > ' + 'monaca upload'.info + '       => Upload this project to Monaca Cloud IDE'
+            '  > ' + 'monaca upload'.info + '       => Upload this project to Monaca Cloud IDE\n'
           ].join("\n");
         util.print(message);
       }.bind(null),
       util.fail.bind(null, error)
-    );
+    )
+    .then(
+      function() {
+         monaca.prepareSession()
+         .then(
+          function() {
+            return inquiry.upload.call();
+          }
+        )
+      }
+    )
 };
 
 function injectData(path, node, value) {
@@ -253,6 +266,24 @@ var inquiry = {
         CreateTask.createApp(this.samples[answer.sample]);
       }
     }.bind(this));
+  },
+
+  upload: function() {
+    var deferred = Q.defer();
+
+    inquirer.prompt({
+      type: 'confirm',
+      name: 'link',
+      message: 'Do you want to link this project with Monaca IDE?',
+      default: true
+    }).then(function(answer) {
+      if (answer.link) {
+        return sync.run('upload', monacaInfo, {
+          projectDir: path.resolve(dirName),
+          force: true
+        });
+      }
+    });
   }
 };
 
