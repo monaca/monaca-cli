@@ -13,7 +13,7 @@ var inquirer = require('monaca-inquirer'),
 
 var SyncTask = {}, monaca;
 
-SyncTask.run = function(taskName, info) {
+SyncTask.run = function(taskName, info, options) {
   monaca = new Monaca(info);
   if (taskName === 'debug') {
     return monaca.relogin().then(this.livesync.bind(this), function() {
@@ -27,7 +27,7 @@ SyncTask.run = function(taskName, info) {
         } else if (taskName === 'import') {
           this.clone(false);
         } else if (taskName === 'upload' || taskName === 'download') {
-          this.load(taskName);
+          this.load(taskName, options);
         }
       }.bind(this),
       util.displayLoginErrors
@@ -35,11 +35,11 @@ SyncTask.run = function(taskName, info) {
   }
 };
 
-SyncTask.load = function(action) {
+SyncTask.load = function(action, arg) {
   var cwd, options = {}, error = '';
-  options.dryrun = argv['dry-run'];
-  options.delete = argv.delete;
-  options.force = argv.force;
+  options.dryrun = argv['dry-run'] || (arg && arg.dryrun);
+  options.delete = argv.delete || (arg && arg.delete);
+  options.force = argv.force || (arg && arg.force);
   options.action = action;
 
   var report = {
@@ -52,7 +52,7 @@ SyncTask.load = function(action) {
     .then(
       function() {
         error = 'Unable to ' + action + ' project: ';
-        return lib.findProjectDir(process.cwd(), monaca);
+        return lib.findProjectDir((arg && arg.projectDir) || process.cwd(), monaca);
       }
     )
     // Checking project directory.
