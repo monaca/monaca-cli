@@ -2,6 +2,12 @@
 CHANGELOG
 ====
 
+v2.3.2
+----
+* Added `link to IDE` option during project creation.
+* Updated Webpack resolvers for transpilable templates.
+* Added support to updated transpilable templates.
+
 v2.3.1
 ----
 * Improved `monaca create` command with new options.
