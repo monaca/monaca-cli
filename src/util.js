@@ -2,7 +2,6 @@
 'use strict';
 
 var Q = require('q'),
-  compareVersions = require('compare-versions'),
   fs = require('fs'),
   colors  =require('colors');
 
@@ -190,6 +189,7 @@ var updateCheck = function(data) {
   content['update_check_time'] = newTime;
 
   if ((!lastUpdate || currentDate.getTime() > (lastUpdate + UPDATE_INTERVAL)) && data.latestVersion) {
+    var compareVersions = require('compare-versions');
     var result = compareVersions(data.currentVersion, data.latestVersion);
 
     if (result === -1 && content) {
