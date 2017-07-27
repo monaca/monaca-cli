@@ -6,6 +6,7 @@ var argv = require('optimist').argv,
   fs = require('fs'),
   path = require('path'),
   https = require('https'),
+  lib = require(path.join(__dirname, 'lib')),
   util = require(path.join(__dirname, 'util'));
 
 colors.setTheme({
@@ -132,10 +133,11 @@ var Monaca = {
     util.print('Commands: (use --all to show all)\n');
 
     var taskMaxLength = 0;
+    var isCordovaProject = lib.soflyAssureCordovaProject(process.cwd());
     var tasks = Object.keys(taskList)
       .map(function(taskSet) {
         return Object.keys(taskList[taskSet]).map(function(taskName) {
-          var task = taskList[taskSet][taskName];
+          var task = taskList[taskSet][taskName]
           if (task.showInHelp !== false || showAll) {
             if (showAll && task.aliases) {
               taskName += ' | ' + task.aliases.join(' | ');
@@ -165,7 +167,14 @@ var Monaca = {
       var cmd = task[0],
         desc = task[1].description,
         dots = new Array(Math.max(15, taskMaxLength) - cmd.length).join('.');
-      util.print('  ' + cmd.bold.info + '  ' + dots.grey + '  ' + desc.bold);
+
+      if (isCordovaProject) {
+        util.print('  ' + cmd.bold.info + '  ' + dots.grey + '  ' + desc.bold);
+      } else {
+        if (task[1].category === 'general') {
+          util.print('  ' + cmd.bold.info + '  ' + dots.grey + '  ' + desc.bold);
+        }
+      }
     });
 
     util.print('');
