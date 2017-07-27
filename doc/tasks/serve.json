@@ -1,6 +1,7 @@
 {
   "preview": {
     "order": 30,
+    "category": "project",
     "description": "run a local web server for preview",
     "longDescription": [
       "Starts a local web server that serves the www assets.",
@@ -30,6 +31,7 @@
   },
   "demo": {
     "order": 31,
+    "category": "project",
     "description": "display the app appereance on iOS and Android",
     "longDescription": [
       "Starts a local web server that serves the www assets",

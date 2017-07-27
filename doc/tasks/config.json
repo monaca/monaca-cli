@@ -1,6 +1,7 @@
 {
   "config": {
     "order": 60,
+    "category": "general",
     "description": "manage Monaca configuration",
     "longDescription": [
       "Manage proxy and API endpoint configuration"
@@ -41,6 +42,7 @@
   },
   "reconfigure": {
     "order": 61,
+    "category": "project",
     "description": "generate default project configurations",
     "longDescription": [
       "Generate default project configurations and files.",

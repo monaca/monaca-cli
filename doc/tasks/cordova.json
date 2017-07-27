@@ -1,6 +1,7 @@
 {
   "platform": {
     "order": 31,
+    "category": "cordova",
     "description": "add, update and remove platforms",
     "longDescription": [
       "Manage platforms. Can be used to add or remove platforms.",
@@ -35,6 +36,7 @@
   },
   "plugin": {
     "order": 70,
+    "category": "cordova",
     "description": "manage Cordova Plugin",
     "longDescription": [
       "Manage installed plugins",
@@ -65,6 +67,7 @@
   },
   "prepare": {
     "order": 33,
+    "category": "cordova",
     "description": "prepare project for build",
     "longDescription": "Copies file for a specified (or all) platform(s).",
     "usage": "monaca prepare [platform]",
@@ -76,6 +79,7 @@
   },
   "compile": {
     "order": 34,
+    "category": "cordova",
     "description": "build the project",
     "longDescription": "Build the project for a specified platform, or all platforms.",
     "usage": "monaca compile [platform]",
@@ -87,6 +91,7 @@
   },
   "run": {
     "order": 35,
+    "category": "cordova",
     "description": "deploys project on a device / emulator",
     "longDescription": "Deploys app on a specified platform or emulator.",
     "usage": "monaca run [platform]",
@@ -121,6 +126,7 @@
   },
   "build": {
     "order": 36,
+    "category": "cordova",
     "description": "shortcut for prepare, then compile",
     "longDescription": "Shortcut for `monaca prepare` then `monaca compile`.",
     "usage": "monaca build [platform]",
@@ -132,6 +138,7 @@
   },
   "emulate": {
     "order": 37,
+    "category": "cordova",
     "description": "run project in emulator",
     "longDescription": "Run project in emulator. Shortcut for `monaca run --emulator`.",
     "usage": "monaca emulate [platform]",

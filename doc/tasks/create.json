@@ -1,6 +1,7 @@
 {
   "create": {
     "order": 10,
+    "category": "general",
     "description": "create a new local Monaca project from a template",
     "usage": "monaca create path",
     "longDescription": [

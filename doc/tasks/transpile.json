@@ -1,6 +1,7 @@
 {
   "transpile": {
     "order": 50,
+    "category": "project",
     "description": "transpile project source code",
     "longDescription": [
       "Transpiles projects that are transpilable.",
