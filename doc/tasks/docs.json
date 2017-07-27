@@ -1,6 +1,7 @@
 {
   "docs": {
     "order": 90,
+    "category": "general",
     "description": "display docs for Monaca CLI, Onsen UI and Tutorials",
     "longDescription": [
       "Displays docs for Monaca CLI, Onsen UI and Tutorials"

@@ -1,6 +1,7 @@
 {
   "clone": {
     "order": 20,
+    "category": "general",
     "description": "clone a project from Monaca Cloud",
     "longDescription": [
       "Clones a project from the Monaca Cloud.",
@@ -19,6 +20,7 @@
   },
   "import": {
     "order": 21,
+    "category": "general",
     "description": "import a project from Monaca Cloud",
     "longDescription": [
       "Imports a project from the Monaca Cloud.",
@@ -37,6 +39,7 @@
   },
   "upload": {
     "order": 23,
+    "category": "project",
     "description": "upload a project to Monaca Cloud",
     "longDescription": [
       "Uploads the current project to the Monaca Cloud.",
@@ -70,6 +73,7 @@
   },
   "download": {
     "order": 22,
+    "category": "project",
     "description": "download a project from Monaca Cloud",
     "longDescription": [
       "Download project from the Monaca Cloud.",
@@ -102,6 +106,7 @@
   },
   "debug": {
     "order": 40,
+    "category": "project",
     "description": "run app on device using Monaca Debugger",
     "longDescription": [
       "Debug one or more applications on a device and receive code changes instantly.",

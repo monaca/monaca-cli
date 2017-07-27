@@ -4,6 +4,7 @@
   var path = require('path'),
     Monaca = require('monaca-lib').Monaca,
     util = require(path.join(__dirname, 'util')),
+    lib = require(path.join(__dirname, 'lib')),
     os = require('os'),
     compareVersions = require('compare-versions'),
     ip = require('ip'),
@@ -51,28 +52,28 @@
       }
     };
 
-    var getTemplateVersions = function() {
+    var getTemplateVersions = function(projectDir) {
       var result = {};
-      var libDir = path.join(process.cwd(), 'www', 'lib');
+      var libDir = path.join(projectDir, 'www', 'lib');
 
       var onsenPaths = [
         path.join(libDir, 'onsenui', 'package.json'),
-        path.join(process.cwd(), 'node_modules', 'onsenui', 'package.json')
+        path.join(projectDir, 'node_modules', 'onsenui', 'package.json')
       ];
 
       var versionsPaths = {
         'ionic' : path.join(libDir, 'ionic', 'version.json'),
         'angular' : path.join(libDir, 'angular', 'package.json'),
-        'vue' : path.join(process.cwd(), 'node_modules', 'vue' , 'package.json'),
-        'react' : path.join(process.cwd(), 'node_modules', 'react' , 'package.json'),
-        'angular2' : path.join(process.cwd(), 'node_modules', '@angular', 'core', 'package.json'),
-        'vue-onsenui' : path.join(process.cwd(), 'node_modules', 'vue-onsenui' , 'package.json'),
-        'react-onsenui' : path.join(process.cwd(), 'node_modules', 'react-onsenui' , 'package.json'),
-        'angular2-onsenui' : path.join(process.cwd(), 'node_modules', 'angular2-onsenui', 'package.json')
+        'vue' : path.join(projectDir, 'node_modules', 'vue' , 'package.json'),
+        'react' : path.join(projectDir, 'node_modules', 'react' , 'package.json'),
+        'angular2' : path.join(projectDir, 'node_modules', '@angular', 'core', 'package.json'),
+        'vue-onsenui' : path.join(projectDir, 'node_modules', 'vue-onsenui' , 'package.json'),
+        'react-onsenui' : path.join(projectDir, 'node_modules', 'react-onsenui' , 'package.json'),
+        'angular2-onsenui' : path.join(projectDir, 'node_modules', 'angular2-onsenui', 'package.json')
       };
 
-      if (fileExists(path.join(process.cwd(), '.monaca','project_info.json'))) {
-        result.cordova = require(path.join(process.cwd(), '.monaca','project_info.json'))['cordova_version'];
+      if (fileExists(path.join(projectDir, '.monaca','project_info.json'))) {
+        result.cordova = require(path.join(projectDir, '.monaca','project_info.json'))['cordova_version'];
       }
 
       for (var i in onsenPaths) {
@@ -135,9 +136,9 @@
     };
 
 
-    var displayProjectInfo = function() {
+    var displayProjectInfo = function(projectDir) {
       util.success('Project info\n');
-      var versions = getTemplateVersions();
+      var versions = getTemplateVersions(projectDir);
 
       for (var i in versions) {
         util.print(util.alignContent(i) + versions[i]);
@@ -164,12 +165,12 @@
     displayConnectionInfo()
     .then(
       function() {
-        return monaca.isCordovaProject(process.cwd());
+        return lib.findProjectDir(process.cwd(), monaca);
       }
     )
     .then(
-      function() {
-        displayProjectInfo();
+      function(projectDir) {
+        displayProjectInfo(projectDir);
         monaca.reportFinish.bind(monaca, report);
       },
       monaca.reportFail.bind(monaca, report)

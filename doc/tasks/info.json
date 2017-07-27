@@ -1,6 +1,7 @@
 {
   "info": {
     "order": 100,
+    "category": "general",
     "description": "display project and environment info",
     "longDescription": [
       "Displays information about monaca dependencies, system, project dependencies and connection to Monaca Cloud"

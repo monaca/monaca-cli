@@ -1,6 +1,7 @@
 {
   "remote build": {
     "order": 24,
+    "category": "project",
     "description": "build a project on Monaca Cloud",
     "longDescription": [
       "Build the project on Monaca Cloud."

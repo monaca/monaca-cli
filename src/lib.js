@@ -5,6 +5,7 @@ var path = require('path'),
   Q = require('q'),
   open = require('open'),
   inquirer = require('monaca-inquirer'),
+  fs = require('fs'),
   util = require(path.join(__dirname, 'util'));
 
 var findProjectDir = function(cwd, monaca) {
@@ -17,6 +18,19 @@ var findProjectDir = function(cwd, monaca) {
       return newPath === cwd ? Q.reject("Directory is not a Monaca project: 'config.xml' file or 'www' folder may be missing.\nPlease visit http://docs.monaca.io/en/monaca_cli/manual/troubleshooting/#incomplete-files-and-folder-structure") : findProjectDir(newPath, monaca);
     }
   );
+};
+
+var soflyAssureCordovaProject = function(cwd) {
+  if (fs.existsSync(path.join(cwd, 'www')) && fs.existsSync(path.join(cwd, 'config.xml'))) {
+    return true;
+  } else {
+    var next = path.resolve(path.join(cwd, '..'));
+    if (next !== cwd) {
+      return soflyAssureCordovaProject(next);
+    } else {
+      return false;
+    }
+  }
 };
 
 var assureMonacaProject = function(cwd, monaca) {
@@ -166,6 +180,7 @@ module.exports = {
   assureMonacaProject: assureMonacaProject,
   confirmOverwrite: confirmOverwrite,
   printSuccessMessage: printSuccessMessage,
+  soflyAssureCordovaProject: soflyAssureCordovaProject,
   loginErrorHandler: loginErrorHandler
 };
 })();
