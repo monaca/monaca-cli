@@ -64,48 +64,67 @@ AuthTask.getCredentials = function(doubleCheck) {
 
 AuthTask.login = function() {
   return monaca.relogin().then(
-    function() {
-      util.print('You are already signed in. Please sign out with \'monaca logout\' in order to sign in with another user.');
-    },
-    function() {
-      var report = {
-        event: 'login'
-      };
-      monaca.reportAnalytics(report);
-
-      util.print('Use "monaca signup" command if you need to sign up.');
-      util.print();
-
-      return this.getCredentials(false)
-        .then(
-          function(credentials) {
-            var pkg = require(path.join(__dirname, '..', 'package.json'));
-
-            return monaca.login(credentials.email, credentials.password, {
-              version: 'monaca-cli ' + pkg.version
-            });
-          }
-        )
-        .then(
-          monaca.reportFinish.bind(monaca, report),
-          monaca.reportFail.bind(monaca, report)
-        )
-        .then(
-          function() {
-            var user = monaca.loginBody;
-            if (user.hasOwnProperty('localkitEvaluationDays')) {
-              // Under evaluation period.
-              util.warn('Monaca CLI is under the evaluation period. It will expire in ' + user.localkitEvaluationDays + ' days.');
-              util.warn('You need to upgrade the plan when the evaluation period ends.');
-            }
-            util.success('\nSuccessfully signed in as ' + user.username + '.');
-          },
-          function(error) {
-            return lib.loginErrorHandler(error);
-          }
-        );
-    }.bind(this)
+    function(result) {
+      return this._confirmNewLogin(result)
+      .then(
+        this._performLogin.bind(this),
+        util.err.bind(null)
+      )
+    }.bind(this),
+    this._performLogin.bind(this)
   );
+};
+
+AuthTask._performLogin = function() {
+  var report = {
+    event: 'login'
+  };
+  monaca.reportAnalytics(report);
+
+  util.print('Use "monaca signup" command if you need to create a new account.');
+  util.print();
+
+  return this.getCredentials(false)
+  .then(
+    function(credentials) {
+      var pkg = require(path.join(__dirname, '..', 'package.json'));
+
+      return monaca.login(credentials.email, credentials.password, {
+        version: 'monaca-cli ' + pkg.version
+      });
+    }
+  )
+  .then(
+    monaca.reportFinish.bind(monaca, report),
+    monaca.reportFail.bind(monaca, report)
+  )
+  .then(
+    function() {
+      var user = monaca.loginBody;
+      if (user.hasOwnProperty('localkitEvaluationDays')) {
+        // Under evaluation period.
+        util.warn('Monaca CLI is under the evaluation period. It will expire in ' + user.localkitEvaluationDays + ' days.');
+        util.warn('You need to upgrade the plan when the evaluation period ends.');
+      }
+      util.success('\nSuccessfully signed in as ' + user.username + '.');
+    },
+    function(error) {
+      return lib.loginErrorHandler(error);
+    }
+  );
+}
+
+
+AuthTask._confirmNewLogin = function(data) {
+  util.print('You are already signed in as ' + data.email.bold + '.');
+  return inquirer.prompt({
+    type: 'confirm',
+    name: 'newLogin',
+    message: 'Do you want to login with another account?',
+    default: false
+  }).then(function(answers) {
+    return answers.newLogin ? Q.resolve() : Q.reject('Cancel');
+  });
 };
 
 AuthTask.logout = function() {
