@@ -2,6 +2,13 @@
 CHANGELOG
 ====
 
+v2.4.0
+----
+* Added Cordova 6.5 support.
+* Filtered displayed tasks depending on the current dir.
+* Improved login by adding direct override.
+* Fixed `monaca info` command to properly work in subdirectories.
+
 v2.3.2
 ----
 * Added `link to IDE` option during project creation.
