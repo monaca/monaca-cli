@@ -54,7 +54,6 @@ AuthTask.getCredentials = function(doubleCheck) {
       validate: function(confirmPassword) {
         return confirmPassword.length >= 6 && confirmPassword === passwordCheck;
       }
-
     }
   ]).then(function(answers) {
     !paramEmail || (answers.email = paramEmail);
@@ -123,8 +122,8 @@ AuthTask._confirmNewLogin = function(data) {
     message: 'Do you want to login with another account?',
     default: false
   }).then(function(answers) {
-    return answers.newLogin ? Q.resolve() : Q.reject('Cancel');
-  });
+    return answers.newLogin ? this.logout() : Q.reject('Cancel');
+  }.bind(this));
 };
 
 AuthTask.logout = function() {
@@ -132,7 +131,7 @@ AuthTask.logout = function() {
 
   var localkit = new Localkit(monaca);
 
-  monaca.logout()
+  return monaca.logout()
     .then(
       function() {
         util.print('You have been signed out.');
@@ -143,7 +142,7 @@ AuthTask.logout = function() {
     .then(
       util.print.bind(null, 'Removed Monaca Debugger pairing information.'),
       util.fail.bind(null, 'Unable to remove Monaca Debugger pairing information: ')
-    );
+    )
 };
 
 AuthTask.signup = function() {
