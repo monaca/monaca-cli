@@ -37,13 +37,18 @@
       [
         "--browser",
         "Open build process in browser."
+      ],
+      [
+        "--build-list",
+        "Display all the available remote builds and allow their download"
       ]
     ],
     "examples": [
       "monaca remote build ios",
       "monaca remote build ios --build-type=debug",
       "monaca remote build android --build-type=debug --android_webview=crosswalk --android_arch=arm",
-      "monaca remote build --browser"
+      "monaca remote build --browser",
+      "monaca remote build --build-list"
     ]
   }
 }
