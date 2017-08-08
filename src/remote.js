@@ -7,6 +7,8 @@ var path = require('path'),
   shell = require('shelljs'),
   Monaca = require('monaca-lib').Monaca,
   Q = require('q'),
+  inquirer = require('monaca-inquirer'),
+  colors  = require('colors'),
   lib = require(path.join(__dirname, 'lib')),
   util = require(path.join(__dirname, 'util'));
 
@@ -35,14 +37,14 @@ RemoteTask.build = function() {
   params.platform = argv._[2];
   params.purpose = argv['build-type'] || 'debug';
 
-  ['browser', 'android_webview', 'android_arch', 'output']
+  ['browser', 'build-list', 'android_webview', 'android_arch', 'output']
   .forEach(function(property) {
     if (argv.hasOwnProperty(property)) {
       params[property] = argv[property];
     }
   });
 
-  if (!params.browser && (!params.platform || !params.purpose)) {
+  if (!params.browser && !params['build-list'] && (!params.platform || !params.purpose)) {
     util.fail('Missing parameters. Please write --help to see the correct usage.');
   }
 
@@ -55,19 +57,23 @@ RemoteTask.build = function() {
 
   var cwd, projectInfo, error = '';
 
-  lib.confirmOverwrite({action: 'upload'})
+  lib.findProjectDir(process.cwd(), monaca)
     // Waiting for user permission.
     .then(
-      function() {
-        return lib.findProjectDir(process.cwd(), monaca);
+      function(directory) {
+        cwd = directory;
+        if (!params['build-list']) {
+         return lib.confirmOverwrite({action: 'upload'});
+       }
       }
     )
     // Checking project directory.
     .then(
-      function(directory) {
-        cwd = directory;
-        util.print('Uploading project to Monaca Cloud...');
-        error = 'Unable to create monaca project: ';
+      function() {
+        if (!params['build-list']) {
+          util.print('Uploading project to Monaca Cloud...');
+          error = 'Unable to create monaca project: ';
+        }
         return lib.assureMonacaProject(cwd, monaca);
       }
     )
@@ -76,15 +82,17 @@ RemoteTask.build = function() {
       function(info) {
         projectInfo = info;
         error = 'Upload failed: ';
-        return monaca.uploadProject(cwd)
-          .progress(util.displayProgress);
+        if (!params['build-list']) {
+          return monaca.uploadProject(cwd)
+            .progress(util.displayProgress);
+        }
       }
     )
     // Uploading project to Monaca Cloud.
     .then(
       function(files) {
-        lib.printSuccessMessage({action: 'upload'}, files);
-        if (!params.browser) {
+        if (!params.browser && !params['build-list']) {
+          lib.printSuccessMessage({action: 'upload'}, files);
           error = 'Unable to build this project: ';
           return monaca.checkBuildAvailability(projectInfo.projectId, params.platform, params.purpose);
         }
@@ -116,6 +124,27 @@ RemoteTask.build = function() {
               process.exit.bind(process, 1),
               util.fail.bind(null, 'Unable to open build page: ')
             );
+        } else if (argv['build-list']) {
+          // Display all the available builds and request which one to download.
+          util.success('\nChecking available builds..\n');
+          return monaca.getRemoteBuildList(projectInfo.projectId)
+          .then(
+            function(result) {
+              var body = JSON.parse(result.body);
+
+              if (body.status === 'ok') {
+                return checkValidBuilds(body)
+                .then(
+                  function(validBuilds) {
+                    util.print('');
+                    return requestBuildSelection(validBuilds);
+                  }
+                )
+              } else {
+                return Q.reject(body.status);
+              }
+            }
+          )
         } else {
           // Build project on Monaca Cloud and download it into ./build folder.
           util.print('\nBuilding project on Monaca Cloud...');
@@ -163,6 +192,63 @@ RemoteTask.build = function() {
       },
       util.fail
     );
+
+  var requestBuildSelection = function(validBuilds) {
+    var deferred = Q.defer();
+
+    inquirer.prompt({
+      type: 'input',
+      name: 'build',
+      message: 'Please enter the build number you want to download or [q] to exit:'
+    })
+    .then(
+      function(response) {
+        if (/^q$/i.test(response.build)) {
+          return deferred.reject('Cancel');
+        } else if (response.build > 0 && response.build <= validBuilds.length) {
+          var result = {};
+          result['binary_url'] = 'https://ide.monaca.mobi/install/package/' + projectInfo.projectId + '/' + validBuilds[response.build - 1].id;
+          util.print('\nDownloading the requested build...');
+          deferred.resolve(result);
+        } else {
+          return deferred.reject('Could not find the requested build.');
+        }
+      }
+    );
+
+    return deferred.promise;
+  };
+
+  var checkValidBuilds = function(body) {
+    var validBuilds = [],
+      allAndroidBuilds = body.result.android.items,
+      allIosBuilds = body.result.ios.items,
+      index = 1;
+
+    for (var build in allAndroidBuilds) {
+      var currentBuild = allAndroidBuilds[build];
+      if (currentBuild.status === 'finish' && currentBuild['is_download_active']) {
+        validBuilds.push(currentBuild);
+        util.print(index.toString().green.bold + ' | Android ' + currentBuild.type + ' build created at ' + currentBuild['created_text'] + ', expires at ' + currentBuild['download_expire_text']);
+        index++;
+      }
+    }
+
+    for (var build in allIosBuilds) {
+      var currentBuild = allIosBuilds[build];
+      if (currentBuild.status === 'finish' && currentBuild['is_download_active']) {
+        validBuilds.push(currentBuild);
+        util.print(index.toString().green.bold + ' | iOS ' + currentBuild.type + ' build created at ' + currentBuild['created_text'] + ', expires at ' + currentBuild['download_expire_text']);
+        index++;
+      }
+    }
+
+    if (validBuilds.length === 0) {
+      return Q.reject('No builds available. Run `monaca remote build --help` to learn how to generate one.');
+    }
+
+    return Q.resolve(validBuilds);
+  }
 };
 
 module.exports = RemoteTask;
