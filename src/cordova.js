@@ -3,11 +3,16 @@
 
 var path = require('path'),
   exec = require('child_process').exec,
+  util = require(path.join(__dirname, 'util')),
   Monaca = require('monaca-lib').Monaca;
 
 var CordovaTask = {}, monaca;
 
 CordovaTask.run = function(taskName, info) {
+  var cordovaJson = require(path.join(__dirname, '..', 'node_modules', 'cordova', 'package.json'));
+  util.warn('Attention, the requested command is a Cordova CLI ' + (cordovaJson.version ? cordovaJson.version : '') + ' command.');
+  util.warn('In case of issue, refer to the official Cordova CLI documentation.\n');
+
   monaca = new Monaca(info);
   var args = process.argv.length > 3 ? process.argv.slice(3).join(' ') : '';
   var cmd = path.join(__dirname, '..', 'node_modules', '.bin', 'cordova') + ' ' + taskName + ' ' + args;
