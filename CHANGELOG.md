@@ -2,6 +2,12 @@
 CHANGELOG
 ====
 
+v2.4.1
+----
+* Integrated remote build history (`monaca remote build --build-list`).
+* Improved logout function.
+* Added distinction notification between Monaca CLI and Cordova CLI commands.
+
 v2.4.0
 ----
 * Added Cordova 6.5 support.
