@@ -50,5 +50,21 @@
       "monaca remote build --browser",
       "monaca remote build --build-list"
     ]
+  },
+  "remote config": {
+    "order": 25,
+    "category": "project",
+    "description": "open the project configuration on Monaca Cloud",
+    "longDescription": [
+      "Open the project configuration on Monaca Cloud.",
+      "Once the configuration has been performed, execute `monaca download` to get the changes locally."
+    ],
+    "usage": [
+      "monaca remote config"
+    ],
+    "examples": [
+      "monaca remote config",
+      "monaca download"
+    ]
   }
 }

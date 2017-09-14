@@ -21,8 +21,8 @@ RemoteTask.run = function(taskName, info) {
     function() {
       var task = argv._[1];
 
-      if (task === 'build') {
-        this.build();
+      if (task === 'build' || task === 'config') {
+        this.remote(task);
       } else {
         util.fail('No such command.');
       }
@@ -31,7 +31,8 @@ RemoteTask.run = function(taskName, info) {
   );
 };
 
-RemoteTask.build = function() {
+// Perform remote operations: build | config
+RemoteTask.remote = function(task) {
 
   var params = {};
   params.platform = argv._[2];
@@ -44,12 +45,12 @@ RemoteTask.build = function() {
     }
   });
 
-  if (!params.browser && !params['build-list'] && (!params.platform || !params.purpose)) {
+  if (!params.browser && !params['build-list'] && task !== 'config' && (!params.platform || !params.purpose)) {
     util.fail('Missing parameters. Please write --help to see the correct usage.');
   }
 
   var report = {
-    event: 'remote-build',
+    event: 'remote-' + task,
     arg1: params.platform,
     otherArgs: JSON.stringify(params)
   };
@@ -91,7 +92,7 @@ RemoteTask.build = function() {
     // Uploading project to Monaca Cloud.
     .then(
       function(files) {
-        if (!params.browser && !params['build-list']) {
+        if (!params.browser && task !== 'config' &&  !params['build-list']) {
           lib.printSuccessMessage({action: 'upload'}, files);
           error = 'Unable to build this project: ';
           return monaca.checkBuildAvailability(projectInfo.projectId, params.platform, params.purpose);
@@ -101,7 +102,7 @@ RemoteTask.build = function() {
     // Checking build availabilty (if no browser).
     .then(
       function() {
-        if (argv.browser) {
+        if (argv.browser || task === 'config') {
           var url = monaca.apiRoot.match(/https(.*)\//)[0] + '/project/' + projectInfo.projectId + '/' + (argv['debugger'] ? 'debugger' : 'build');
           return monaca.getSessionUrl(url)
             .then(
@@ -110,6 +111,9 @@ RemoteTask.build = function() {
                 open(url, function(error) {
                   if (error) {
                     return deferred.reject(error);
+                  }
+                  if (task === 'config') {
+                    util.warn('\nOnce the Cloud configuration has been saved, run `monaca download` to get the changes locally.');
                   }
                   deferred.resolve();
                 });
