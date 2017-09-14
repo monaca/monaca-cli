@@ -168,7 +168,7 @@ var Monaca = {
         desc = task[1].description,
         dots = new Array(Math.max(15, taskMaxLength) - cmd.length).join('.');
 
-      if (isCordovaProject) {
+      if (isCordovaProject || showAll) {
         util.print('  ' + cmd.bold.info + '  ' + dots.grey + '  ' + desc.bold);
       } else {
         if (task[1].category === 'general') {
