@@ -87,10 +87,10 @@ var Monaca = {
     var extended = false;
     if (!argv._[0] && argv.help) {
       extended = true;
-      lib.printHelp(argv.all, taskList, extended);
+      lib.printHelp(taskList, extended);
       process.exit(0);
     } else if (!argv._[0] && !argv.help) {
-      lib.printHelp(argv.all, taskList, extended);
+      lib.printHelp(taskList, extended);
       process.exit(0);
     }
 

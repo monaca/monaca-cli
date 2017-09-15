@@ -194,9 +194,8 @@ var printUsage = function() {
   util.print('Usage: monaca command [args]\n');
 };
 
-var printCommands = function(showAll, taskList) {
-  showAll = !!showAll;
-  util.print('Commands: (use --all to show all)\n');
+var printCommands = function(taskList) {
+  util.print('Commands: (use --help to show all)\n');
 
   var taskMaxLength = 0;
   var isCordovaProject = soflyAssureCordovaProject(process.cwd());
@@ -204,10 +203,7 @@ var printCommands = function(showAll, taskList) {
     .map(function(taskSet) {
       return Object.keys(taskList[taskSet]).map(function(taskName) {
         var task = taskList[taskSet][taskName]
-        if (task.showInHelp !== false || showAll) {
-          if (showAll && task.aliases) {
-            taskName += ' | ' + task.aliases.join(' | ');
-          }
+        if (task.showInHelp !== false) {
           taskMaxLength = Math.max(taskMaxLength, taskName.length + 3);
           return [taskName, task];
         } else {
@@ -234,7 +230,7 @@ var printCommands = function(showAll, taskList) {
       desc = task[1].description,
       dots = new Array(Math.max(15, taskMaxLength) - cmd.length).join('.');
 
-    if (isCordovaProject || showAll) {
+    if (isCordovaProject) {
       util.print('  ' + cmd.bold.info + '  ' + dots.grey + '  ' + desc.bold);
     } else {
       if (task[1].category === 'general') {
@@ -353,14 +349,14 @@ var printExamples = function() {
   util.print('  $ monaca remote build # Execute remote build for packaging');
 };
 
-var printHelp = function(showAll, taskList, extended) {
+var printHelp = function(taskList, extended) {
   printLogo();
   printUsage();
   if (extended) {
     printExtendedCommands(); //change
   } else {
     printDescription();
-    printCommands(showAll, taskList);
+    printCommands(taskList);
     printExamples();
   }
 
