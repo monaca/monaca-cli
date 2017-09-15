@@ -2,6 +2,13 @@
 CHANGELOG
 ====
 
+v2.4.2
+----
+* Bumped up built-in Cordova CLI to version 6.5
+* Added `monaca remote config` command.
+* Added extended general purpose helper by executing `monaca --help`.
+* Deprecated `monaca --all` command.
+
 v2.4.1
 ----
 * Integrated remote build history (`monaca remote build --build-list`).
