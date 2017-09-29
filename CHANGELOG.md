@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v2.4.3
+----
+* Fixed broken `monaca -v` command.
+* Improved internal login in `monaca-lib` dependency.
+
 v2.4.2
 ----
 * Bumped up built-in Cordova CLI to version 6.5
