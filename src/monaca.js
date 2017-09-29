@@ -79,7 +79,7 @@ var Monaca = {
   run: function() {
     // Version.
     if (argv._[0] === 'version' || argv.version || argv.v) {
-      help.printVersion();
+      lib.printVersion();
       process.exit(0);
     }
 
