@@ -9,7 +9,7 @@ var TranspileTask = {}, monaca;
 
 TranspileTask.run = function(taskName, info) {
   if (projectConfig.scripts.build) {
-    util.warn('A custom script was detected. `' + projectConfig.scripts.build + '` command will be executed instead of `monaca transpile`.');
+    util.warn('A custom script has been detected. `' + projectConfig.scripts.build + '` command will be executed instead of `monaca transpile`.');
     var childProcess = exec(projectConfig.scripts.build);
 
     childProcess.stdout.on('data', function(data) {

@@ -21,7 +21,7 @@
 
   ServeTask.run = function(taskName, info) {
     if (projectConfig.scripts.dev) {
-      util.warn('A custom script was detected. `' + projectConfig.scripts.dev + '` command will be executed instead of `monaca transpile`.');
+      util.warn('A custom script has been detected. `' + projectConfig.scripts.dev + '` command will be executed instead of `monaca transpile`.');
       var childProcess = exec(projectConfig.scripts.dev);
 
       childProcess.stdout.on('data', function(data) {
