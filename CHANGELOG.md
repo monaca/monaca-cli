@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v2.4.4
+----
+* Improved compatibility with [Onsen UI vue-cordova-webpack](https://github.com/OnsenUI/vue-cordova-webpack) template.
+* Warning message fix.
+
 v2.4.3
 ----
 * Fixed broken `monaca -v` command.
