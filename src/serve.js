@@ -20,9 +20,8 @@
   var DEFAULT_PORT = 8000
 
   ServeTask.run = function(taskName, info) {
-    if (projectConfig.scripts.dev) {
-      util.warn('A custom script has been detected. `' + projectConfig.scripts.dev + '` command will be executed instead of `monaca transpile`.');
-      var childProcess = exec(projectConfig.scripts.dev);
+    if (taskName !== 'demo' && projectConfig && projectConfig.scripts && projectConfig.scripts.dev) {
+      var childProcess = exec('npm run dev');
 
       childProcess.stdout.on('data', function(data) {
         process.stdout.write(data.toString());

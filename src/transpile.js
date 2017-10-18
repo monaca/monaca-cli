@@ -8,9 +8,8 @@ var path = require('path'),
 var TranspileTask = {}, monaca;
 
 TranspileTask.run = function(taskName, info) {
-  if (projectConfig.scripts.build) {
-    util.warn('A custom script has been detected. `' + projectConfig.scripts.build + '` command will be executed instead of `monaca transpile`.');
-    var childProcess = exec(projectConfig.scripts.build);
+  if (projectConfig && projectConfig.scripts && projectConfig.scripts.build) {
+    var childProcess = exec('npm run build');
 
     childProcess.stdout.on('data', function(data) {
       process.stdout.write(data.toString());
