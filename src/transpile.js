@@ -3,11 +3,17 @@ var path = require('path'),
   exec = require('child_process').exec,
   util = require(path.join(__dirname, 'util')),
   Monaca = require('monaca-lib').Monaca,
-  projectConfig = require(path.join(process.cwd(), 'package.json'));
+  projectConfig;
 
 var TranspileTask = {}, monaca;
 
 TranspileTask.run = function(taskName, info) {
+  try {
+    projectConfig = require(path.join(process.cwd(), 'package.json'));
+  } catch (err) {
+    transpileProject(taskName, info);
+  }
+
   if (projectConfig && projectConfig.scripts && projectConfig.scripts.build) {
     var childProcess = exec('npm run build');
 
@@ -17,40 +23,43 @@ TranspileTask.run = function(taskName, info) {
 
     childProcess.stderr.on('data', function(data) {
       if (data) {
-        reportErrors += data.toString();
         process.stderr.write(data.toString().error);
       }
     });
   } else {
-    var projectDir = process.cwd();
-    monaca = new Monaca(info);
+    transpileProject(taskName, info);
+  }
+};
 
-    if (!monaca.isTranspilable(projectDir)) {
-      util.fail('This project is not transpilable.');
-    }
+var transpileProject = function(taskName, info) {
+  var projectDir = process.cwd();
+  monaca = new Monaca(info);
 
-    var report = {
-      event: 'transpile'
-    };
+  if (!monaca.isTranspilable(projectDir)) {
+    util.fail('This project is not transpilable.');
+  }
 
-    monaca.reportAnalytics(report);
+  var report = {
+    event: 'transpile'
+  };
 
-    var isTranspileEnabled = monaca.isTranspileEnabled(process.cwd());
+  monaca.reportAnalytics(report);
 
-    if (isTranspileEnabled) {
-      util.checkNodeRequirement();
-    }
+  var isTranspileEnabled = monaca.isTranspileEnabled(process.cwd());
 
-    return monaca.transpile(projectDir)
-      .then(
-        monaca.reportFinish.bind(monaca, report),
-        monaca.reportFail.bind(monaca, report)
-      )
-      .then(
-        util.success.bind(null),
-        util.fail.bind(null, 'Project has failed to transpile. ')
-      );
-    }
+  if (isTranspileEnabled) {
+    util.checkNodeRequirement();
+  }
+
+  return monaca.transpile(projectDir)
+    .then(
+      monaca.reportFinish.bind(monaca, report),
+      monaca.reportFail.bind(monaca, report)
+    )
+    .then(
+      util.success.bind(null),
+      util.fail.bind(null, 'Project has failed to transpile. ')
+    );
 };
 
 module.exports = TranspileTask;
