@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.4.5
+----
+* Fixed broken `transpile`, `preview | serve` commands in specific conditions.
+
 v2.4.4
 ----
 * Improved compatibility with [Onsen UI vue-cordova-webpack](https://github.com/OnsenUI/vue-cordova-webpack) template.
