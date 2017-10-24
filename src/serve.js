@@ -9,49 +9,58 @@
     portfinder = require('portfinder'),
     exec = require('child_process').exec,
     util = require(path.join(__dirname, 'util')),
+    lib = require(path.join(__dirname, 'lib')),
     Monaca = require('monaca-lib').Monaca,
     argv = require('optimist')
     .alias('p', 'port')
     .default('open', true)
-    .argv,
-    projectConfig;
+    .argv;
 
   var ServeTask = {}, monaca;
-  var DEFAULT_PORT = 8000
+  var DEFAULT_PORT = 8000;
 
   ServeTask.run = function(taskName, info) {
-    try {
-      projectConfig = require(path.join(process.cwd(), 'package.json'));
-    } catch (err) {
-      serveProject(taskName, info);
-    }
-
-    if (taskName !== 'demo' && projectConfig && projectConfig.scripts && projectConfig.scripts.dev) {
-      var childProcess = exec('npm run dev');
-
-      childProcess.stdout.on('data', function(data) {
-        process.stdout.write(data.toString());
-      });
-
-      childProcess.stderr.on('data', function(data) {
-        if (data) {
-          process.stderr.write(data.toString().error);
-        }
-      });
-    } else {
-      serveProject(taskName, info);
-    }
-  };
-
-  var serveProject = function(taskName, info) {
     monaca = new Monaca(info);
 
+    lib.findProjectDir(process.cwd(), monaca)
+    .then(
+      function(dir) {
+        var projectDir = dir,
+          projectConfig;
+
+        try {
+          projectConfig = require(path.join(projectDir, 'package.json'));
+        } catch (err) {
+          return serveProject(taskName, projectDir);
+        }
+
+        if (taskName !== 'demo' && projectConfig && projectConfig.scripts && projectConfig.scripts.dev) {
+          var childProcess = exec('npm run dev');
+
+          childProcess.stdout.on('data', function(data) {
+            process.stdout.write(data.toString());
+          });
+
+          childProcess.stderr.on('data', function(data) {
+            if (data) {
+              process.stderr.write(data.toString().error);
+            }
+          });
+        } else {
+          return serveProject(taskName, projectDir);
+        }
+      }
+    )
+    .catch(util.fail.bind(null, 'Project ' + taskName + ' failed: '));
+  };
+
+  var serveProject = function(taskName, projectDir) {
     var report = {
       event: taskName
     };
     monaca.reportAnalytics(report);
 
-    monaca.isCordovaProject(process.cwd())
+    monaca.isCordovaProject(projectDir, monaca)
       .then(
         function() {
 
@@ -76,7 +85,7 @@
       .then(
         function(port) {
           var port = port,
-            isTranspileEnabled = monaca.isTranspileEnabled(process.cwd());
+            isTranspileEnabled = monaca.isTranspileEnabled(projectDir);
 
           if (isTranspileEnabled) {
             util.checkNodeRequirement();
@@ -104,7 +113,7 @@
 
             // Webpack Dev Server
             var webpack = require(path.join(monaca.userCordova, 'node_modules', 'webpack'));
-            var webpackConfig = require(monaca.getWebpackConfigFile(process.cwd(), 'dev'));
+            var webpackConfig = require(monaca.getWebpackConfigFile(projectDir, 'dev'));
 
             if (webpackConfig.devServer.inline) {
               if (webpackConfig.entry.app && webpackConfig.entry.app instanceof Array) {
@@ -126,7 +135,7 @@
             var params = {
               port: port,
               host: "0.0.0.0",
-              root: path.join(process.cwd(), 'www'),
+              root: path.join(projectDir, 'www'),
               open: (taskName === 'demo') ? false : true,
               mount: [['/monaca-demo', path.resolve(__dirname, '..', 'pages', 'demo')]],
               logLevel: 3
