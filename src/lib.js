@@ -84,7 +84,7 @@ var confirmOverwrite = function(options) {
    return Q.resolve();
   }
 
-  util.warn('This operation will overwrite all the' + (options.action === 'upload' ? 'remote changes that have been made.' : 'local changes you have made.'));
+  util.warn('This operation will overwrite all the ' + (options.action === 'upload' ? 'remote changes that have been made.' : 'local changes you have made.'));
   return inquirer.prompt({
     type: 'confirm',
     name: 'overwrite',

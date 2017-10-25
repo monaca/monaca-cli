@@ -52,10 +52,9 @@ ConfigTask.reconfigure = function() {
   };
   monaca.reportAnalytics(report);
 
-  var projectDir = process.cwd();
-
-  return monaca.isCordovaProject(projectDir, ['.monaca'])
-    .then(function() {
+  return lib.findProjectDir(process.cwd(), monaca)
+    .then(function(dir) {
+      var projectDir = dir;
       var promises = [];
       var dict = {
         transpile: 'generateBuildConfigs',

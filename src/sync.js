@@ -69,7 +69,7 @@ SyncTask.load = function(action, arg) {
     // Assuring this is a Monaca-like project (if uploading).
     .then(
       function() {
-        var isTranspileEnabled = monaca.isTranspileEnabled(process.cwd());
+        var isTranspileEnabled = monaca.isTranspileEnabled(cwd);
 
         if (isTranspileEnabled) {
           util.checkNodeRequirement();
@@ -230,105 +230,112 @@ SyncTask.livesync = function() {
     });
   } catch (error) { }
 
-  try {
-    var nw = path.join(process.cwd(), 'node_modules', 'nw');
-    var nwBin = require(nw).findpath();
-    var adbPath =  path.join(__dirname, '..', 'bin', process.platform, (process.platform == "win32") ? 'adb.exe' : 'adb');
+  lib.findProjectDir(process.cwd(), monaca)
+  .then(
+    function(dir) {
+      var projectDir = dir;
 
-    localkit.initInspector({
-      inspectorCallback: function(result) {
-        child_process.spawn(nwBin, [result.app, result.webSocketUrl]);
-      },
-      adbPath: adbPath
-    });
-  } catch (error) {
-    if ( error.code === 'MODULE_NOT_FOUND' ) {
-      nwError = true;
-    }
-  }
+      try {
+        var nw = path.join(projectDir, 'node_modules', 'nw');
+        var nwBin = require(nw).findpath();
+        var adbPath =  path.join(__dirname, '..', 'bin', process.platform, (process.platform == "win32") ? 'adb.exe' : 'adb');
 
-  var projects = argv._.slice(1);
-
-  if (projects.length === 0) {
-    projects.push(process.cwd());
-  }
-
-  var report = {
-    event: 'debug',
-    arg1: JSON.stringify(projects)
-  };
-  monaca.reportAnalytics(report);
-
-  if (projects.length > 1) {
-    projects = [projects.shift()];
-    util.err('Only one project can be served at the same time. Serving ', projects[0]);
-  }
-
-
-  var error = 'Unable to add projects: ';
-
-  localkit.setProjects(projects)
-    // Adding projects.
-    .then(
-      function() {
-        // Starting file watching
-        error = 'Unable to start file watching: ';
-        return localkit.startWatch();
-      }
-    )
-    .then(
-      function() {
-        // Starting HTTP server
-        error = 'Unable to start HTTP server: ';
-        return localkit.startHttpServer({ httpPort: argv.port });
-      }
-    )
-    // Starting HTTP server.
-    .then(
-      function(server) {
-        // Send "exit" event when program is terminated.
-        process.on('SIGINT', function() {
-          util.print('\nStopping debug...');
-          this.sendExitEvent();
-          process.exit(0);
-        }.bind(localkit.projectEvents));
-
-        util.print('Waiting for Monaca Debugger connecting to ' + server.address + ':' + server.port + '.');
-        error = 'Unable to start beacon transmitter: ';
-        return localkit.startBeaconTransmitter();
-      }
-    )
-    // Starting beacon transmiter.
-    .then(
-      function() {
-        if (nwError) {
-          util.warn('\nNode Webkit is not installed, so inspector capabilities will be disabled.\nPlease run "npm install nw" and restart the debug.\n');
+        localkit.initInspector({
+          inspectorCallback: function(result) {
+            child_process.spawn(nwBin, [result.app, result.webSocketUrl]);
+          },
+          adbPath: adbPath
+        });
+      } catch (error) {
+        if ( error.code === 'MODULE_NOT_FOUND' ) {
+          nwError = true;
         }
       }
-    )
-    .then(
-      monaca.reportFinish.bind(monaca, report),
-      monaca.reportFail.bind(monaca, report)
-    )
-    .then(
-      function() {
-        var options = {
-          watch: true,
-          cache: true
-        };
 
-        var promises = [];
-        projects.forEach(function(project) {
-          promises.push(monaca.transpile(project, options))
-        });
+      var projects = argv._.slice(1);
 
-        return Q.all(promises);
+      if (projects.length === 0) {
+        projects.push(projectDir);
       }
-    )
-    .catch(
-      util.fail.bind(null, error, '\n')
-    );
 
+      var report = {
+        event: 'debug',
+        arg1: JSON.stringify(projects)
+      };
+      monaca.reportAnalytics(report);
+
+      if (projects.length > 1) {
+        projects = [projects.shift()];
+        util.err('Only one project can be served at the same time. Serving ', projects[0]);
+      }
+
+
+      var error = 'Unable to add projects: ';
+
+      localkit.setProjects(projects)
+        // Adding projects.
+        .then(
+          function() {
+            // Starting file watching
+            error = 'Unable to start file watching: ';
+            return localkit.startWatch();
+          }
+        )
+        .then(
+          function() {
+            // Starting HTTP server
+            error = 'Unable to start HTTP server: ';
+            return localkit.startHttpServer({ httpPort: argv.port });
+          }
+        )
+        // Starting HTTP server.
+        .then(
+          function(server) {
+            // Send "exit" event when program is terminated.
+            process.on('SIGINT', function() {
+              util.print('\nStopping debug...');
+              this.sendExitEvent();
+              process.exit(0);
+            }.bind(localkit.projectEvents));
+
+            util.print('Waiting for Monaca Debugger connecting to ' + server.address + ':' + server.port + '.');
+            error = 'Unable to start beacon transmitter: ';
+            return localkit.startBeaconTransmitter();
+          }
+        )
+        // Starting beacon transmiter.
+        .then(
+          function() {
+            if (nwError) {
+              util.warn('\nNode Webkit is not installed, so inspector capabilities will be disabled.\nPlease run "npm install nw" and restart the debug.\n');
+            }
+          }
+        )
+        .then(
+          monaca.reportFinish.bind(monaca, report),
+          monaca.reportFail.bind(monaca, report)
+        )
+        .then(
+          function() {
+            var options = {
+              watch: true,
+              cache: true
+            };
+
+            var promises = [];
+            projects.forEach(function(project) {
+              promises.push(monaca.transpile(project, options))
+            });
+
+            return Q.all(promises);
+          }
+        )
+        .catch(
+          util.fail.bind(null, error, '\n')
+        );
+    }
+  )
+  .catch(util.fail.bind(null, 'Operation failed: '));
 };
 
 module.exports = SyncTask;
