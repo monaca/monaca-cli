@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v2.4.6
+----
+* Allowed `preview|serve|demo|debug|transpile|reconfigure` commands to be executed from subdirectories.
+* Minor bug fix.
+
 v2.4.5
 ----
 * Fixed broken `transpile`, `preview | serve` commands in specific conditions.
