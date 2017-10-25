@@ -60,7 +60,7 @@
     };
     monaca.reportAnalytics(report);
 
-    monaca.isCordovaProject(projectDir, monaca)
+    monaca.isCordovaProject(projectDir)
       .then(
         function() {
 
