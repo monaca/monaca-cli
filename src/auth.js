@@ -100,11 +100,6 @@ AuthTask._performLogin = function() {
   .then(
     function() {
       var user = monaca.loginBody;
-      if (user.hasOwnProperty('localkitEvaluationDays')) {
-        // Under evaluation period.
-        util.warn('Monaca CLI is under the evaluation period. It will expire in ' + user.localkitEvaluationDays + ' days.');
-        util.warn('You need to upgrade the plan when the evaluation period ends.');
-      }
       util.success('\nSuccessfully signed in as ' + user.username + '.');
     },
     function(error) {
