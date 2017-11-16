@@ -2,6 +2,12 @@
 CHANGELOG
 ====
 
+v2.5.0
+----
+** All previous Monaca CLI versions will not be anymore compatible with Monaca Cloud Services **
+* Security enhancements.
+* Webpack config updates.
+
 v2.4.6
 ----
 * Allowed `preview|serve|demo|debug|transpile|reconfigure` commands to be executed from subdirectories.
