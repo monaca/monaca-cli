@@ -4,7 +4,8 @@ CHANGELOG
 
 v2.5.0
 ----
-** All previous Monaca CLI versions will not be anymore compatible with Monaca Cloud Services **
+**All previous Monaca CLI versions will not be anymore compatible with Monaca Cloud Services**
+
 * Security enhancements.
 * Webpack config updates.
 
