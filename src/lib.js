@@ -12,8 +12,8 @@ var VERSION = require(path.join(__dirname, '..', 'package.json')).version;
 
 var findProjectDir = function(cwd, monaca) {
   return monaca.isMonacaProject(cwd).then(
-    function() {
-      return Q.resolve(cwd);
+    function(framework) {
+      return Q.resolve(cwd, framework);
     },
     function(error) {
       var newPath = path.join(cwd, '..');
@@ -36,7 +36,15 @@ var soflyAssureCordovaProject = function(cwd) {
 };
 
 var assureMonacaProject = function(cwd, monaca) {
-  return monaca.getProjectId(cwd)
+  var framework;
+
+  return monaca.isMonacaProject(cwd)
+  .then(
+    function(projectFramework) {
+      framework = projectFramework;
+
+      return monaca.getProjectId(cwd);
+    })
     .then(
       function(projectId) {
         if (typeof projectId === 'undefined') {
@@ -63,7 +71,8 @@ var assureMonacaProject = function(cwd, monaca) {
               return monaca.createProject({
                 name: info.name,
                 description: info.description,
-                templateId: 'minimum'
+                templateId: 'minimum',
+                framework: framework
               });
             }
           )
