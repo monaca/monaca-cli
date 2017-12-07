@@ -65,7 +65,7 @@ var assureMonacaProject = function(cwd, monaca) {
           return Q.reject(error);
         }
 
-        return monaca.getProjectInfo(cwd)
+        return monaca.getProjectInfo(cwd, framework)
           .then(
             function(info) {
               return monaca.createProject({
