@@ -12,8 +12,8 @@ var VERSION = require(path.join(__dirname, '..', 'package.json')).version;
 
 var findProjectDir = function(cwd, monaca) {
   return monaca.isMonacaProject(cwd).then(
-    function(framework) {
-      return Q.resolve(cwd, framework);
+    function() {
+      return Q.resolve(cwd);
     },
     function(error) {
       var newPath = path.join(cwd, '..');
@@ -57,7 +57,8 @@ var assureMonacaProject = function(cwd, monaca) {
     .then(
       function(projectId) {
         return Q.resolve({
-          projectId: projectId
+          projectId: projectId,
+          framework: framework
         });
       },
       function(error) {

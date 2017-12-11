@@ -61,8 +61,9 @@ RemoteTask.remote = function(task) {
   lib.findProjectDir(process.cwd(), monaca)
     // Waiting for user permission.
     .then(
-      function(directory) {
-        cwd = directory;
+      function(projectDir) {
+        cwd = projectDir;
+
         if (!params['build-list']) {
          return lib.confirmOverwrite({action: 'upload'});
        }
@@ -95,7 +96,7 @@ RemoteTask.remote = function(task) {
         if (!params.browser && task !== 'config' &&  !params['build-list']) {
           lib.printSuccessMessage({action: 'upload'}, files);
           error = 'Unable to build this project: ';
-          return monaca.checkBuildAvailability(projectInfo.projectId, params.platform, params.purpose);
+          return monaca.checkBuildAvailability(projectInfo, params);
         }
       }
     )
