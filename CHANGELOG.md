@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.5.1
+----
+* Fixed `debug` inspector issue.
+
 v2.5.0
 ----
 **All previous Monaca CLI versions will not be anymore compatible with Monaca Cloud Services**
