@@ -43,6 +43,10 @@
   "reconfigure": {
     "order": 61,
     "category": "project",
+    "frameworkSupport": {
+      "cordova": true,
+      "react-native": false
+    },
     "description": "generate default project configurations",
     "longDescription": [
       "Generate default project configurations and files.",

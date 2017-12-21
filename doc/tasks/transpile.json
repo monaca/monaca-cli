@@ -2,6 +2,10 @@
   "transpile": {
     "order": 50,
     "category": "project",
+    "frameworkSupport": {
+      "cordova": true,
+      "react-native": false
+    },
     "description": "transpile project source code",
     "longDescription": [
       "Transpiles projects that are transpilable.",

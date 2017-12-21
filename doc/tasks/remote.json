@@ -2,6 +2,10 @@
   "remote build": {
     "order": 24,
     "category": "project",
+    "frameworkSupport": {
+      "cordova": true,
+      "react-native": true
+    },
     "description": "build a project on Monaca Cloud",
     "longDescription": [
       "Build the project on Monaca Cloud."
@@ -54,6 +58,10 @@
   "remote config": {
     "order": 25,
     "category": "project",
+    "frameworkSupport": {
+      "cordova": true,
+      "react-native": true
+    },
     "description": "open the project configuration on Monaca Cloud",
     "longDescription": [
       "Open the project configuration on Monaca Cloud.",

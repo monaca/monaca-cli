@@ -22,13 +22,22 @@ var findProjectDir = function(cwd, monaca) {
   );
 };
 
-var soflyAssureCordovaProject = function(cwd) {
-  if (fs.existsSync(path.join(cwd, 'www')) && fs.existsSync(path.join(cwd, 'config.xml'))) {
-    return true;
+var softlyAssureMonacaProject = function(cwd) {
+  var projectConfig;
+
+  try {
+     projectConfig = require(path.resolve(cwd, 'package.json'));
+  } catch (err) {}
+
+  if (projectConfig && projectConfig.dependencies && projectConfig.dependencies['react-native']) {
+    return 'react-native';
+  } else if (fs.existsSync(path.resolve(cwd, 'www')) && fs.existsSync(path.join(cwd, 'config.xml'))) {
+    return 'cordova';
   } else {
-    var next = path.resolve(path.join(cwd, '..'));
+    var next = path.resolve(cwd, '..');
+
     if (next !== cwd) {
-      return soflyAssureCordovaProject(next);
+      return softlyAssureMonacaProject(next);
     } else {
       return false;
     }
@@ -208,7 +217,6 @@ var printCommands = function(taskList) {
   util.print('Commands: (use --help to show all)\n');
 
   var taskMaxLength = 0;
-  var isCordovaProject = soflyAssureCordovaProject(process.cwd());
   var tasks = Object.keys(taskList)
     .map(function(taskSet) {
       return Object.keys(taskList[taskSet]).map(function(taskName) {
@@ -228,6 +236,8 @@ var printCommands = function(taskList) {
       return a.join('') !== '';
     });
 
+  var framework = softlyAssureMonacaProject(process.cwd());
+
   tasks
     .sort(function(a, b) {
       var a_key = a[0];
@@ -240,12 +250,14 @@ var printCommands = function(taskList) {
       desc = task[1].description,
       dots = new Array(Math.max(15, taskMaxLength) - cmd.length).join('.');
 
-    if (isCordovaProject) {
-      util.print('  ' + cmd.bold.info + '  ' + dots.grey + '  ' + desc.bold);
-    } else {
-      if (task[1].category === 'general') {
+    if (task[1].category && task[1].category === 'general') {
+      if (!(task[1].frameworkSupport && task[1].frameworkSupport[framework])) {
         util.print('  ' + cmd.bold.info + '  ' + dots.grey + '  ' + desc.bold);
       }
+    } else if (!framework && (task[1].category && task[1].category === 'rootOnly')) {
+      util.print('  ' + cmd.bold.info + '  ' + dots.grey + '  ' + desc.bold);
+    } else if (framework && task[1].frameworkSupport && task[1].frameworkSupport[framework]) {
+      util.print('  ' + cmd.bold.info + '  ' + dots.grey + '  ' + desc.bold);
     }
   });
 
@@ -378,7 +390,7 @@ module.exports = {
   assureMonacaProject: assureMonacaProject,
   confirmOverwrite: confirmOverwrite,
   printSuccessMessage: printSuccessMessage,
-  soflyAssureCordovaProject: soflyAssureCordovaProject,
+  softlyAssureMonacaProject: softlyAssureMonacaProject,
   loginErrorHandler: loginErrorHandler,
   printVersion: printVersion,
   printHelp: printHelp

@@ -1,7 +1,7 @@
 {
   "clone": {
     "order": 20,
-    "category": "general",
+    "category": "rootOnly",
     "description": "clone a project from Monaca Cloud",
     "longDescription": [
       "Clones a project from the Monaca Cloud.",
@@ -20,7 +20,7 @@
   },
   "import": {
     "order": 21,
-    "category": "general",
+    "category": "rootOnly",
     "description": "import a project from Monaca Cloud",
     "longDescription": [
       "Imports a project from the Monaca Cloud.",
@@ -40,6 +40,10 @@
   "upload": {
     "order": 23,
     "category": "project",
+    "frameworkSupport": {
+      "cordova": true,
+      "react-native": true
+    },
     "description": "upload a project to Monaca Cloud",
     "longDescription": [
       "Uploads the current project to the Monaca Cloud.",
@@ -74,6 +78,10 @@
   "download": {
     "order": 22,
     "category": "project",
+    "frameworkSupport": {
+      "cordova": true,
+      "react-native": true
+    },
     "description": "download a project from Monaca Cloud",
     "longDescription": [
       "Download project from the Monaca Cloud.",
@@ -107,6 +115,10 @@
   "debug": {
     "order": 40,
     "category": "project",
+    "frameworkSupport": {
+      "cordova": true,
+      "react-native": false
+    },
     "description": "run app on device using Monaca Debugger",
     "longDescription": [
       "Debug one or more applications on a device and receive code changes instantly.",

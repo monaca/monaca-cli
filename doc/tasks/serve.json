@@ -2,6 +2,10 @@
   "preview": {
     "order": 30,
     "category": "project",
+    "frameworkSupport": {
+      "cordova": true,
+      "react-native": false
+    },
     "description": "run a local web server for preview",
     "longDescription": [
       "Starts a local web server that serves the www assets.",
@@ -32,6 +36,10 @@
   "demo": {
     "order": 31,
     "category": "project",
+    "frameworkSupport": {
+      "cordova": true,
+      "react-native": false
+    },
     "description": "display the app appereance on iOS and Android",
     "longDescription": [
       "Starts a local web server that serves the www assets",
