@@ -66,6 +66,7 @@
         'angular' : path.join(libDir, 'angular', 'package.json'),
         'vue' : path.join(projectDir, 'node_modules', 'vue' , 'package.json'),
         'react' : path.join(projectDir, 'node_modules', 'react' , 'package.json'),
+        'react-native' : path.join(projectDir, 'node_modules', 'react-native' , 'package.json'),
         'angular2' : path.join(projectDir, 'node_modules', '@angular', 'core', 'package.json'),
         'vue-onsenui' : path.join(projectDir, 'node_modules', 'vue-onsenui' , 'package.json'),
         'react-onsenui' : path.join(projectDir, 'node_modules', 'react-onsenui' , 'package.json'),
@@ -152,7 +153,7 @@
       return monaca.getConnectionStatus()
       .then(
         function(status) {
-          util.print(util.alignContent('status') + status + '\n');
+          util.print(util.alignContent('cloud status') + status + '\n');
           return Q.resolve();
         }
       );
