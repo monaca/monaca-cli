@@ -42,7 +42,7 @@
     "category": "project",
     "frameworkSupport": {
       "cordova": true,
-      "react-native": true
+      "react-native": false
     },
     "description": "upload a project to Monaca Cloud",
     "longDescription": [
@@ -80,7 +80,7 @@
     "category": "project",
     "frameworkSupport": {
       "cordova": true,
-      "react-native": true
+      "react-native": false
     },
     "description": "download a project from Monaca Cloud",
     "longDescription": [
