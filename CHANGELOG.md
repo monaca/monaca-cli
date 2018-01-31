@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v2.5.2
+----
+* Fixed npm issue during project creation.
+* Improved error message when a remote build fails.
+
 v2.5.1
 ----
 * Fixed `debug` inspector issue.
