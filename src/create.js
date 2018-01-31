@@ -82,16 +82,6 @@ CreateTask.createApp = function(template) {
       }.bind(null),
       util.fail.bind(null, error)
     )
-    .then(
-      function() {
-         monaca.prepareSession()
-         .then(
-          function() {
-            return inquiry.upload.call();
-          }
-        )
-      }
-    )
 };
 
 function injectData(path, node, value) {
