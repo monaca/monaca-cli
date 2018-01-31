@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.5.3
+----
+* Temporary disabled project link on creation because of output issues with recent npm versions.
+
 v2.5.2
 ----
 * Fixed npm issue during project creation.
