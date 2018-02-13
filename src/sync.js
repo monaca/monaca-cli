@@ -307,7 +307,7 @@ SyncTask.livesync = function() {
         .then(
           function() {
             if (nwError) {
-              util.warn('\nNode Webkit is not installed, so inspector capabilities will be disabled.\nPlease run "npm install nw" and restart the debug.\n');
+              util.warn('\nNode Webkit is not installed, so inspector capabilities will be disabled.\nPlease run "npm install nw@0.26.6" and restart the debug.\n');
             }
           }
         )

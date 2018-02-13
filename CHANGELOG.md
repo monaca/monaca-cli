@@ -2,6 +2,19 @@
 CHANGELOG
 ====
 
+v2.5.3
+----
+* Temporary disabled project link on creation because of output issues with recent npm versions.
+
+v2.5.2
+----
+* Fixed npm issue during project creation.
+* Improved error message when a remote build fails.
+
+v2.5.1
+----
+* Fixed `debug` inspector issue.
+
 v2.5.0
 ----
 **All previous Monaca CLI versions will not be anymore compatible with Monaca Cloud Services**
