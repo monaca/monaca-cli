@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.6.0
+----
+* Added React-Native Project Support
+
 v2.5.3
 ----
 * Temporary disabled project link on creation because of output issues with recent npm versions.
