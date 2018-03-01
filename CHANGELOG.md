@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.6.1
+----
+* Bumped built-in Cordova CLI dependency to 7.1.0.
+
 v2.6.0
 ----
 * Added React-Native Project Support
