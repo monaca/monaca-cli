@@ -324,7 +324,18 @@ SyncTask.livesync = function() {
 
             var promises = [];
             projects.forEach(function(project) {
-              promises.push(monaca.transpile(project, options))
+              var cb = function(data) {
+                if (data.type == 'lifecycle') {
+                  if (data.action == 'start-compile') {
+                    localkit.stopWatchProject(project);
+                    // console.log('------------- stopWatchProject');
+                  } else if (data.action == 'end-compile') {
+                    localkit.startWatchProject(project);
+                    // console.log('------------- startWatchProject');
+                  }
+                }
+              };
+              promises.push(monaca.transpile(project, options,cb))
             });
 
             return Q.all(promises);
