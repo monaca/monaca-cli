@@ -140,7 +140,8 @@
                 '/monaca-demo': path.resolve(__dirname, '..', 'pages', 'demo')
               },
               files: [ "*", "**/*"],
-              logLevel: 'debug'
+              logLevel: 'debug',
+              notify: false
             }
             server.init(params);
 /*
