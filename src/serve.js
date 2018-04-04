@@ -10,6 +10,7 @@
     exec = require('child_process').exec,
     util = require(path.join(__dirname, 'util')),
     lib = require(path.join(__dirname, 'lib')),
+    terminal = require(path.join(__dirname, 'terminal')),
     Monaca = require('monaca-lib').Monaca,
     argv = require('optimist')
     .alias('p', 'port')
@@ -116,10 +117,17 @@
             var webpackConfig = require(monaca.getWebpackConfigFile(projectDir, 'dev'));
 
             if (webpackConfig.devServer.inline) {
+              var packUrl = "http://localhost:" + port + "/";
+
+              if (terminal.isOnMonaca) {
+                packUrl = "https://0.0.0.0/";
+                webpackConfig.devServer.disableHostCheck = true;
+              }
+
               if (webpackConfig.entry.app && webpackConfig.entry.app instanceof Array) {
-                webpackConfig.entry.app.unshift("webpack-dev-server/client?http://localhost:" + port + "/");
+                webpackConfig.entry.app.unshift("webpack-dev-server/client?" + packUrl);
               } else if (webpackConfig.entry && webpackConfig.entry instanceof Array) {
-                webpackConfig.entry.unshift("webpack-dev-server/client?http://localhost:" + port + "/");
+                webpackConfig.entry.unshift("webpack-dev-server/client?" + packUrl);
               }
             }
 

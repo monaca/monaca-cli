@@ -7,7 +7,8 @@ var argv = require('optimist').argv,
   path = require('path'),
   https = require('https'),
   lib = require(path.join(__dirname, 'lib')),
-  util = require(path.join(__dirname, 'util'));
+  util = require(path.join(__dirname, 'util')),
+  terminal = require(path.join(__dirname, 'terminal'));
 
 colors.setTheme({
   silly: 'rainbow',
@@ -106,6 +107,11 @@ var Monaca = {
       || (task.name === 'remote build' && !argv.browser && !argv['build-list'] && argv._.length < 3)
       || (task.name === 'config' && !argv.reset && argv._.length < 2)) {
       util.displayHelp(task.name, taskList[task.set]);
+      process.exit(0);
+    }
+
+    if (!terminal.isValidTask(task.name)) {
+      util.fail(terminal.getInvalidCommandErrorMessage(task.name));
       process.exit(0);
     }
 
