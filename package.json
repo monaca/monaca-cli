@@ -29,6 +29,7 @@
   "homepage": "https://monaca.io",
   "preferGlobal": true,
   "dependencies": {
+    "browser-sync": "^2.23.6",
     "colors": "^0.6.2",
     "compare-versions": "3.0.1",
     "cordova": "7.1.0",

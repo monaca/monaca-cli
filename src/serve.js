@@ -138,8 +138,22 @@
 
           } else {
 
-            var server = require("live-server");
-
+            var server = require("browser-sync");
+            var params = {
+              port: port,
+              server: {
+                baseDir: path.join(projectDir, 'www')
+              },
+              routes: {
+                '/monaca-demo': path.resolve(__dirname, '..', 'pages', 'demo')
+              },
+              files: [ "*", "**/*"],
+              logLevel: 'debug',
+              notify: false
+            }
+            server.init(params);
+/*
+            //for live-server
             var params = {
               port: port,
               host: "0.0.0.0",
@@ -148,8 +162,8 @@
               mount: [['/monaca-demo', path.resolve(__dirname, '..', 'pages', 'demo')]],
               logLevel: 3
             }
-
             server.start(params);
+*/
 
             if (taskName == 'demo') {
               open('http://127.0.0.1:' + port + '/monaca-demo/');
