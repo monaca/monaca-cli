@@ -150,7 +150,7 @@
               files: [ "*", "**/*"],
               logLevel: 'debug',
               notify: false
-            }
+            };
             server.init(params);
 /*
             //for live-server
