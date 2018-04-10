@@ -138,36 +138,28 @@
 
           } else {
 
-            var server = require("browser-sync");
-            var params = {
-              port: port,
-              server: {
-                baseDir: path.join(projectDir, 'www')
-              },
-              routes: {
-                '/monaca-demo': path.resolve(__dirname, '..', 'pages', 'demo')
-              },
-              files: [ "*", "**/*"],
-              logLevel: 'debug',
-              notify: false
-            };
-            server.init(params);
-/*
-            //for live-server
-            var params = {
-              port: port,
+            var server = require("browser-sync").create();
+            server.init({
               host: "0.0.0.0",
-              root: path.join(projectDir, 'www'),
-              open: (taskName === 'demo') ? false : true,
-              mount: [['/monaca-demo', path.resolve(__dirname, '..', 'pages', 'demo')]],
-              logLevel: 3
-            }
-            server.start(params);
-*/
-
-            if (taskName == 'demo') {
-              open('http://127.0.0.1:' + port + '/monaca-demo/');
-            }
+              port: port,
+              ui: false,
+              server: {
+                baseDir: path.join(projectDir, 'www'),
+                routes: {
+                  '/monaca-demo': path.resolve(__dirname, '..', 'pages', 'demo')
+                }
+              },
+              files: [
+                path.join(projectDir,  "www/*"),
+                path.join(projectDir, "www/**/*")
+              ],
+              open: false,
+              notify: false,
+            }, function() {
+              if (taskName == 'demo') {
+                open('http://127.0.0.1:' + port + '/monaca-demo/');
+              }
+            });
           }
 
           if (process.platform === 'win32') {
