@@ -38,7 +38,7 @@
   /**
    * Invalid command error message template.
    */
-  Terminal.invalidCommandMessage= 'Error: ___TASK_NAME___ is not a valid task on monaca terminal.';
+  Terminal.invalidCommandMessage= 'This task is not supported when running on Monaca Terminal. Run `monaca --help` to show all available tasks.';
 
   /**
    * Get invalid command error message.
