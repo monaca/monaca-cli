@@ -38,7 +38,7 @@
     "ip": "^1.1.5",
     "live-server": "1.2.0",
     "monaca-inquirer": "^1.0.4",
-    "monaca-lib": "2.6.1",
+    "monaca-lib": "github:monaca/monaca-lib#2627e179c3c109ee92758015ad3e2ce8812d035d",
     "open": "0.0.5",
     "optimist": "^0.6.1",
     "portfinder": "^1.0.7",
