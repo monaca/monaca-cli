@@ -265,10 +265,8 @@ var printCommands = function(taskList) {
   util.print('');
 };
 
-var printExtendedCommands = function() {
-  var isTerminal = terminal.isOnMonaca;
-
-  if (!isTerminal) {
+var printExtendedCommands = function(isOnMonacaTerminal) {
+  if (!isOnMonacaTerminal) {
     util.print('---------------------------------');
     util.print(('Create Monaca Project').bold.info);
     util.print('---------------------------------\n');
@@ -284,7 +282,7 @@ var printExtendedCommands = function() {
   util.print('  monaca demo');
   util.print('    run a local web server and displays the iOS/Android version of view, when supported\n');
 
-  if (!isTerminal) {
+  if (!isOnMonacaTerminal) {
     util.print('  monaca debug [--port <port>|--no-open]');
     util.print('    run app on the device by using Monaca Debugger\n');
     util.print(('  * Monaca Debugger for Android/iOS is available on\n    Google Play Store/Apple App Store.\n').bold.warn);
@@ -298,7 +296,7 @@ var printExtendedCommands = function() {
   util.print('  monaca reconfigure [--transpile|--dependencies|--components]');
   util.print('    generate default project configurations\n');
 
-  if (!isTerminal) {
+  if (!isOnMonacaTerminal) {
     util.print('---------------------------------');
     util.print(('Using Monaca Cloud - Setup').bold.info);
     util.print('---------------------------------\n');
@@ -315,7 +313,7 @@ var printExtendedCommands = function() {
     util.print(('  * For more details, please visit: https://monaca.io\n').bold.warn);
   }
 
-  if (!isTerminal) {
+  if (!isOnMonacaTerminal) {
     util.print('---------------------------------');
     util.print(('Using Monaca Cloud - Remote Build').bold.info);
     util.print('---------------------------------\n');
@@ -362,7 +360,7 @@ var printExtendedCommands = function() {
   util.print('  monaca info');
   util.print('    display information about monaca dependencies, system, project dependencies and connection to Monaca Cloud\n');
 
-  if (!isTerminal) {
+  if (!isOnMonacaTerminal) {
     util.print('---------------------------------');
     util.print(('Docs').bold.info);
     util.print('---------------------------------\n');
@@ -393,10 +391,14 @@ var printExamples = function() {
 };
 
 var printHelp = function(taskList, extended) {
+  var isOnMonaca = terminal.isOnMonaca;
+
   printLogo();
   printUsage();
   if (extended) {
-    printExtendedCommands(); //change
+    printExtendedCommands(isOnMonaca); //change
+  } else if (isOnMonaca) {
+    printExtendedCommands(isOnMonaca);
   } else {
     printDescription();
     printCommands(taskList);
