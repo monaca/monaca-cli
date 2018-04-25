@@ -2,6 +2,12 @@
 CHANGELOG
 ====
 
+v2.7.0
+----
+* Stopped livereload in case of transpilable project
+* Changed web server program
+
+
 v2.6.1
 ----
 * Bumped built-in Cordova CLI dependency to 7.1.0.
