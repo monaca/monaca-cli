@@ -1,0 +1,45 @@
+{
+  "signing": {
+    "order": 24,
+    "category": "project",
+    "frameworkSupport": {
+      "cordova": true,
+      "react-native": true
+    },
+    "description": "Signing management",
+    "longDescription": [
+      "Manage signing configurations for iOS and Android builds."
+    ],
+    "usage": [
+      "monaca signing <action> <item>"
+    ],
+    "options": [
+      [
+        "action",
+        "Should be one of the following actions: list, generate, upload, add, remove, export"
+      ],
+      [
+        "item",
+        "Should be one of the following items: alias, keystore, provisioning, privatekeys, pkcsr, certificate, pkcs12"
+      ]
+    ],
+    "examples": [
+      "monaca signing list alias",
+      "monaca signing generate keystore",
+      "monaca signing upload keystore",
+      "monaca signing add alias",
+      "monaca signing remove alias",
+      "monaca signing export keystore",
+      "monaca signing list provisioning",
+      "monaca signing list privatekeys",
+      "monaca signing generate pkcsr",
+      "monaca signing export pkcsr",
+      "monaca signing upload certificate",
+      "monaca signing upload provisioning",
+      "monaca signing upload pkcs12",
+      "monaca signing remove certificate",
+      "monaca signing remove provisioning",
+      "monaca signing remove pkcs12"
+    ]
+  }
+}
