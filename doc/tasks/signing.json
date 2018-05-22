@@ -6,7 +6,7 @@
       "cordova": true,
       "react-native": true
     },
-    "description": "Signing management",
+    "description": "manage signing configurations",
     "longDescription": [
       "Manage signing configurations for iOS and Android builds."
     ],
