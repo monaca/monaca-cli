@@ -7,7 +7,8 @@ var argv = require('optimist').argv,
   path = require('path'),
   https = require('https'),
   lib = require(path.join(__dirname, 'lib')),
-  util = require(path.join(__dirname, 'util'));
+  util = require(path.join(__dirname, 'util')),
+  terminal = require(path.join(__dirname, 'terminal'));
 
 colors.setTheme({
   silly: 'rainbow',
@@ -97,7 +98,12 @@ var Monaca = {
     var task = this._getTask();
 
     if (!task.set) {
-      util.fail('Error: ' + task.name + ' is not a valid task.');
+      util.fail('Error: ' + task.name + ' is not a valid task. Run `monaca --help` to show all available tasks.');
+    }
+
+    if (!terminal.isValidTask(task.name)) {
+      util.fail(terminal.getInvalidCommandErrorMessage(task.name));
+      process.exit(0);
     }
 
     if (argv.help || argv.h

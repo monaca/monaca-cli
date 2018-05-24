@@ -183,7 +183,12 @@ var printUpdate = function(newVersion) {
 var updateCheck = function(data) {
   var currentDate = new Date();
   var newTime = currentDate.getTime().toString();
-  var content = JSON.parse(fs.readFileSync(data.config, 'utf8'));
+  var content = {};
+
+  if (fs.existsSync(data.config)) {
+    content = JSON.parse(fs.readFileSync(data.config, 'utf8'));
+  }
+
   var lastUpdate = content['update_check_time'];
 
   content['update_check_time'] = newTime;

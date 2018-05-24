@@ -10,6 +10,7 @@
     exec = require('child_process').exec,
     util = require(path.join(__dirname, 'util')),
     lib = require(path.join(__dirname, 'lib')),
+    terminal = require(path.join(__dirname, 'terminal')),
     Monaca = require('monaca-lib').Monaca,
     argv = require('optimist')
     .alias('p', 'port')
@@ -116,10 +117,17 @@
             var webpackConfig = require(monaca.getWebpackConfigFile(projectDir, 'dev'));
 
             if (webpackConfig.devServer.inline) {
+              var packUrl = "http://localhost:" + port + "/";
+
+              if (terminal.isOnMonaca) {
+                packUrl = "https://0.0.0.0/";
+                webpackConfig.devServer.disableHostCheck = true;
+              }
+
               if (webpackConfig.entry.app && webpackConfig.entry.app instanceof Array) {
-                webpackConfig.entry.app.unshift("webpack-dev-server/client?http://localhost:" + port + "/");
+                webpackConfig.entry.app.unshift("webpack-dev-server/client?" + packUrl);
               } else if (webpackConfig.entry && webpackConfig.entry instanceof Array) {
-                webpackConfig.entry.unshift("webpack-dev-server/client?http://localhost:" + port + "/");
+                webpackConfig.entry.unshift("webpack-dev-server/client?" + packUrl);
               }
             }
 
@@ -130,22 +138,28 @@
 
           } else {
 
-            var server = require("live-server");
-
-            var params = {
-              port: port,
+            var server = require("browser-sync").create();
+            server.init({
               host: "0.0.0.0",
-              root: path.join(projectDir, 'www'),
-              open: (taskName === 'demo') ? false : true,
-              mount: [['/monaca-demo', path.resolve(__dirname, '..', 'pages', 'demo')]],
-              logLevel: 3
-            }
-
-            server.start(params);
-
-            if (taskName == 'demo') {
-              open('http://127.0.0.1:' + port + '/monaca-demo/');
-            }
+              port: port,
+              ui: false,
+              server: {
+                baseDir: path.join(projectDir, 'www'),
+                routes: {
+                  '/monaca-demo': path.resolve(__dirname, '..', 'pages', 'demo')
+                }
+              },
+              files: [
+                path.join(projectDir,  "www/*"),
+                path.join(projectDir, "www/**/*")
+              ],
+              open: false,
+              notify: false,
+            }, function() {
+              if (taskName == 'demo') {
+                open('http://127.0.0.1:' + port + '/monaca-demo/');
+              }
+            });
           }
 
           if (process.platform === 'win32') {

@@ -6,7 +6,8 @@ var path = require('path'),
   open = require('open'),
   inquirer = require('monaca-inquirer'),
   fs = require('fs'),
-  util = require(path.join(__dirname, 'util'));
+  util = require(path.join(__dirname, 'util')),
+  terminal = require(path.join(__dirname, 'terminal'));
 
 var VERSION = require(path.join(__dirname, '..', 'package.json')).version;
 
@@ -264,12 +265,15 @@ var printCommands = function(taskList) {
   util.print('');
 };
 
-var printExtendedCommands = function() {
-  util.print('---------------------------------');
-  util.print(('Create Monaca Project').bold.info);
-  util.print('---------------------------------\n');
-  util.print('  monaca create [<dir-name>|--template-list|--template <template-name>]');
-  util.print('    create a new Monaca project\n');
+var printExtendedCommands = function(isOnMonacaTerminal) {
+  if (!isOnMonacaTerminal) {
+    util.print('---------------------------------');
+    util.print(('Create Monaca Project').bold.info);
+    util.print('---------------------------------\n');
+    util.print('  monaca create [<dir-name>|--template-list|--template <template-name>]');
+    util.print('    create a new Monaca project\n');
+  }
+
   util.print('---------------------------------');
   util.print(('Local Debug').bold.info);
   util.print('---------------------------------\n');
@@ -277,9 +281,13 @@ var printExtendedCommands = function() {
   util.print('    run a local web server for preview\n');
   util.print('  monaca demo');
   util.print('    run a local web server and displays the iOS/Android version of view, when supported\n');
-  util.print('  monaca debug [--port <port>|--no-open]');
-  util.print('    run app on the device by using Monaca Debugger\n');
-  util.print(('  * Monaca Debugger for Android/iOS is available on\n    Google Play Store/Apple App Store.\n').bold.warn);
+
+  if (!isOnMonacaTerminal) {
+    util.print('  monaca debug [--port <port>|--no-open]');
+    util.print('    run app on the device by using Monaca Debugger\n');
+    util.print(('  * Monaca Debugger for Android/iOS is available on\n    Google Play Store/Apple App Store.\n').bold.warn);
+  }
+
   util.print('---------------------------------');
   util.print(('Local Build and Configuration').bold.info);
   util.print('---------------------------------\n');
@@ -287,68 +295,79 @@ var printExtendedCommands = function() {
   util.print('    transpile project source code.\n');
   util.print('  monaca reconfigure [--transpile|--dependencies|--components]');
   util.print('    generate default project configurations\n');
-  util.print('---------------------------------');
-  util.print(('Using Monaca Cloud - Setup').bold.info);
-  util.print('---------------------------------\n');
-  util.print('  monaca signup <email>');
-  util.print('    register a new Monaca account\n');
-  util.print('  monaca login <email>');
-  util.print('    sign in to Monaca Cloud\n');
-  util.print('  monaca logout');
-  util.print('    sign out from Monaca Cloud\n');
-  util.print('  monaca config proxy [<proxy-server-url>|--reset]');
-  util.print('    configure proxy to use when connecting to Monaca Cloud\n');
-  util.print('  monaca config endpoint [<endpoint-url>|--reset]');
-  util.print('    configure endpoint URL to use when connecting to Monaca Cloud\n');
-  util.print(('  * For more details, please visit: https://monaca.io\n').bold.warn);
-  util.print('---------------------------------');
-  util.print(('Using Monaca Cloud - Remote Build').bold.info);
-  util.print('---------------------------------\n');
-  util.print('  monaca remote build <platform> [--build-type <type>|--output <path>|--android_webview\n  (default|crosswalk)|--android_arch <arch>|--browser|--build-list]');
-  util.print('    build project on Monaca Cloud\n');
-  util.print('---------------------------------');
-  util.print(('Using Monaca Cloud - Sync').bold.info);
-  util.print('---------------------------------\n');
-  util.print('  monaca clone');
-  util.print('    clone from Monaca cloud project\n');
-  util.print('  monaca download [--delete|--force|--dry-run]');
-  util.print('    download project from Monaca Cloud\n');
-  util.print('  monaca upload [--delete|--force|--dry-run]');
-  util.print('    upload project to Monaca Cloud\n');
-  util.print('---------------------------------');
-  util.print(('Using Monaca Cloud - Import').bold.info);
-  util.print('---------------------------------\n');
-  util.print('  monaca import');
-  util.print('    import from Monaca cloud project\n');
-  util.print('---------------------------------');
-  util.print(('Aliases for Cordova commands').bold.info);
-  util.print('---------------------------------\n');
-  util.print('  monaca plugin');
-  util.print('    manage Cordova Plugin\n');
-  util.print('  monaca platform');
-  util.print('    add, update and remove platforms\n');
-  util.print('  monaca info');
-  util.print('    show info about Cordova environment\n');
-  util.print('  monaca prepare');
-  util.print('    prepare project for build\n');
-  util.print('  monaca compile');
-  util.print('    build the project\n');
-  util.print('  monaca run');
-  util.print('    deploy project on a device / emulator\n');
-  util.print('  monaca build');
-  util.print('    shortcut for prepare, then compile\n');
-  util.print('  monaca emulate');
-  util.print('    run project on emulator\n');
+
+  if (!isOnMonacaTerminal) {
+    util.print('---------------------------------');
+    util.print(('Using Monaca Cloud - Setup').bold.info);
+    util.print('---------------------------------\n');
+    util.print('  monaca signup <email>');
+    util.print('    register a new Monaca account\n');
+    util.print('  monaca login <email>');
+    util.print('    sign in to Monaca Cloud\n');
+    util.print('  monaca logout');
+    util.print('    sign out from Monaca Cloud\n');
+    util.print('  monaca config proxy [<proxy-server-url>|--reset]');
+    util.print('    configure proxy to use when connecting to Monaca Cloud\n');
+    util.print('  monaca config endpoint [<endpoint-url>|--reset]');
+    util.print('    configure endpoint URL to use when connecting to Monaca Cloud\n');
+    util.print(('  * For more details, please visit: https://monaca.io\n').bold.warn);
+  }
+
+  if (!isOnMonacaTerminal) {
+    util.print('---------------------------------');
+    util.print(('Using Monaca Cloud - Remote Build').bold.info);
+    util.print('---------------------------------\n');
+    util.print('  monaca remote build <platform> [--build-type <type>|--output <path>|--android_webview\n  (default|crosswalk)|--android_arch <arch>|--browser|--build-list]');
+    util.print('    build project on Monaca Cloud\n');
+    util.print('---------------------------------');
+    util.print(('Using Monaca Cloud - Sync').bold.info);
+    util.print('---------------------------------\n');
+    util.print('  monaca clone');
+    util.print('    clone from Monaca cloud project\n');
+    util.print('  monaca download [--delete|--force|--dry-run]');
+    util.print('    download project from Monaca Cloud\n');
+    util.print('  monaca upload [--delete|--force|--dry-run]');
+    util.print('    upload project to Monaca Cloud\n');
+    util.print('---------------------------------');
+    util.print(('Using Monaca Cloud - Import').bold.info);
+    util.print('---------------------------------\n');
+    util.print('  monaca import');
+    util.print('    import from Monaca cloud project\n');
+    util.print('---------------------------------');
+    util.print(('Aliases for Cordova commands').bold.info);
+    util.print('---------------------------------\n');
+    util.print('  monaca plugin');
+    util.print('    manage Cordova Plugin\n');
+    util.print('  monaca platform');
+    util.print('    add, update and remove platforms\n');
+    util.print('  monaca info');
+    util.print('    show info about Cordova environment\n');
+    util.print('  monaca prepare');
+    util.print('    prepare project for build\n');
+    util.print('  monaca compile');
+    util.print('    build the project\n');
+    util.print('  monaca run');
+    util.print('    deploy project on a device / emulator\n');
+    util.print('  monaca build');
+    util.print('    shortcut for prepare, then compile\n');
+    util.print('  monaca emulate');
+    util.print('    run project on emulator\n');
+  }
+
   util.print('---------------------------------');
   util.print(('Local Environment Info').bold.info);
   util.print('---------------------------------\n');
   util.print('  monaca info');
   util.print('    display information about monaca dependencies, system, project dependencies and connection to Monaca Cloud\n');
-  util.print('---------------------------------');
-  util.print(('Docs').bold.info);
-  util.print('---------------------------------\n');
-  util.print('  monaca docs [onsen|tutorial|usage]');
-  util.print('    display docs for Monaca CLI, Onsen UI and Tutorials\n');
+
+  if (!isOnMonacaTerminal) {
+    util.print('---------------------------------');
+    util.print(('Docs').bold.info);
+    util.print('---------------------------------\n');
+    util.print('  monaca docs [onsen|tutorial|usage]');
+    util.print('    display docs for Monaca CLI, Onsen UI and Tutorials\n');
+  }
+
   util.print('---------------------------------');
   util.print(('Help').bold.info);
   util.print('---------------------------------\n');
@@ -372,10 +391,14 @@ var printExamples = function() {
 };
 
 var printHelp = function(taskList, extended) {
+  var isOnMonaca = terminal.isOnMonaca;
+
   printLogo();
   printUsage();
   if (extended) {
-    printExtendedCommands(); //change
+    printExtendedCommands(isOnMonaca); //change
+  } else if (isOnMonaca) {
+    printExtendedCommands(isOnMonaca);
   } else {
     printDescription();
     printCommands(taskList);
