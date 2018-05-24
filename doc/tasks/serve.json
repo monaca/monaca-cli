@@ -40,7 +40,7 @@
       "cordova": true,
       "react-native": false
     },
-    "description": "display the app appereance on iOS and Android",
+    "description": "display the app appearance on iOS and Android",
     "longDescription": [
       "Starts a local web server that serves the www assets",
       "on special views for Android and iOS",
