@@ -24,22 +24,19 @@
       ]
     ],
     "examples": [
-      "monaca signing list alias",
       "monaca signing generate keystore",
-      "monaca signing upload keystore",
-      "monaca signing add alias",
-      "monaca signing remove alias",
-      "monaca signing export keystore",
-      "monaca signing list provisioning",
-      "monaca signing list privatekeys",
       "monaca signing generate pkcsr",
-      "monaca signing export pkcsr",
+      "monaca signing add alias",
+      "monaca signing upload keystore",
+      "monaca signing upload pkcs12",
       "monaca signing upload certificate",
       "monaca signing upload provisioning",
-      "monaca signing upload pkcs12",
+      "monaca signing export keystore",
+      "monaca signing export pkcsr",
+      "monaca signing remove alias",
+      "monaca signing remove pkcs12",
       "monaca signing remove certificate",
-      "monaca signing remove provisioning",
-      "monaca signing remove pkcs12"
+      "monaca signing remove provisioning"
     ]
   }
 }

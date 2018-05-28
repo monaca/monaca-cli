@@ -204,6 +204,46 @@ var updateCheck = function(data) {
   }
 };
 
+var validatePassword = (password) => {
+  if (password && password.length >= 6) {
+    return true;
+  } else {
+    console.log('\nThe minimum length for this field is 6');
+    return false;
+  }
+}
+
+var validateEmail = (email) => {
+  const emailValidation = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailValidation.test(email);
+}
+
+var validateCountryCode = (countryCode) => {
+  if (countryCode && countryCode.length === 2) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+var validateRequireField = (text) => {
+  if (text && text.length >= 1) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+var getFormatExpirationDate = (timestamp) => {
+  if (!timestamp || timestamp < 0) return 'No Expiration Date';
+  try {
+    let d = new Date(timestamp * 1000);
+    return d.toLocaleDateString();
+  } catch (e) {
+    return 'No Expiration Date';
+  }
+}
+
 module.exports = {
   print: println,
   err: printerr,
@@ -217,6 +257,11 @@ module.exports = {
   displayHelp: displayHelp,
   checkNodeRequirement: checkNodeRequirement,
   updateCheck: updateCheck,
-  alignContent: alignContent
+  alignContent: alignContent,
+  validatePassword: validatePassword,
+  validateEmail: validateEmail,
+  validateCountryCode: validateCountryCode,
+  validateRequireField: validateRequireField,
+  getFormatExpirationDate: getFormatExpirationDate,
 };
 })();

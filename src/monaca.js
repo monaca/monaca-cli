@@ -110,7 +110,10 @@ var Monaca = {
       || (task.name === 'create' && argv._.length < 2 && !argv['template-list'])
       || (task.name === 'docs' && argv._.length < 2)
       || (task.name === 'remote build' && !argv.browser && !argv['build-list'] && argv._.length < 3)
-      || (task.name === 'config' && !argv.reset && argv._.length < 2)) {
+      || (task.name === 'config' && !argv.reset && argv._.length < 2)
+      || (task.name === 'signing' && !argv.reset && argv._.length < 2)
+      )
+    {
       util.displayHelp(task.name, taskList[task.set]);
       process.exit(0);
     }

@@ -1,70 +1,24 @@
-/**
- * @todo improve comment
- * Targets: alias, keystore, provisioning, privatekeys, pkcsr, certificate, pkcs12
- * 
- * monaca signing list alias
- * monaca signing list provisioning
- * monaca signing list privatekeys
- * 
- * monaca signing generate keystore
- * monaca signing generate pkcsr
- * 
- * monaca signing upload keystore
- * monaca signing upload certificate
- * monaca signing upload provisioning
- * monaca signing upload pkcs12
- * 
- * monaca signing add alias
- * 
- * monaca signing export keystore
- * monaca signing export pkcsr
- * 
- * monaca signing remove alias
- * monaca signing remove certificate
- * monaca signing remove provisioning
- * monaca signing remove pkcs12
- */
-
-/**
- * @todo remove unused items.
- */
 let path = require('path');
 let argv = require('optimist').argv;
-let shell = require('shelljs');
 let Monaca = require('monaca-lib').Monaca;
 let Q = require('q');
 let inquirer = require('monaca-inquirer');
-let colors  = require('colors');
 let lib = require(path.join(__dirname, 'lib'));
 let util = require(path.join(__dirname, 'util'));
 
 let monaca;
 let _project_id;
+const _helpMessage = 'To learn about a monaca signing type:\n$ monaca signing --help\n';
+const _listErrorMessage = `The provided target does not support signing list capabilities.\n${_helpMessage}`;
+const _generateErrorMessage = `The provided target does not support signing generate capabilities.\n${_helpMessage}`;
+const _uploadErrorMessage = `The provided target does not support signing upload capabilities.\n${_helpMessage}`;
+const _addErrorMessage = `The provided target does not support signing add capabilities.\n${_helpMessage}`;
+const _removeErrorMessage = `The provided target does not support signing remove capabilities.\n${_helpMessage}`;
+const _exportErrorMessage = `The provided target does not support signing export capabilities.\n${_helpMessage}`;
+const NO_ACTION = 'no_action_selected';
+const _noActionMessage = 'No action selected!';
 
 let _methods = {
-  /**
-   * @todo Delete list methods.
-   */
-  // list: (target) => {
-  //   switch(target) {
-  //     case 'alias':
-  //       return monaca.fetchSigningAliasCollection(_project_id);
-  //     break;
-
-  //     case 'provisioning':
-  //       return monaca.fetchSigningProvisioningProfileCollection();
-  //     break;
-      
-  //     case 'privatekeys':
-  //       return monaca.fetchSigningPrivateKeyCollection();
-  //     break;
-      
-  //     default:
-  //       return Q.reject('The provided target does not support signing list capabilities.');
-  //     break; 
-  //   }
-  // },
-
   generate: (target) => {
     switch(target) {
       case 'keystore':
@@ -84,7 +38,7 @@ let _methods = {
               message: 'Enter alias password:',
               validate: function(alias_password) {
                 aliasPassword = alias_password;
-                return true;
+                return util.validatePassword(aliasPassword);
               }
             },
             {
@@ -101,7 +55,7 @@ let _methods = {
               message: 'Enter KeyStore password:',
               validate: function(keystore_password) {
                 keystorePassword = keystore_password;
-                return true;
+                return util.validatePassword(keystorePassword);
               }
             },
             {
@@ -127,17 +81,26 @@ let _methods = {
             {
               type: 'input',
               name: 'email',
-              message: 'Enter your email:'
+              message: 'Enter your email address:',
+              validate: function(email) {
+                return util.validateEmail(email);
+              }
             },
             {
               type: 'input',
               name: 'name',
-              message: 'Enter your name:'
+              message: 'Enter your name:',
+              validate: function(name) {
+                return util.validateRequireField(name);
+              }
             },
             {
               type: 'input',
               name: 'country',
-              message: 'Enter your country (E.g. US, JP, etc):'
+              message: 'Enter your country (E.g. US, JP, etc):',
+              validate: function(country) {
+                return util.validateCountryCode(country);
+              }
             }
           ]
         )
@@ -149,7 +112,7 @@ let _methods = {
       break;
       
       default:
-        return Q.reject('The provided target does not support signing generate capabilities.');
+        return Q.reject(_generateErrorMessage);
       break; 
     }
   },
@@ -162,12 +125,18 @@ let _methods = {
             {
               type: 'input',
               name: 'filePath',
-              message: 'Enter KeyStore file path:'
+              message: 'Enter KeyStore file path:',
+              validate: function(filePath) {
+                return util.validateRequireField(filePath);
+              }
             },
             {
               type: 'password',
               name: 'password',
-              message: 'Enter KeyStore password:'
+              message: 'Enter KeyStore password:',
+              validate: function(password) {
+                return util.validateRequireField(password);
+              }
             }
           ]
         )
@@ -184,7 +153,10 @@ let _methods = {
             {
               type: 'input',
               name: 'filePath',
-              message: 'Enter Certificate file path:'
+              message: 'Enter Certificate file path:',
+              validate: function(filePath) {
+                return util.validateRequireField(filePath); 
+              }
             }
           ]
         )
@@ -201,7 +173,10 @@ let _methods = {
             {
               type: 'input',
               name: 'filePath',
-              message: 'Enter Provisioning Profile file path:'
+              message: 'Enter Provisioning Profile file path:',
+              validate: function(filePath) {
+                return util.validateRequireField(filePath); 
+              }
             }
           ]
         )
@@ -218,7 +193,10 @@ let _methods = {
             {
               type: 'input',
               name: 'filePath',
-              message: 'Enter P12 file path:'
+              message: 'Enter P12 file path:',
+              validate: function(filePath) {
+                return util.validateRequireField(filePath); 
+              }
             },
             {
               type: 'password',
@@ -235,7 +213,7 @@ let _methods = {
       break;
       
       default:
-        return Q.reject('The provided target does not support signing upload capabilities.');
+        return Q.reject(_uploadErrorMessage);
       break; 
     }
   },
@@ -258,7 +236,7 @@ let _methods = {
               message: 'Enter alias password:',
               validate: function(alias_password) {
                 aliasPassword = alias_password;
-                return true;
+                return util.validatePassword(aliasPassword);
               }
             },
             {
@@ -279,43 +257,95 @@ let _methods = {
       break;
       
       default:
-        return Q.reject('The provided target does not support signing add capabilities.');
+        return Q.reject(_addErrorMessage);
       break; 
     }
   },
   
   remove: (target) => {
     switch(target) {
-      /**
-       * @todo implement
-       */
       case 'alias':
-        return monaca.fetchSigningAliasCollection(_project_id)
-          .then(
-            (aliases) => {
-              console.log(aliases);
-            }
-          );
-
-        // return monaca.removeSigningAlias(_project_id, alias_name);
-      break;
-
-      /**
-       * @todo implement
-       */
-      case 'certificate':
-        return monaca.removeSigningCertificate(id);
-      break;
-      
-      case 'provisioning':
-        return monaca.fetchSigningProvisioningProfileCollection().then(
+       return monaca.fetchSigningAliasCollection(_project_id).then(
           (profiles) => {
+            if (!profiles || !profiles.length || profiles.length <= 0) {
+              util.print('There is no alias to be removed.');
+              return NO_ACTION;
+            }
+            return inquirer.prompt(
+              [
+                {
+                  type: 'list',
+                  name: 'profile',
+                  message: 'Please select an alias to remove:',
+                  cancelable: true,
+                  choices: profiles.map((profile) => {
+                    return {
+                      name: profile,
+                      value: profile,
+                      short: profile
+                    };
+                  })
+                }
+              ]
+            )
+            .then(
+              (answers) => {
+                if (!answers || !answers.profile) return NO_ACTION;
+                return monaca.removeSigningAlias(_project_id, answers.profile);
+              }  
+            );
+          }
+        );
+      break;
+
+      case 'certificate':
+        return monaca.fetchSigningCertificateCollection().then(
+          (profiles) => {
+            if (!profiles || !profiles.length || profiles.length <= 0) {
+              util.print('There is no certificates to be removed.');
+              return NO_ACTION;
+            }
             return inquirer.prompt(
               [
                 {
                   type: 'list',
                   name: 'profile',
                   message: 'Please select a profile to remove:',
+                  cancelable: true,
+                  choices: profiles.map((profile) => {
+                    return {
+                      name: `${profile.label} -- Expiration Date: ${util.getFormatExpirationDate(profile.expiration)}`,
+                      value: profile.crt_id,
+                      short: profile.label
+                    };
+                  })
+                }
+              ]
+            )
+            .then(
+              (answers) => {
+                if (!answers || !answers.profile) return NO_ACTION;
+                return monaca.removeSigningCertificate(answers.profile);
+              }  
+            );
+          }
+        );
+      break;
+      
+      case 'provisioning':
+        return monaca.fetchSigningProvisioningProfileCollection().then(
+          (profiles) => {
+            if (!profiles || !profiles.length || profiles.length <= 0) {
+              util.print('There is no provisioning profiles to be removed.');
+              return NO_ACTION;
+            }
+            return inquirer.prompt(
+              [
+                {
+                  type: 'list',
+                  name: 'profile',
+                  message: 'Please select a profile to remove:',
+                  cancelable: true,
                   choices: profiles.map((profile) => {
                     return {
                       name: profile.label,
@@ -328,6 +358,7 @@ let _methods = {
             )
             .then(
               (answers) => {
+                if (!answers || !answers.profile) return NO_ACTION;
                 return monaca.removeSigningProvisioningProfile(answers.profile);
               }  
             );
@@ -335,15 +366,42 @@ let _methods = {
         );
       break;
 
-      /**
-       * @todo implement
-       */
       case 'pkcs12':
-        return monaca.removeSigningPrivateKey(id);
+        return monaca.fetchSigningPrivateKeyCollection().then(
+          (profiles) => {
+            if (!profiles || !profiles.length || profiles.length <= 0) {
+              util.print('There is no pkcs12 to be removed.');
+              return NO_ACTION;
+            }
+            return inquirer.prompt(
+              [
+                {
+                  type: 'list',
+                  name: 'profile',
+                  message: 'Please select a pkcs12 to remove:',
+                  cancelable: true,
+                  choices: profiles.map((profile) => {
+                    return {
+                      name: `${profile.email} ( ${profile.key_id} )`,
+                      value: profile.key_id,
+                      short: profile.email
+                    };
+                  })
+                }
+              ]
+            )
+            .then(
+              (answers) => {
+                if (!answers || !answers.profile) return NO_ACTION;
+                return monaca.removeSigningPrivateKey(answers.profile);
+              }  
+            );
+          }
+        );
       break;
       
       default:
-        return Q.reject('The provided target does not support signing remove capabilities.');
+        return Q.reject(_removeErrorMessage);
       break; 
     }
   },
@@ -367,40 +425,71 @@ let _methods = {
         );
       break;
 
-      /**
-       * @todo Add step to display list of avaiable CSR to select for export.
-       */
       case 'pkcsr':
-        return inquirer.prompt(
-          [
-            {
-              type: 'input',
-              name: 'downloadToDir',
-              message: 'Enter the directory where the export will be saved to:'
+        return monaca.fetchSigningPrivateKeyCollection().then(
+          (profiles) => {
+            if (!profiles || !profiles.length || profiles.length <= 0) {
+              util.print('There is no pkcs12 to be exported.');
+              return NO_ACTION;
             }
-          ]
-        )
-        .then(
-          (answers) => {
-            return monaca.exportSigningPKCSR(csr_id, answers.downloadToDir);
-          }  
+            return inquirer.prompt(
+              [
+                {
+                  type: 'list',
+                  name: 'profile',
+                  message: 'Please select a pkcs12 to export:',
+                  cancelable: true,
+                  choices: profiles.map((profile) => {
+                    return {
+                      name: `${profile.email} ( ${profile.key_id} )`,
+                      value: profile.key_id,
+                      short: profile.email
+                    };
+                  })
+                }
+              ]
+            )
+            .then(
+              (answers1) => {
+                if (!answers1 || !answers1.profile) return NO_ACTION;
+
+                let key = answers1.profile;
+
+                return inquirer.prompt(
+                  [
+                    {
+                      type: 'input',
+                      name: 'downloadToDir',
+                      message: 'Enter the directory where the export will be saved to:'
+                    }
+                  ]
+                )
+                .then(
+                  (answers) => {
+                    return monaca.exportSigningPKCSR(key, answers.downloadToDir);
+                  }  
+                );
+
+              }  
+            );
+          }
         );
       break;
       
       default:
-        return Q.reject('The provided target does not support signing export capabilities.');
+        return Q.reject(_exportErrorMessage);
       break; 
     }
   }
 };
 
-/**
- * @todo improve run to display help and error when missing action and/or item.
- */
 module.exports = {
   // Entry point for all singing tasks
   run: (task, info) => {
     monaca = new Monaca(info);
+    let step = '';
+    let action = '';
+    let target = '';
 
     lib.findProjectDir(process.cwd(), monaca)
       .then(
@@ -417,37 +506,55 @@ module.exports = {
       )
       .then(
         () => {
+          step = 'prepareSession';
           return monaca.prepareSession();
         }
       )
       .then(
         () => {
+          step = 'executing';
           // The avaialble actions are: list, generate, upload, add, remove, export
-          let action = argv._[1];
+          action = argv._[1];
           let hasAction = _methods.hasOwnProperty(action);
 
-          let target = argv._[2];
+          target = argv._[2];
 
           // If the action exists, call the action with the target.
           if(action && hasAction && target) {
             return _methods[action](target);
           } else {
-            if(!action) util.fail('Missing action for the signing command.');
-            if(action && !hasAction) util.fail('No such action for the signing command.');
-            if(!target) util.fail('Missing target for the signing command action.');
+            let message = '';
+            if(!action) message = 'Missing action for the signing command.';
+            if(action && !hasAction) message = 'No such action for the signing command.';
+            if(!target) message = 'Missing target for the signing command action.';
+            if (message) {
+              util.fail(`${message}\n${_helpMessage}`);
+            }
           }
-        },
-
-        util.displayLoginErrors
+        }
       )
       .then(
-        (data) => {
-          if(data) console.log(data);
-        },
-
         (message) => {
-          console.log(message);
+          if (message === NO_ACTION) {
+            util.print(_noActionMessage);
+          } else {
+            util.success(`${action} ${target}: success`);            
+          }
+        },
+        (err) => {
+          if (step === 'prepareSession') {
+            util.displayLoginErrors();
+          } else {
+            util.fail(err);
+          }
         }
-      );
+      )
+      .catch((err) => { //catch the rest of the error
+        if (step === 'prepareSession') {
+          util.displayLoginErrors();
+        } else {
+          util.fail(err);
+        }
+      });
   }
 };
