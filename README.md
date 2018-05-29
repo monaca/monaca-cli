@@ -40,6 +40,7 @@ clone  .........  clone a project from Monaca Cloud
 import  ........  import a project from Monaca Cloud
 download  ......  download a project from Monaca Cloud
 upload  ........  upload a project to Monaca Cloud
+signing ........  manage signing configurations
 remote build  ..  build a project on Monaca Cloud
 remote config  ..  open the project configuration on Monaca Cloud
 preview  .......  run a local web server for preview
