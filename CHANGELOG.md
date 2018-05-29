@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.7.4
+----
+* Added `monaca signing` command. This command is used to manage iOS and Android signing configuration such as keystore, certificate, provisioning profile, etc.
+
 v2.7.0
 ----
 * Stopped livereload in case of transpilable project
