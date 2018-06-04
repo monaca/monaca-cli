@@ -16,11 +16,11 @@
     "options": [
       [
         "action",
-        "Should be one of the following actions: list, generate, upload, add, remove, export"
+        "Should be one of the following actions: generate, upload, add, remove, export"
       ],
       [
         "item",
-        "Should be one of the following items: alias, keystore, provisioning, privatekeys, pkcsr, certificate, pkcs12"
+        "Should be one of the following items: alias, keystore, provisioning, pkcsr, certificate, pkcs12"
       ]
     ],
     "examples": [
