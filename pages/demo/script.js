@@ -20,7 +20,6 @@ function findGetParameter(parameterName) {
 
 // Get the WebPack port
 var PORT = findGetParameter('WEBPACK_PORT');
-console.log(PORT);
 PORT = PORT !== null ? 'http://127.0.0.1:' + PORT : '';
 
 // Modify the iframe source for each platform
