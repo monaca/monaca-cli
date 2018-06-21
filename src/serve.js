@@ -86,55 +86,91 @@
       .then(
         function(port) {
           var port = port,
-            isTranspileEnabled = monaca.isTranspileEnabled(projectDir);
+            isTranspileEnabled = monaca.isTranspileEnabled(projectDir),
+            nextPort = null;
 
           if (isTranspileEnabled) {
             util.checkNodeRequirement();
           }
 
-          // Make sure the logs only appear at the end of the process.
-          var hookStdout = function() {
-            var originalWrite = process.stdout.write
-
-            process.stdout.write = function(string) {
-              originalWrite.apply(process.stdout, arguments)
-              if (/bundle is now VALID|webpack: Compiled successfully/.test(string)) {
-                process.stdout.write = originalWrite;
-                process.stdout.write('\n');
-                if (taskName == 'demo') {
-                  open('http://127.0.0.1:' + port + '/monaca-demo/');
-                } else {
-                  open('http://127.0.0.1:' + port + '/webpack-dev-server/');
-                }
-              }
-            };
-          };
-
           if (isTranspileEnabled) {
 
-            // Webpack Dev Server
-            var webpack = require(path.join(monaca.userCordova, 'node_modules', 'webpack'));
-            var webpackConfig = require(monaca.getWebpackConfigFile(projectDir, 'dev'));
+            // Getting the next port available for WebPack Server (taskName === 'demo')
+            portfinder.basePort = (port+1);
+            portfinder.getPort(function (err, _port) {
+              if (err) {
+                util.warn('There is not any port available.\n');
+                return;
+              }
+              nextPort = _port;
 
-            if (webpackConfig.devServer.inline) {
-              var packUrl = "http://localhost:" + port + "/";
+              // Make sure the logs only appear at the end of the process.
+              var hookStdout = function() {
+                var originalWrite = process.stdout.write
 
-              if (terminal.isOnMonaca) {
-                packUrl = "https://0.0.0.0/";
-                webpackConfig.devServer.disableHostCheck = true;
+                process.stdout.write = function(string) {
+                  originalWrite.apply(process.stdout, arguments)
+                  if (/bundle is now VALID|webpack: Compiled successfully/.test(string)) {
+                    process.stdout.write = originalWrite;
+                    process.stdout.write('\n');
+                    if (taskName === 'demo') {
+
+                      util.warn('The webpack-dev-server is running at http://127.0.0.1:' + nextPort + '.\n');
+
+                      // Open a Browser Sync providing the demo template and listenning the WebPack Server
+                      var server_template = require("browser-sync").create();
+                      server_template.init({
+                        host: "0.0.0.0",
+                        port: port,
+                        ui: false,
+                        server : {
+                          routes: {
+                            '/monaca-demo': path.resolve(__dirname, '..', 'pages', 'demo')
+                          }
+                        },
+                        open: false,
+                        notify: false,
+                      }, function() {
+                          open('http://127.0.0.1:' + port + '/monaca-demo/?WEBPACK_PORT=' + nextPort);
+                      });
+
+                    } else {
+                        open('http://127.0.0.1:' + port + '/webpack-dev-server/');
+                    }
+                  }
+                };
+              };
+
+              // Webpack Dev Server
+              var webpack = require(path.join(monaca.userCordova, 'node_modules', 'webpack'));
+              var webpackConfig = require(monaca.getWebpackConfigFile(projectDir, 'dev'));
+
+              if (webpackConfig.devServer.inline) {
+                var packUrl = taskName === 'demo' ? "http://localhost:" + nextPort + "/": "http://localhost:" + port + "/";
+
+                if (terminal.isOnMonaca) {
+                  packUrl = "https://0.0.0.0/";
+                  webpackConfig.devServer.disableHostCheck = true;
+                }
+
+                if (webpackConfig.entry.app && webpackConfig.entry.app instanceof Array) {
+                  webpackConfig.entry.app.unshift("webpack-dev-server/client?" + packUrl);
+                } else if (webpackConfig.entry && webpackConfig.entry instanceof Array) {
+                  webpackConfig.entry.unshift("webpack-dev-server/client?" + packUrl);
+                }
               }
 
-              if (webpackConfig.entry.app && webpackConfig.entry.app instanceof Array) {
-                webpackConfig.entry.app.unshift("webpack-dev-server/client?" + packUrl);
-              } else if (webpackConfig.entry && webpackConfig.entry instanceof Array) {
-                webpackConfig.entry.unshift("webpack-dev-server/client?" + packUrl);
+              var WebpackDevServer = require(path.join(monaca.userCordova, 'node_modules', 'webpack-dev-server'));
+              var server = new WebpackDevServer(webpack(webpackConfig), webpackConfig.devServer);
+
+              // Different port number
+              if (taskName === 'demo') {
+                server.listen(nextPort, '0.0.0.0', hookStdout);
+              } else {
+                server.listen(port, '0.0.0.0', hookStdout);
               }
-            }
 
-            var WebpackDevServer = require(path.join(monaca.userCordova, 'node_modules', 'webpack-dev-server'));
-            var server = new WebpackDevServer(webpack(webpackConfig), webpackConfig.devServer);
-
-            server.listen(port, '0.0.0.0', hookStdout);
+            });
 
           } else {
 
@@ -156,7 +192,7 @@
               open: false,
               notify: false,
             }, function() {
-              if (taskName == 'demo') {
+              if (taskName === 'demo') {
                 open('http://127.0.0.1:' + port + '/monaca-demo/');
               }
             });
