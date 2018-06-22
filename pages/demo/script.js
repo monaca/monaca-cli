@@ -25,5 +25,5 @@ PORT = PORT !== null ? 'http://127.0.0.1:' + PORT : '';
 // Modify the iframe source for each platform
 window.onload = function() {
     document.querySelector('#iosIframe').src = PORT + '/?platform=ios';
-    document.getElementById('androidIframe').src = PORT + '/?platform=android';
+    document.querySelector('#androidIframe').src = PORT + '/?platform=android';
 };
