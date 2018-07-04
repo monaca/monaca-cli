@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v2.7.6
+----
+* Added `skipTranspile` option to `monaca upload` to skip transpiling if supplied
+* Generated `.monacaignore` for all project templates and Improved retrieving local project files in `monaca-lib@2.7.6`
+
 v2.7.5
 ----
 * Fixed `monaca demo` issues for transpile projects.
