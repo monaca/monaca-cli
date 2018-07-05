@@ -153,11 +153,14 @@
                   webpackConfig.devServer.disableHostCheck = true;
                 }
 
-                if (webpackConfig.entry.app && webpackConfig.entry.app instanceof Array) {
+                if (webpackConfig.entry.watch && webpackConfig.entry.watch instanceof Array) {
+                  webpackConfig.entry.watch.unshift("webpack-dev-server/client?" + packUrl);
+                } else if (webpackConfig.entry.app && webpackConfig.entry.app instanceof Array) {
                   webpackConfig.entry.app.unshift("webpack-dev-server/client?" + packUrl);
                 } else if (webpackConfig.entry && webpackConfig.entry instanceof Array) {
                   webpackConfig.entry.unshift("webpack-dev-server/client?" + packUrl);
                 }
+
               }
 
               var WebpackDevServer = require(path.join(monaca.userCordova, 'node_modules', 'webpack-dev-server'));
