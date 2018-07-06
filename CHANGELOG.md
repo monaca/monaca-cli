@@ -2,6 +2,12 @@
 CHANGELOG
 ====
 
+v2.7.7
+----
+* Appended `webpack-dev-server/client` to webpack configuration only if `inline` and `hot` are set to true
+* Appended `webpack-dev-server/client` to `entry.watch` if supplied
+* Modified `monaca preview` to write files to `www` directory in `monaca-lib@2.7.7` so that the `monaca debugger` will see the changes immediately without running `monaca transpile`
+
 v2.7.6
 ----
 * Added `skipTranspile` option to `monaca upload` to skip transpiling if supplied

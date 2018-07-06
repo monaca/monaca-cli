@@ -141,27 +141,38 @@
                 };
               };
 
-              // Webpack Dev Server
-              var webpack = require(path.join(monaca.userCordova, 'node_modules', 'webpack'));
-              var webpackConfig = require(monaca.getWebpackConfigFile(projectDir, 'dev'));
+              try {
+                // Webpack Dev Server
+                var webpack = require(path.join(monaca.userCordova, 'node_modules', 'webpack'));
+                var webpackConfig = require(monaca.getWebpackConfigFile(projectDir, 'dev'));
 
-              if (webpackConfig.devServer.inline) {
-                var packUrl = taskName === 'demo' ? "http://localhost:" + nextPort + "/": "http://localhost:" + port + "/";
+                if (webpackConfig.devServer.inline) {
+                  var packUrl = taskName === 'demo' ? "http://localhost:" + nextPort + "/": "http://localhost:" + port + "/";
 
-                if (terminal.isOnMonaca) {
-                  packUrl = "https://0.0.0.0/";
-                  webpackConfig.devServer.disableHostCheck = true;
+                  if (terminal.isOnMonaca) {
+                    packUrl = "https://0.0.0.0/";
+                    webpackConfig.devServer.disableHostCheck = true;
+                  }
+
+                  // add webpack-dev-server client socket if inline and hot are set to true
+                  if (webpackConfig.devServer.inline && webpackConfig.devServer.hot) {
+                    if (webpackConfig.entry.watch && webpackConfig.entry.watch instanceof Array) {
+                      webpackConfig.entry.watch.unshift("webpack-dev-server/client?" + packUrl);
+                    } else if (webpackConfig.entry.app && webpackConfig.entry.app instanceof Array) {
+                      webpackConfig.entry.app.unshift("webpack-dev-server/client?" + packUrl);
+                    } else if (webpackConfig.entry && webpackConfig.entry instanceof Array) {
+                      webpackConfig.entry.unshift("webpack-dev-server/client?" + packUrl);
+                    }                  
+                  }
+
                 }
 
-                if (webpackConfig.entry.app && webpackConfig.entry.app instanceof Array) {
-                  webpackConfig.entry.app.unshift("webpack-dev-server/client?" + packUrl);
-                } else if (webpackConfig.entry && webpackConfig.entry instanceof Array) {
-                  webpackConfig.entry.unshift("webpack-dev-server/client?" + packUrl);
-                }
+                var WebpackDevServer = require(path.join(monaca.userCordova, 'node_modules', 'webpack-dev-server'));
+                var server = new WebpackDevServer(webpack(webpackConfig), webpackConfig.devServer);
+
+              } catch (e) {
+                console.log('webpack error', e);
               }
-
-              var WebpackDevServer = require(path.join(monaca.userCordova, 'node_modules', 'webpack-dev-server'));
-              var server = new WebpackDevServer(webpack(webpackConfig), webpackConfig.devServer);
 
               // Different port number
               if (taskName === 'demo') {
