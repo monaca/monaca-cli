@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.7.8
+----
+* Always append `webpack-dev-server/client` to webpack configuration to fix `Angular`'s `live reloading` with `monaca-lib@2.7.8`
+
 v2.7.7
 ----
 * Appended `webpack-dev-server/client` to webpack configuration only if `inline` and `hot` are set to true
