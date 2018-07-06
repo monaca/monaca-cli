@@ -154,15 +154,12 @@
                     webpackConfig.devServer.disableHostCheck = true;
                   }
 
-                  // add webpack-dev-server client socket if inline and hot are set to true
-                  if (webpackConfig.devServer.inline && webpackConfig.devServer.hot) {
-                    if (webpackConfig.entry.watch && webpackConfig.entry.watch instanceof Array) {
-                      webpackConfig.entry.watch.unshift("webpack-dev-server/client?" + packUrl);
-                    } else if (webpackConfig.entry.app && webpackConfig.entry.app instanceof Array) {
-                      webpackConfig.entry.app.unshift("webpack-dev-server/client?" + packUrl);
-                    } else if (webpackConfig.entry && webpackConfig.entry instanceof Array) {
-                      webpackConfig.entry.unshift("webpack-dev-server/client?" + packUrl);
-                    }                  
+                  if (webpackConfig.entry.watch && webpackConfig.entry.watch instanceof Array) {
+                    webpackConfig.entry.watch.unshift("webpack-dev-server/client?" + packUrl);
+                  } else if (webpackConfig.entry.app && webpackConfig.entry.app instanceof Array) {
+                    webpackConfig.entry.app.unshift("webpack-dev-server/client?" + packUrl);
+                  } else if (webpackConfig.entry && webpackConfig.entry instanceof Array) {
+                    webpackConfig.entry.unshift("webpack-dev-server/client?" + packUrl);
                   }
 
                 }
