@@ -73,8 +73,9 @@
         'angular2-onsenui' : path.join(projectDir, 'node_modules', 'angular2-onsenui', 'package.json')
       };
 
-      if (fileExists(path.join(projectDir, '.monaca','project_info.json'))) {
-        result.cordova = require(path.join(projectDir, '.monaca','project_info.json'))['cordova_version'];
+      if (fileExists(path.join(projectDir, 'node_modules', 'cordova', 'package.json'))) {
+        var cliPackage = require(path.join(projectDir, 'node_modules', 'cordova', 'package.json'));
+        result.cordova = cliPackage.version;
       }
 
       for (var i in onsenPaths) {

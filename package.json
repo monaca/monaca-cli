@@ -33,7 +33,6 @@
     "browser-sync": "^2.23.6",
     "colors": "^0.6.2",
     "compare-versions": "3.0.1",
-    "cordova": "7.1.0",
     "extend": "^2.0.0",
     "global-npm": "^0.3.0",
     "ip": "^1.1.5",
