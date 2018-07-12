@@ -6,7 +6,7 @@
       "cordova": true,
       "react-native": false
     },
-    "description": "run a local web server for preview",
+    "description": "run a local web server for preview (execute `npm run dev` defined in package.json)",
     "longDescription": [
       "Starts a local web server that serves the www assets.",
       "",
@@ -16,50 +16,10 @@
     ],
     "usage": "monaca preview",
     "examples": [
-      "monaca preview",
-      "monaca preview -p 8001",
-      "monaca preview --no-open"
+      "monaca preview"
     ],
-    "options": [
-      [
-        "--port, -p",
-        "Port. Defaults to 8000"
-      ],
-      [
-        "--no-open",
-        "Do not open browser"
-      ]
-    ],
+    "options": [],
     "showInHelp": true,
     "aliases": ["serve"]
-  },
-  "demo": {
-    "order": 31,
-    "category": "project",
-    "frameworkSupport": {
-      "cordova": true,
-      "react-native": false
-    },
-    "description": "display the app appearance on iOS and Android",
-    "longDescription": [
-      "Starts a local web server that serves the www assets",
-      "on special views for Android and iOS",
-      "",
-      "Will watch the file-system for changes and reload the",
-      "browser when a change occurs.",
-      ""
-    ],
-    "usage": "monaca demo",
-    "examples": [
-      "monaca demo",
-      "monaca demo -p 8001"
-    ],
-    "options": [
-      [
-        "--port, -p",
-        "Port. Defaults to 8000"
-      ]
-    ],
-    "showInHelp": true
   }
 }
