@@ -39,45 +39,7 @@ ConfigTask.run = function(taskName, info) {
     } else {
       this.showAPIEndpoint();
     }
-  } else if (taskName === 'reconfigure') {
-    this.reconfigure();
   }
-};
-
-ConfigTask.reconfigure = function() {
-  var rawArgv = process.argv.slice(3)
-  var report = {
-    event: 'reconfigure',
-    arg1: rawArgv
-  };
-  monaca.reportAnalytics(report);
-
-  return lib.findProjectDir(process.cwd(), monaca)
-    .then(function(dir) {
-      var projectDir = dir;
-      var promises = [];
-      var dict = {
-        transpile: 'generateBuildConfigs',
-        components: 'initComponents',
-        dependencies: 'installBuildDependencies'
-      };
-
-      Object.keys(dict).forEach(function(action) {
-        if (rawArgv.length === 0 || argv[action]) {
-          promises.push(monaca[dict[action]](projectDir));
-        }
-      });
-
-      return Q.all(promises);
-    })
-    .then(
-      monaca.reportFinish.bind(monaca, report),
-      monaca.reportFail.bind(monaca, report)
-    )
-    .then(
-      util.success.bind(null, '\nReconfiguration finished. '),
-      util.fail.bind(null, '\nSomething went wrong during reconfiguration. ')
-    );
 };
 
 ConfigTask.showProxy = function() {

@@ -48,7 +48,6 @@ demo  ..........  display the app appereance on iOS and Android
 debug  .........  run app on device using Monaca Debugger
 transpile  .....  transpile project source code
 config  ........  manage Monaca configuration
-reconfigure  ...  generate default project configurations
 plugin  ........  manage Cordova Plugin
 docs  ..........  display docs for Monaca CLI, Onsen UI and Tutorials
 info  ..........  display project and environment info

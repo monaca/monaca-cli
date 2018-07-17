@@ -293,8 +293,6 @@ var printExtendedCommands = function(isOnMonacaTerminal) {
   util.print('---------------------------------\n');
   util.print('  monaca transpile [--generate-config|--install-dependencies]');
   util.print('    transpile project source code.\n');
-  util.print('  monaca reconfigure [--transpile|--dependencies|--components]');
-  util.print('    generate default project configurations\n');
 
   if (!isOnMonacaTerminal) {
     util.print('---------------------------------');
