@@ -40,6 +40,7 @@ SyncTask.load = function(action, arg) {
   options.dryrun = argv['dry-run'] || (arg && arg.dryrun);
   options.delete = argv.delete || (arg && arg.delete);
   options.force = argv.force || (arg && arg.force);
+  options.skipTranspile = argv.skipTranspile || (arg && arg.skipTranspile);
   options.action = action;
 
   var report = {
