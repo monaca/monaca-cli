@@ -1,0 +1,22 @@
+{
+  "upgrade": {
+    "order": 10,
+    "category": "project",
+    "frameworkSupport": {
+      "cordova": true,
+      "react-native": false
+    },
+    "description": "upgrade old projects to new monaca cli 3.0.0 structure",
+    "longDescription": [
+      "TODO:"
+    ],
+    "usage": [
+      "monaca upgrade"
+    ],
+    "options": [
+    ],
+    "examples": [
+      "monaca upgrade"
+    ]
+  }
+}
