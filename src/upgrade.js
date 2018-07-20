@@ -34,7 +34,7 @@ module.exports = {
           .then(
             (answer) => {
               if (answer.alias_upgrade_type) {
-                return monaca.upgrade(projectDir); 
+                return monaca.upgrade(projectDir);
               } else {
                 util.warn('To avoid any kind of problem we recommend downgrading to Monaca CLI 2.7.x.');
               }
@@ -46,7 +46,7 @@ module.exports = {
 
       }
     )
-    .catch(util.fail.bind(null, 'Project ' + taskName + ' failed: '));
+    .catch(err => util.fail(`Project ${taskName} failed. ${err}`));
 
   }
 }
