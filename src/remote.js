@@ -181,8 +181,16 @@ RemoteTask.remote = function(task) {
             }
           }
 
-          shell.mkdir('-p', path.join(cwd, 'build'));
-          return path.join(cwd, 'build', filename);
+          let build_path = '';
+          try {
+            build_path = path.join( process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'], 'Desktop');
+          } catch (e) {
+            build_path = '/tmp/build';
+            console.log('could not get the desktop directory', e);
+            console.log('save to ', build_path);
+            shell.mkdir('-p', build_path);
+          }
+          return path.join(build_path, filename);
         });
       }
     )

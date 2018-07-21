@@ -58,6 +58,10 @@
     ],
     "options": [
       [
+        "--skipTranspile",
+        "do not transpile/build project before uploading."
+      ],
+      [
         "--delete",
         "deletes those files on Monaca cloud which are not present locally."
       ],
