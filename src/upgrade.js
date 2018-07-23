@@ -5,9 +5,8 @@ const Monaca = require('monaca-lib').Monaca;
 /**
  * Monaca Upgrade commnads.
  *
- * @param {string}
- * @param {object} info Info object with client type and version
- * @param {object} options Info object with client type and version
+ * @param {String} taskName
+ * @param {Object} info Info object with client type and version
  * @return
  */
 module.exports = {
@@ -22,27 +21,17 @@ module.exports = {
         if (monaca.isOldProject(projectDir)) {
           const confirmMessage = 'We are going to install some new build dependencies inside the project and to overwrite the package.json injecting some commands under the \'scripts\' tag.\n\n Are you sure you want to upgrade your project?';
 
-          return lib.confirmMessage(confirmMessage)
+          return lib.confirmMessage(confirmMessage, true)
           .then(
             (answer) => {
-
-              if (answer.value) {
-                return lib.overwriteScriptsUpgrade();
-              } else {
-                util.warn('To avoid any kind of problem we recommend downgrading to Monaca CLI 2.7.x.');
-              }
+              if (answer.value) return lib.overwriteScriptsUpgrade();
+              else util.warn('To avoid any kind of problem we recommend downgrading to Monaca CLI 2.7.x.');
             }
           )
           .then(
-            (answer) => {
-              if(answer) {
-                return monaca.upgrade(projectDir, answer.value);
-              }
-            }  
+            (answer) => { if(answer) return monaca.upgrade(projectDir, answer.value); }
           );
-        } else {
-          util.warn('The project is already the latest version.');
-        }
+        } else util.warn('The project is already the latest version.');
 
       }
     )
