@@ -137,7 +137,7 @@ SyncTask.clone = function(saveCloudProjectID) {
     .then(
       function() {
         util.print((saveCloudProjectID ? 'Cloning' : 'Importing') + ' \'' + project.name + '\' to ' + project.absolutePath);
-        return monaca.cloneProject(project.projectId, project.destPath)
+        return monaca.cloneProject(project.projectId, project.destPath, saveCloudProjectID)
           .progress(util.displayProgress);
       }
     )
