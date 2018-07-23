@@ -406,6 +406,24 @@ var printHelp = function(taskList, extended) {
   util.print('');
 };
 
+let confirmMessage = (message, byDefault = false) => {
+  return inquirer.prompt(
+    [
+      {
+        type: 'confirm',
+        name: 'value',
+        message: message,
+        default: byDefault
+      }
+    ]
+  )
+}
+
+let overwriteScriptsUpgrade = () => {
+  const message = 'We are going to add some new commands into `scripts` in package.json: `dev`, `wacth` and `build`.\n\n Are you sure you want to overwrite them?';
+  return confirmMessage(message, true);
+}
+
 module.exports = {
   findProjectDir: findProjectDir,
   assureMonacaProject: assureMonacaProject,
@@ -414,6 +432,8 @@ module.exports = {
   softlyAssureMonacaProject: softlyAssureMonacaProject,
   loginErrorHandler: loginErrorHandler,
   printVersion: printVersion,
-  printHelp: printHelp
+  printHelp: printHelp,
+  confirmMessage,
+  overwriteScriptsUpgrade
 };
 })();
