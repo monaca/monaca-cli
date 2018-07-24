@@ -79,6 +79,8 @@ RemoteTask.remote = function(task) {
         return lib.assureMonacaProject(cwd, monaca);
       }
     )
+    // Checking if the user needs to upgrade the project
+    .then( () => lib.executeUpgrade(cwd, monaca) )
     // Assuring this is a Monaca-like project.
     .then(
       function(info) {

@@ -67,6 +67,10 @@ SyncTask.load = function(action, arg) {
         }
       }
     )
+    // Checking if the user needs to upgrade the project
+    .then(
+      () => lib.executeUpgrade(cwd, monaca)
+    )
     // Assuring this is a Monaca-like project (if uploading).
     .then(
       function() {
@@ -162,7 +166,7 @@ SyncTask.clone = function(saveCloudProjectID) {
 };
 
 SyncTask.livesync = function() {
-  var localkit, nwError = false;
+  var localkit, nwError = false, projectDir;
 
   try {
     localkit = new Localkit(monaca, false);
@@ -232,9 +236,15 @@ SyncTask.livesync = function() {
   } catch (error) { }
 
   lib.findProjectDir(process.cwd(), monaca)
+  // Checking if the user needs to upgrade the project
   .then(
-    function(dir) {
-      var projectDir = dir;
+    (dir) => {
+      projectDir= dir;
+      return lib.executeUpgrade(projectDir, monaca);
+    }
+  )
+  .then(
+    function() {
 
       try {
         var nw = path.join(projectDir, 'node_modules', 'nw');

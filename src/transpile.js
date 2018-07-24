@@ -1,18 +1,24 @@
-let path = require('path');
-let util = require(path.join(__dirname, 'util'));
-let lib = require(path.join(__dirname, 'lib'));
-let Monaca = require('monaca-lib').Monaca;
+const path = require('path');
+const util = require(path.join(__dirname, 'util'));
+const lib = require(path.join(__dirname, 'lib'));
+const Monaca = require('monaca-lib').Monaca;
 
 let TranspileTask = {}; let monaca;
 
 TranspileTask.run = function(taskName, info) {
+  let projectDir;
   monaca = new Monaca(info);
 
   lib.findProjectDir(process.cwd(), monaca)
+  // Checking if the user needs to upgrade the project
   .then(
-    function(dir) {
-      let projectDir = dir;
-
+    (dir) => {
+      projectDir= dir;
+      return lib.executeUpgrade(projectDir, monaca);
+    }
+  )
+  .then(
+    () => {
       if (!monaca.isTranspilable(projectDir)) {
         util.fail('This project is not transpilable.');
       }

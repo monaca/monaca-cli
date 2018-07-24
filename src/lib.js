@@ -424,6 +424,41 @@ let overwriteScriptsUpgrade = () => {
   return confirmMessage(message, true);
 }
 
+/**
+ * Asks the user if he wants to upgrade the project.
+ *
+ * @param {string} projectDir
+ * @param {Object} monaca Monaca object
+ * @return {Promise}
+ */
+let executeUpgrade = (projectDir, monaca) => {
+  return new Promise ((resolve, reject) => {
+    if (monaca.isOldProject(projectDir)) {
+      const message = 'Your project was created using Monaca CLI 2.7.x so you need to upgrade your project or downgrading your Monaca CLI version to 2.7.x. \n\n Do you want to upgrade your project?';
+
+      confirmMessage(message, true)
+      .then(
+        (answer) => {
+          if(answer.value) return overwriteScriptsUpgrade();
+          else {
+            util.warn('To avoid any kind of problem we recommend downgrading to Monaca CLI 2.7.x.');
+            reject(new Error('Using an old version of Monaca CLI.'));
+          }
+        }
+      )
+      .then(
+        (answer) => {
+          if(answer) return monaca.upgrade(projectDir, answer.value);
+        }
+      )
+      .then( projectDir => resolve(projectDir))
+      .catch( err => reject(err) );
+
+    } else resolve(projectDir);
+  });
+}
+
+
 module.exports = {
   findProjectDir: findProjectDir,
   assureMonacaProject: assureMonacaProject,
@@ -433,7 +468,8 @@ module.exports = {
   loginErrorHandler: loginErrorHandler,
   printVersion: printVersion,
   printHelp: printHelp,
-  confirmMessage,
-  overwriteScriptsUpgrade
+  confirmMessage: confirmMessage,
+  overwriteScriptsUpgrade: overwriteScriptsUpgrade,
+  executeUpgrade: executeUpgrade
 };
 })();
