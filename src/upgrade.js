@@ -25,7 +25,7 @@ module.exports = {
           .then(
             (answer) => {
               if (answer.value) return lib.overwriteScriptsUpgrade();
-              else util.warn('To avoid any kind of problem we recommend downgrading to Monaca CLI 2.7.x.');
+              else util.warn('To avoid any kind of problem we recommend downgrading to Monaca CLI 2.x');
             }
           )
           .then(
