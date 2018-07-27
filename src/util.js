@@ -16,23 +16,27 @@ var _print = function(type, items) {
   process[type === 'error' ? 'stderr' : 'stdout'].write((type ? msg[type] : msg) + '\n');
 };
 
-var println = function() {
+let println = function() {
   _print('', arguments);
 };
 
-var printerr = function() {
+let printinfo = function() {
+  _print('info', arguments);
+};
+
+let printerr = function() {
   _print('error', arguments);
 };
 
-var printwarn = function() {
+let printwarn = function() {
   _print('warn', arguments);
 };
 
-var printsuccess = function() {
+let printsuccess = function() {
   _print('success', arguments);
 };
 
-var fail = function() {
+let fail = function() {
   _print('error', arguments);
   process.exit(1);
 };
@@ -246,6 +250,7 @@ var getFormatExpirationDate = (timestamp) => {
 
 module.exports = {
   print: println,
+  info: printinfo,
   err: printerr,
   warn: printwarn,
   success: printsuccess,
