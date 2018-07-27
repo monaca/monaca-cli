@@ -434,27 +434,30 @@ let overwriteScriptsUpgrade = () => {
 let executeUpgrade = (projectDir, monaca) => {
   return new Promise ((resolve, reject) => {
     if (monaca.isOldProject(projectDir)) {
-      const message = 'Your project was created using Monaca CLI 2.7.x so you need to upgrade your project or downgrading your Monaca CLI version to 2.7.x. \n\n Do you want to upgrade your project?';
+      if (parseFloat(monaca.getCordovaVersion(projectDir)) >= 7.1 ) {
+        const message = 'Your project was created using Monaca CLI 2.7.x so you need to upgrade your project or downgrading your Monaca CLI version to 2.7.x. We are going to install some new build dependencies inside the project and to overwrite the package.json injecting some commands under the \'scripts\' tag. \n\n Do you want to upgrade your project?';
 
-      confirmMessage(message, true)
-      .then(
-        (answer) => {
-          if(answer.value) return overwriteScriptsUpgrade();
-          else {
-            util.warn('To avoid any kind of problem we recommend downgrading to Monaca CLI 2.7.x.');
-            reject(new Error('Using an old version of Monaca CLI.'));
+        confirmMessage(message, true)
+        .then(
+          (answer) => {
+            if(answer.value) return overwriteScriptsUpgrade();
+            else {
+              util.warn('To avoid any kind of problem we recommend downgrading to Monaca CLI 2.7.x.');
+              reject(new Error('Using an old version of Monaca CLI.'));
+            }
           }
-        }
-      )
-      .then(
-        (answer) => {
-          if(answer) return monaca.upgrade(projectDir, answer.value);
-        }
-      )
-      .then( projectDir => resolve(projectDir))
-      .catch( err => reject(err) );
-
-    } else resolve(projectDir);
+        )
+        .then( answer => { if(answer) return monaca.upgrade(projectDir, answer.value); } )
+        .then( projectDir => resolve(projectDir))
+        .catch( err => reject(err) );
+      } else {
+        util.warn('Your project is using a previous version of Cordova. If you want to use the latest Monaca CLI (3.x), please upgrade the cordova version to 7.1.');
+        util.print(`Steps:\n  1) Make a ${'backup'.commands} of the project`);
+        util.print(`  2) Run ${'monaca remote config'.commands}, then upgrade the cordova to 7.1. You might need to upgrade multiple times as the upgrade is in sequence 5.2 -> 6.2 -> 6.5 -> 7.1`);
+        util.print(`  3) Run ${'monaca download'.commands} to download all the changes`);
+        util.print(`  4) Run ${'monaca upgrade'.commands} again`);
+      }
+    } else resolve('The project is already the latest version.');
   });
 }
 
