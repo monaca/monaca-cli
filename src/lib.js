@@ -435,7 +435,7 @@ let executeUpgrade = (projectDir, monaca) => {
   return new Promise ((resolve, reject) => {
     if (monaca.isOldProject(projectDir)) {
       if (parseFloat(monaca.getCordovaVersion(projectDir)) >= 7.1 ) {
-        const message = 'Your project was created using Monaca CLI 2.x so you need to upgrade your project or downgrading your Monaca CLI version to 2.x. We are going to install some new build dependencies inside the project and to overwrite the package.json injecting some commands under the \'scripts\' tag. \n\n Do you want to upgrade your project?';
+        const message = 'Your project was created using Monaca CLI 2.x so you need to upgrade your project or downgrading your Monaca CLI version to 2.x. \n\n We are going to install some new build dependencies inside the project and to overwrite the package.json injecting some commands under the \'scripts\' tag. \n\n Do you want to upgrade your project?';
 
         confirmMessage(message, true)
         .then(
