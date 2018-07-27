@@ -456,6 +456,7 @@ let executeUpgrade = (projectDir, monaca) => {
         util.print(`  2) Run ${'monaca remote config'.commands}, then upgrade the cordova to 7.1. You might need to upgrade multiple times as the upgrade is in sequence 5.2 -> 6.2 -> 6.5 -> 7.1`);
         util.print(`  3) Run ${'monaca download'.commands} to download all the changes`);
         util.print(`  4) Run ${'monaca upgrade'.commands} again`);
+        reject('The project is using an old Cordova version');
       }
     } else resolve('The project is already the latest version.');
   });
