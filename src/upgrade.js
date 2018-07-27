@@ -15,27 +15,9 @@ module.exports = {
 
     // Checking if the path is under a Monaca Project.
     lib.findProjectDir(process.cwd(), monaca)
-    .then(
-      (projectDir) => {
-
-        if (monaca.isOldProject(projectDir)) {
-          const confirmMessage = 'We are going to install some new build dependencies inside the project and to overwrite the package.json injecting some commands under the \'scripts\' tag.\n\n Are you sure you want to upgrade your project?';
-
-          return lib.confirmMessage(confirmMessage, true)
-          .then(
-            (answer) => {
-              if (answer.value) return lib.overwriteScriptsUpgrade();
-              else util.warn('To avoid any kind of problem we recommend downgrading to Monaca CLI 2.x');
-            }
-          )
-          .then(
-            (answer) => { if(answer) return monaca.upgrade(projectDir, answer.value); }
-          );
-        } else util.warn('The project is already the latest version.');
-
-      }
-    )
-    .catch(err => util.fail(`Project ${taskName} failed. ${err}`));
+      .then( projectDir => lib.executeUpgrade(projectDir, monaca) )
+      .then( projectDir => util.success(`${projectDir}; ${taskName} process finished.`) )
+      .catch( err => util.fail(`Project ${taskName} failed. ${err}`) );
 
   }
 }
