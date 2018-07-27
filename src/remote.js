@@ -83,7 +83,7 @@ RemoteTask.remote = function(task) {
     .then( 
       (info) => {
         projectInfo = info;
-        lib.executeUpgrade(cwd, monaca) 
+        return task !== 'config' ? lib.executeUpgrade(cwd, monaca) : Promise.resolve(cwd);
       }
     )
     // Assuring this is a Monaca-like project.
