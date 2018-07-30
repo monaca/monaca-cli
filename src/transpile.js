@@ -14,15 +14,12 @@ TranspileTask.run = function(taskName, info) {
   .then(
     (dir) => {
       projectDir= dir;
+      if (!monaca.isTranspilable(projectDir)) util.fail('This project is not transpilable.'); 
       return lib.executeUpgrade(projectDir, monaca);
     }
   )
   .then(
-    () => {
-      if (!monaca.isTranspilable(projectDir)) {
-        util.fail('This project is not transpilable.');
-      }
-    
+    () => {    
       let report = {
         event: 'transpile'
       };
