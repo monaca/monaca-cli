@@ -406,7 +406,8 @@ var printHelp = function(taskList, extended) {
   util.print('');
 };
 
-let confirmMessage = (message, byDefault = false) => {
+let confirmMessage = (message, byDefault = false, force = false) => {
+  if (force) return Promise.resolve({value: true});
   return inquirer.prompt(
     [
       {
@@ -419,9 +420,9 @@ let confirmMessage = (message, byDefault = false) => {
   )
 }
 
-let overwriteScriptsUpgrade = () => {
+let overwriteScriptsUpgrade = (force = false) => {
   const message = 'We are going to add some new commands into `scripts` in package.json: `dev`, `watch` and `build`.\n\n Are you sure you want to overwrite them?';
-  return confirmMessage(message, true);
+  return confirmMessage(message, true, force);
 }
 
 /**
@@ -429,18 +430,19 @@ let overwriteScriptsUpgrade = () => {
  *
  * @param {string} projectDir
  * @param {Object} monaca Monaca object
+ * @param {Boolean} force Skip asking user
  * @return {Promise}
  */
-let executeUpgrade = (projectDir, monaca) => {
+let executeUpgrade = (projectDir, monaca, force) => {
   return new Promise ((resolve, reject) => {
     if (monaca.isOldProject(projectDir)) {
       if (parseFloat(monaca.getCordovaVersion(projectDir)) >= 7.1 ) {
         const message = 'Your project was created using Monaca CLI 2.x so you need to upgrade your project or downgrading your Monaca CLI version to 2.x. \n\n We are going to install some new build dependencies inside the project and to overwrite the package.json injecting some commands under the \'scripts\' tag. \n\n Do you want to upgrade your project?';
 
-        confirmMessage(message, true)
+        confirmMessage(message, true, force)
         .then(
           (answer) => {
-            if(answer.value) return overwriteScriptsUpgrade();
+            if(answer.value) return overwriteScriptsUpgrade(force);
             else {
               util.warn('To avoid any kind of problem we recommend downgrading to Monaca CLI 2.x');
               reject(new Error('Using an old version of Monaca CLI.'));
