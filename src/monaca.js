@@ -20,6 +20,7 @@ colors.setTheme({
   help: 'cyan',
   warn: ['yellow', 'bold'],
   commands: ['cyan', 'italic'],
+  url: ['cyan', 'underline'],
   debug: 'blue',
   error: ['red', 'bold'],
   success: ['green', 'bold']
