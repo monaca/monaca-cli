@@ -460,7 +460,7 @@ let executeUpgrade = (projectDir, monaca, force) => {
         util.print(`  4) Run ${'monaca upgrade'.commands} again`);
         reject('The project is using an old Cordova version');
       }
-    } else resolve('The project is already the latest version.');
+    } else resolve({message: 'The project is already the latest version.'});
   });
 }
 

@@ -19,7 +19,7 @@ module.exports = {
     // Checking if the path is under a Monaca Project.
     lib.findProjectDir(process.cwd(), monaca)
       .then( projectDir => lib.executeUpgrade(projectDir, monaca, force) )
-      .then( projectDir => util.success(`${taskName} process finished.`) )
+      .then( data => util.success(data.message ? `${data.message} ${taskName} process finished.`: `${taskName} process finished.`) )
       .catch( err => util.fail(`Project ${taskName} failed. ${err}`) );
 
   }
