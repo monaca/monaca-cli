@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v2.7.9
+----
+* Modified `monaca remote build` to ask users providing the build directory if it is not specified. In addition, the default build directory is changed to `Desktop` directory.
+* Fixed `monaca import` to NOT set `project_id` to `local_properties.json` (with `monaca-lib@2.7.9`)
+
 v2.7.8
 ----
 * Always append `webpack-dev-server/client` to webpack configuration to fix `Angular`'s `live reloading` with `monaca-lib@2.7.8`
