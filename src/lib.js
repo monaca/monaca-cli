@@ -434,6 +434,8 @@ let overwriteScriptsUpgrade = (force = false) => {
  * @return {Promise}
  */
 let executeUpgrade = (projectDir, monaca, force) => {
+  let options = {};
+
   return new Promise ((resolve, reject) => {
     if (monaca.isOldProject(projectDir)) {
       if (parseFloat(monaca.getCordovaVersion(projectDir)) >= 7.1 ) {
@@ -449,7 +451,12 @@ let executeUpgrade = (projectDir, monaca, force) => {
             }
           }
         )
-        .then( answer => { if(answer) return monaca.upgrade(projectDir, answer.value); } )
+        .then(answer => {
+          if (answer) {
+            options.overwrite = answer.value;
+            return monaca.upgrade(projectDir, options);
+          }
+        })
         .then( projectDir => resolve(projectDir))
         .catch( err => reject(err) );
       } else {

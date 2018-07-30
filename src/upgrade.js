@@ -16,6 +16,8 @@ module.exports = {
     let monaca = new Monaca(info);
     const force = !!argv.force || (options && options.force) || false;
 
+    process.on('SIGINT', err => util.fail(`Project ${taskName} failed. ${err}`) );
+
     // Checking if the path is under a Monaca Project.
     lib.findProjectDir(process.cwd(), monaca)
       .then( projectDir => lib.executeUpgrade(projectDir, monaca, force) )
