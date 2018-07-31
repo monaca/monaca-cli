@@ -167,12 +167,28 @@ RemoteTask.remote = function(task) {
         return result.binary_url ? monaca.getSessionUrl(result.binary_url) : Q.reject(result.error_message);
       }
     )
-    // Getting session URL.
+    // Getting session URL && Preparing the file path
     .then(
       function(sessionUrl) {
+        // return the filepath if it is specified
+        if (params.output) {
+          return Q.resolve({
+            sessionUrl: sessionUrl,
+            buildDir: params.output
+          });
+        } else {
+          return specifyBuildDirectory(sessionUrl);
+        }
+      }
+    )
+    // Download file
+    .then(
+      function(result) {
+        let sessionUrl = result.sessionUrl;
+        let buildDir = result.buildDir;
         return monaca.download(sessionUrl, {}, function(response) {
           if (params.output) {
-            return path.resolve(params.output);
+            return path.resolve(params.output); //filepath specified by --path
           }
 
           var filename = 'output.bin';
@@ -183,8 +199,8 @@ RemoteTask.remote = function(task) {
             }
           }
 
-          shell.mkdir('-p', path.join(cwd, 'build'));
-          return path.join(cwd, 'build', filename);
+          shell.mkdir('-p', buildDir);
+          return path.join(buildDir, filename);
         });
       }
     )
@@ -199,6 +215,32 @@ RemoteTask.remote = function(task) {
       },
       util.fail
     );
+
+  var specifyBuildDirectory = function(sessionUrl) {
+    let deferred = Q.defer();
+
+    // get the build directory from user
+    let default_path = path.join( process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'], 'Desktop');
+    util.print(''); //insert an empty line
+    inquirer.prompt({
+      type: 'input',
+      name: 'build_path',
+      message: 'Please enter the directory to save the file or press Enter to accept the default:',
+      default: default_path
+    })
+    .then(
+      function(response) {
+        if (response && response.build_path) {
+          return deferred.resolve({
+            sessionUrl: sessionUrl,
+            buildDir: response.build_path
+          });
+        }
+      }
+    );
+
+    return deferred.promise;
+  };
 
   var requestBuildSelection = function(validBuilds) {
     var deferred = Q.defer();
