@@ -21,6 +21,10 @@
       [
         "--force",
         "doesn't ask user, default settings."
+      ],
+      [
+        "--createPackageJson",
+        "creates a basic package.json file with name and description."
       ]
     ]
   }

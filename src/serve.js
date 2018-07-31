@@ -17,10 +17,10 @@ let ServeTask = {}; let monaca;
 ServeTask.run = function (taskName, info) {
   monaca = new Monaca(info);
   lib.findProjectDir(process.cwd(), monaca)
-    // Checking if the user needs to upgrade the project
-    .then( dir => lib.executeUpgrade(dir, monaca) )
-    // Executing
-    .then( () => spawn('npm', ['run', 'monaca:preview'], {stdio: 'inherit'}) )
+    .then( dir => {
+      lib.needToUpgrade(dir, monaca);
+      try { spawn('npm', ['run', 'monaca:preview'], {stdio: 'inherit'}); } catch(ex) { throw ex; }
+    })
     .catch( util.fail.bind(null, 'Project ' + taskName + ' failed: ') );
 };
 

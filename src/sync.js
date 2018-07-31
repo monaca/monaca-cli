@@ -62,14 +62,11 @@ SyncTask.load = function(action, arg) {
         error = 'Unable to create monaca project: ';
         cwd = directory;
 
+        lib.needToUpgrade(cwd, monaca);
         if (action === 'upload') {
           return lib.assureMonacaProject(cwd, monaca);
         }
       }
-    )
-    // Checking if the user needs to upgrade the project
-    .then(
-      () => lib.executeUpgrade(cwd, monaca)
     )
     // Assuring this is a Monaca-like project (if uploading).
     .then(
@@ -240,11 +237,7 @@ SyncTask.livesync = function() {
   .then(
     (dir) => {
       projectDir= dir;
-      return lib.executeUpgrade(projectDir, monaca);
-    }
-  )
-  .then(
-    function() {
+      lib.needToUpgrade(projectDir, monaca);
 
       try {
         var nw = path.join(projectDir, 'node_modules', 'nw');

@@ -426,49 +426,15 @@ let overwriteScriptsUpgrade = (force = false) => {
 }
 
 /**
- * Asks the user if he wants to upgrade the project.
+ * Test if the project needs to be upgraded
  *
  * @param {string} projectDir
  * @param {Object} monaca Monaca object
- * @param {Boolean} force Skip asking user
- * @return {Promise}
+ * @return {boolean | Exception}
  */
-let executeUpgrade = (projectDir, monaca, force) => {
-  let options = {};
-
-  return new Promise ((resolve, reject) => {
-    if (monaca.isOldProject(projectDir)) {
-      if (parseFloat(monaca.getCordovaVersion(projectDir)) >= 7.1 ) {
-        const message = 'Your project was created using Monaca CLI 2.x so you need to upgrade your project or downgrading your Monaca CLI version to 2.x. \n\n We are going to install some new build dependencies inside the project and to overwrite the package.json injecting some commands under the \'scripts\' tag. \n\n Do you want to upgrade your project?';
-
-        confirmMessage(message, true, force)
-        .then(
-          (answer) => {
-            if(answer.value) return overwriteScriptsUpgrade(force);
-            else {
-              util.warn('To avoid any kind of problem we recommend downgrading to Monaca CLI 2.x');
-              reject(new Error('Using an old version of Monaca CLI.'));
-            }
-          }
-        )
-        .then(answer => {
-          if (answer) {
-            options.overwrite = answer.value;
-            return monaca.upgrade(projectDir, options);
-          }
-        })
-        .then( projectDir => resolve(projectDir))
-        .catch( err => reject(err) );
-      } else {
-        util.warn('Your project is using a previous version of Cordova. If you want to use the latest Monaca CLI (3.x), please upgrade the cordova version to 7.1.');
-        util.print(`Steps:\n  1) Make a ${'backup'.commands} of the project`);
-        util.print(`  2) Run ${'monaca remote config'.commands}, then upgrade the cordova to 7.1. You might need to upgrade multiple times as the upgrade is in sequence 5.2 -> 6.2 -> 6.5 -> 7.1`);
-        util.print(`  3) Run ${'monaca download'.commands} to download all the changes`);
-        util.print(`  4) Run ${'monaca upgrade'.commands} again`);
-        reject('The project is using an old Cordova version');
-      }
-    } else resolve({message: 'The project is already the latest version.'});
-  });
+let needToUpgrade = (projectDir, monaca) => {
+    if (monaca.isOldProject(projectDir)) throw `Your project was created using Monaca CLI 2.x so you need to upgrade your project ('monaca upgrade') or downgrading your Monaca CLI version to 2.x.`;
+    else false;
 }
 
 
@@ -483,6 +449,6 @@ module.exports = {
   printHelp: printHelp,
   confirmMessage: confirmMessage,
   overwriteScriptsUpgrade: overwriteScriptsUpgrade,
-  executeUpgrade: executeUpgrade
+  needToUpgrade: needToUpgrade
 };
 })();

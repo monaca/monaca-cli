@@ -79,16 +79,12 @@ RemoteTask.remote = function(task) {
         return lib.assureMonacaProject(cwd, monaca);
       }
     )
-    // Checking if the user needs to upgrade the project
+    // Assuring this is a Monaca-like project.
     .then( 
       (info) => {
         projectInfo = info;
-        return task !== 'config' ? lib.executeUpgrade(cwd, monaca) : Promise.resolve(cwd);
-      }
-    )
-    // Assuring this is a Monaca-like project.
-    .then(
-      () => {
+        lib.needToUpgrade(cwd, monaca);
+
         error = 'Upload failed: ';
         if (!params['build-list']) {
           return monaca.uploadProject(cwd)

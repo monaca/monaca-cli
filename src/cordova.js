@@ -14,6 +14,7 @@ CordovaTask.run = function(taskName, info) {
   
   lib.findProjectDir(process.cwd(), monaca)
   .then( (projectDir) => {
+    try { lib.needToUpgrade(projectDir, monaca); } catch (err) { util.fail(`${err}`); }
 
     let cordovaJson;
     

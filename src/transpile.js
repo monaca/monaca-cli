@@ -15,11 +15,7 @@ TranspileTask.run = function(taskName, info) {
     (dir) => {
       projectDir= dir;
       if (!monaca.isTranspilable(projectDir)) util.fail('This project is not transpilable.'); 
-      return lib.executeUpgrade(projectDir, monaca);
-    }
-  )
-  .then(
-    () => {    
+      lib.needToUpgrade(projectDir, monaca);
       let report = {
         event: 'transpile'
       };
