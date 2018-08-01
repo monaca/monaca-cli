@@ -1,9 +1,10 @@
 const util = require('./util');
 const lib = require('./lib');
 const Monaca = require('monaca-lib').Monaca;
+const common = require('monaca-lib').common;
 const inquirer = require('monaca-inquirer');
 
-const URL = 'https://docs.monaca.io/en/products_guide/initialize'
+const CLI_MIGRATION_DOC_URL = common.CLI_MIGRATION_DOC_URL;
 
 let printInitInfo = (commands) => {
   util.warn('\nBefore using Monaca, take a look at the following points:');
@@ -31,7 +32,7 @@ let printInitInfo = (commands) => {
   // plugins
   util.print(`F. Cordova plugins are managed by ${'package.json'.commands} file. If your plugin information is defined in ${'config.xml'.commands} file, you will need to import them again into Monaca.`);
   // monaca documentation url
-  util.print(`G. More information about how to initialize other kind of projects at ${URL.url}`);
+  util.print(`G. More information about how to initialize other kind of projects at ${CLI_MIGRATION_DOC_URL.url}`);
 }
 
 /**
@@ -48,7 +49,7 @@ module.exports = {
     let monaca = new Monaca(info);
     let commands = {}, isTranspile;
 
-    util.warn(`Before trying to initialize your project, please take a look at ${URL} to get the basic information about how to do this process.`);
+    util.warn(`Before trying to initialize your project, please take a look at ${CLI_MIGRATION_DOC_URL} to get the basic information about how to do this process.`);
     return lib.confirmMessage(confirmMessage, true)
     .then(
         answer => {
