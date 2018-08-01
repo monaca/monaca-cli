@@ -14,8 +14,8 @@ let printInitInfo = (commands) => {
   // monaca commands
   util.print(`C. Some new commands have been added:\n`
     + `\t${'monaca:preview'.commands}: ${commands.serve.commands}\n`
-    + `\t${'monaca:build'.commands}:   ${commands.build.commands}\n`
-    + `\t${'monaca:debug'.commands}:   ${commands.watch.commands}\n`
+    + `\t${'monaca:build'.commands}:   ${commands.build ? commands.build.commands : 'not transpile'}\n`
+    + `\t${'monaca:debug'.commands}:   ${commands.watch ? commands.watch.commands : 'not transpile'}\n`
     + `   Make sure that the commands you have specified before are working properly because Monaca will need them.`);
   // public folder
   util.print(`D. Make sure that opening ${'index.html'.commands} over ${'file://'.commands} works. For example, you may need to change\n`
@@ -46,28 +46,63 @@ module.exports = {
   run: (taskName, info) => {
     const confirmMessage = 'Are you sure you want to continue initializing this project?'
     let monaca = new Monaca(info);
-    let commands;
+    let commands = {}, isTranspile;
 
     util.warn(`Before trying to initialize your project, please take a look at ${URL} to get the basic information about how to do this process.`);
     return lib.confirmMessage(confirmMessage, true)
     .then(
-      answer => {
-        if (!answer.value) throw 'Init process stopped!';
-        return inquirer.prompt(
-          [
-            { type: 'confirm', name: 'isTranspile', default: true, message: 'Is it a transpilable project?' },
-            { type: 'input', name: 'serve', message: 'Which command do you use to serve the app?', default: 'npm run dev' },
-            { type: 'input', name: 'build', message: 'Which command do you use to build the app?', default: 'npm run build' },
-            { type: 'input', name: 'watch', message: 'Which command do you use to watch the changes from your app?', default: 'npm run watch' }
-          ]
-        )
-      }
-    )
-    .then(
-      answers => { if(!answers) throw 'Error'; commands = answers; return monaca.init(process.cwd(), answers.isTranspile, { serve: answers.serve.concat(' & ', answers.watch), build: answers.build, watch: answers.watch }); }
-    )
-    .then( projectDir => { printInitInfo(commands); return projectDir; } )
-    .then( projectDir => util.success(`${taskName} process finished.`) )
-    .catch( err => util.fail(`Project ${taskName} failed. ${err}`) )
+        answer => {
+          if (!answer.value) throw 'Init process stopped!';
+          return inquirer.prompt({
+            type: 'confirm',
+            name: 'isTranspile',
+            default: true,
+            message: 'Is it a transpilable project?'
+          });
+        }
+      )
+      .then(
+        answer => {
+          isTranspile = answer.isTranspile;
+          return inquirer.prompt(
+            [{
+                type: 'input',
+                name: 'serve',
+                message: 'Which command do you use to serve the app?',
+                default: 'npm run dev'
+              },
+              {
+                type: 'input',
+                name: 'build',
+                message: 'Which command do you use to build the app?',
+                default: 'npm run build',
+                when: isTranspile
+              },
+              {
+                type: 'input',
+                name: 'watch',
+                message: 'Which command do you use to watch the changes from your app?',
+                default: 'npm run watch',
+                when: isTranspile
+              }
+            ]
+          )
+        }
+      )
+      .then(
+        answers => {
+          if (!answers) throw 'Error';
+          commands['serve'] = isTranspile ? answers.serve.concat(' & ', answers.watch) : answers.serve;
+          if (isTranspile) commands['build'] = answers.build;
+          if (isTranspile) commands['watch'] = answers.watch;
+          return monaca.init(process.cwd(), isTranspile, commands);
+        }
+      )
+      .then(projectDir => {
+        printInitInfo(commands);
+        return projectDir;
+      })
+      .then(projectDir => util.success(`${taskName} process finished.`))
+      .catch(err => util.fail(`Project ${taskName} failed. ${err}`))
   }
 }
