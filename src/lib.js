@@ -13,12 +13,13 @@ var VERSION = require(path.join(__dirname, '..', 'package.json')).version;
 
 var findProjectDir = function(cwd, monaca) {
   return monaca.isMonacaProject(cwd).then(
-    function() {
+    (type) => {
       return Q.resolve(cwd);
     },
-    function(error) {
-      var newPath = path.join(cwd, '..');
-      return newPath === cwd ? Q.reject("Directory is not a Monaca project: 'config.xml' file or 'www' folder may be missing.\nPlease visit http://docs.monaca.io/en/monaca_cli/manual/troubleshooting/#incomplete-files-and-folder-structure") : findProjectDir(newPath, monaca);
+    (error) => {
+      const errMessage = `Directory is not a Monaca project: 'config.xml' file, 'www' folder or '.monaca' folder may be missing.\nPlease visit http://docs.monaca.io/en/monaca_cli/manual/troubleshooting/#incomplete-files-and-folder-structure.\n\n\nPlease execute 'monaca init' to initialize your project.`;
+      let newPath = path.join(cwd, '..');
+      return newPath === cwd ? Q.reject(errMessage) : findProjectDir(newPath, monaca);
     }
   );
 };
