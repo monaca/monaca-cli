@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.7.10
+----
+* Modified `monaca preview` to include `loader.js` and `loader.css` to `index.html` (with `monaca-lib@2.7.10`)
+
 v2.7.9
 ----
 * Modified `monaca remote build` to ask users providing the build directory if it is not specified. In addition, the default build directory is changed to `Desktop` directory.
