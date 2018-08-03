@@ -71,11 +71,7 @@ SyncTask.load = function(action, arg) {
     // Assuring this is a Monaca-like project (if uploading).
     .then(
       function() {
-        var isTranspileEnabled = monaca.isTranspileEnabled(cwd);
-
-        if (isTranspileEnabled) {
-          util.checkNodeRequirement();
-        }
+        if (monaca.hasTranspileScript(cwd)) util.checkNodeRequirement();
 
         error = action.toUpperCase() + ' failed: ';
         return monaca[action + 'Project'](cwd, options)
