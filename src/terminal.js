@@ -18,6 +18,8 @@
     'transpile',
     'demo',
     'info',
+    'upgrade',
+    'init'
   ];
 
   /**
