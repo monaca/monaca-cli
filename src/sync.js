@@ -235,6 +235,9 @@ SyncTask.livesync = function() {
       projectDir= dir;
       lib.needToUpgrade(projectDir, monaca);
 
+      // if it is transpile project but doesn't has the watch script, it should be failed
+      if (monaca.hasTranspileScript(projectDir) && !monaca.hasDebugScript(projectDir)) util.fail('Please create \'monaca:debug\' script to transpile and watch the file changes in \'package.json\' ');
+
       try {
         var nw = path.join(projectDir, 'node_modules', 'nw');
         var nwBin = require(nw).findpath();
