@@ -17,7 +17,7 @@ var findProjectDir = function(cwd, monaca) {
       return Q.resolve(cwd);
     },
     (error) => {
-      const errMessage = `Directory is not a Monaca project: 'config.xml' file, 'www' folder or '.monaca' folder may be missing.\nPlease visit http://docs.monaca.io/en/monaca_cli/manual/troubleshooting/#incomplete-files-and-folder-structure.\n\n\nPlease execute 'monaca init' to initialize your project.`;
+      const errMessage = `Directory is not a Monaca project: 'config.xml' file, 'www' folder or '.monaca' folder may be missing.\nPlease visit http://docs.monaca.io/en/monaca_cli/manual/troubleshooting/#incomplete-files-and-folder-structure.\n\nPlease execute 'monaca init' to initialize your project in case of having been created using another CLI tool.`;
       let newPath = path.join(cwd, '..');
       return newPath === cwd ? Q.reject(errMessage) : findProjectDir(newPath, monaca);
     }

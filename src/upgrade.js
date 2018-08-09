@@ -36,7 +36,7 @@ module.exports = {
         }
       })
       .then(
-        (answer) => {
+        answer => {
           if(answer.value) return lib.overwriteScriptsUpgrade(opts.overwrite);
           else {
             util.warn('To avoid any kind of problem we recommend downgrading to Monaca CLI 2.x');
@@ -44,8 +44,8 @@ module.exports = {
           }
         }
       )
-      .then( answer => { if (answer) { opts.overwrite = answer.value; return monaca.upgrade(projectDir, opts); } })
-      .then( () => util.success(`${taskName} process finished.`) )
-      .catch( err => util.fail(`Project ${taskName} failed. ${err}`) );
+      .then(answer => { if (answer) { opts.overwrite = answer.value; return monaca.upgrade(projectDir, opts); } })
+      .then(() => util.success(`${taskName} process finished.`))
+      .catch(err => util.fail(`Project ${taskName} failed. ${err}`));
   }
 }

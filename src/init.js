@@ -7,6 +7,7 @@ const inquirer = require('monaca-inquirer');
 const CLI_MIGRATION_DOC_URL = common.CLI_MIGRATION_DOC_URL;
 
 let printInitInfo = (commands) => {
+  // Main steps to keep in mind
   util.warn('\nBefore using Monaca, take a look at the following points:');
   // www folder
   util.print(`A. Change the output folder to ${'www'.commands}.`);
@@ -103,7 +104,7 @@ module.exports = {
         printInitInfo(commands);
         return projectDir;
       })
-      .then(projectDir => util.success(`${taskName} process finished.`))
+      .then(info => util.success(`${taskName} process finished. Please visit ${info.doc} for more info.`))
       .catch(err => util.fail(`Project ${taskName} failed. ${err}`))
   }
 }
