@@ -2,6 +2,12 @@
 CHANGELOG
 ====
 
+v2.7.11
+----
+* appended `path` to the `upload` and `download` request url (with `monaca-lib@2.7.11`)
+* return `upload` and `download` progress to `localkit` (with `monaca-lib@2.7.11`)
+* remove `platforms` from default `.monacaignore` for project with lower cordova version (with `monaca-lib@2.7.11`)
+
 v2.7.10
 ----
 * Modified `monaca preview` to include `loader.js` and `loader.css` to `index.html` (with `monaca-lib@2.7.10`)
