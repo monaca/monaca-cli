@@ -150,7 +150,7 @@
                   var packUrl = taskName === 'demo' ? "http://localhost:" + nextPort + "/": "http://localhost:" + port + "/";
 
                   if (terminal.isOnMonaca) {
-                    packUrl = "https://0.0.0.0/";
+                    packUrl = "https://0.0.0.0:" + port  +  "/";
                     webpackConfig.devServer.disableHostCheck = true;
                   }
 

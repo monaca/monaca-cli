@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.7.12
+----
+* fixed the hot reloading for transpile project templates in Monaca Cloud IDE.
+
 v2.7.11
 ----
 * appended `path` to the `upload` and `download` request url (with `monaca-lib@2.7.11`)
