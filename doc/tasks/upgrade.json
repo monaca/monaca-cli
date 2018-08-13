@@ -26,6 +26,7 @@
         "--createPackageJson",
         "creates a basic package.json file with name and description."
       ]
-    ]
+    ],
+    "aliases": ["update"]
   }
 }

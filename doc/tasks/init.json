@@ -11,6 +11,7 @@
     ],
     "examples": [
       "monaca init"
-    ]
+    ],
+    "aliases": ["migrate"]
   }
 }
