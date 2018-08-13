@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.7.13
+----
+* Revert changes made in `2.7.12` due to Monaca proxy server. It only applies to `Monaca Cloud IDE`.
+
 v2.7.12
 ----
 * fixed the hot reloading for transpile project templates in Monaca Cloud IDE.
