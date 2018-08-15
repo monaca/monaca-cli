@@ -18,7 +18,7 @@
     'transpile',
     'demo',
     'info',
-    'upgrade',
+    'update',
     'init'
   ];
 

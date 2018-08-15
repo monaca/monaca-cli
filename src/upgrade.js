@@ -26,10 +26,10 @@ module.exports = {
         projectDir = dir;
         if (monaca.isOldProject(projectDir)) {
           if (parseFloat(monaca.getCordovaVersion(projectDir)) >= 7.1 || opts.createPackageJson) {
-            const message = 'Your project was created using Monaca CLI 2.x so you need to upgrade your project or downgrading your Monaca CLI version to 2.x. \n\n We are going to install some new build dependencies inside the project and to overwrite the package.json injecting some commands under the \'scripts\' tag. \n\n Do you want to upgrade your project?';
+            const message = 'Your project was created using Monaca CLI 2.x so you need to update your project or downgrading your Monaca CLI version to 2.x. \n\n We are going to install some new build dependencies inside the project and to overwrite the package.json injecting some commands under the \'scripts\' tag. \n\n Do you want to update your project?';
             return lib.confirmMessage(message, true, opts.overwrite);
           } else {
-            throw 'Your project is using a previous version of Cordova (< 7.1). You need to execute \'monaca upgrade --createPackageJson\' to create a package.json file.';
+            throw 'Your project is using a previous version of Cordova (< 7.1). You need to execute \'monaca update --createPackageJson\' to create a package.json file.';
           }
         } else {
           throw 'The project is already the latest version.';

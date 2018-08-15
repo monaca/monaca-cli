@@ -434,7 +434,7 @@ let overwriteScriptsUpgrade = (force = false) => {
  * @return {boolean | Exception}
  */
 let needToUpgrade = (projectDir, monaca) => {
-    if (monaca.isOldProject(projectDir)) throw `Your project was created using Monaca CLI 2.x so you need to upgrade your project ('monaca upgrade') or downgrading your Monaca CLI version to 2.x.`;
+    if (monaca.isOldProject(projectDir)) throw `Your project was created using Monaca CLI 2.x so you need to update your project ('monaca update') or downgrading your Monaca CLI version to 2.x.`;
     else false;
 }
 
