@@ -5,9 +5,9 @@ v3.0.0
 ----
 
 #### Features
-* Added `monaca upgrade` command. This command is used to upgrade projects created using Monaca CLI 2.x or lower to Monaca CLI 3.
+* Added `monaca update` command. This command is used to update project created using Monaca CLI 2.x or lower to Monaca CLI 3.
 * Added `monaca init` command. This command is used to initialize projects created using other CLI tools to the Monaca structure.
-* Added `needToUpgrade` function to check if the user can execute a command or needs to upgrade the project (with [`monaca-lib@3.0.0`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v300)).
+* Added `needToUpgrade` function to check if the user can execute a command or needs to update the project (with [`monaca-lib@3.0.0`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v300)).
 * Modified `isMonacaProject` function (with [`monaca-lib@3.0.0`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v300)).
 
 #### Deprecated
