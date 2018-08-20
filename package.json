@@ -1,6 +1,6 @@
 {
   "name": "monaca",
-  "version": "3.0.0",
+  "version": "3.0.0-beta.2",
   "description": "Monaca Command Line Tool",
   "bin": {
     "monaca": "bin/monaca"
@@ -39,7 +39,7 @@
     "ip": "^1.1.5",
     "live-server": "1.2.0",
     "monaca-inquirer": "^1.0.4",
-    "monaca-lib": "^3.0.0",
+    "monaca-lib": "^3.0.0-beta.2",
     "open": "0.0.5",
     "optimist": "^0.6.1",
     "portfinder": "^1.0.7",
