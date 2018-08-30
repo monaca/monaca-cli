@@ -15,13 +15,13 @@ v3.0.0
 * Removed `monaca demo` command.
 
 #### Breaking changes
-* Remove `port` and `no-open` option to `monaca preview`.
-* Remove `generate-config` and `install-dependencies` option to `monaca transpile`.
+* Remove `port` and `no-open` option from `monaca preview`.
+* Remove `generate-config` and `install-dependencies` option from `monaca transpile`.
 * Modified `monaca preview`, `monaca transpile` and `monaca debug` to execute the new Monaca Commands (with [`monaca-lib@3.0.0`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v300)):
   * `'monaca:preview'`
   * `'monaca:transpile'`
   * `'monaca:debug'`
-* Modified `cordova` commands to execute Cordova from each project instead of using global Cordova.
+* Modified `cordova` commands to execute Cordova from project dependency instead of using global Cordova.
 
 v2.7.9
 ----
