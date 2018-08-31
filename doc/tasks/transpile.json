@@ -6,16 +6,15 @@
       "cordova": true,
       "react-native": false
     },
-    "description": "transpile project source code (execute `npm run build` defined in package.json)",
+    "description": "transpile project source code (execute `npm run monaca:transpile` defined in package.json)",
     "longDescription": [
       "Transpiles projects that are transpilable.",
-      "For example: React and Angular2 projects."
+      "For example: React, Vue and Angular projects."
     ],
     "usage": "monaca transpile",
     "examples": [
       "monaca transpile"
     ],
-    "options": [],
     "showInHelp": true
   }
 }

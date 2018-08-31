@@ -6,7 +6,7 @@
       "cordova": true,
       "react-native": false
     },
-    "description": "run a local web server for preview (execute `npm run dev` defined in package.json)",
+    "description": "run a local web server for preview (execute `npm run monaca:preview` defined in package.json)",
     "longDescription": [
       "Starts a local web server that serves the www assets.",
       "",
@@ -18,7 +18,6 @@
     "examples": [
       "monaca preview"
     ],
-    "options": [],
     "showInHelp": true,
     "aliases": ["serve"]
   }

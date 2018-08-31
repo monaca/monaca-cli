@@ -6,7 +6,7 @@
       "cordova": true,
       "react-native": false
     },
-    "description": "update old projects to new monaca cli 3.0.0 structure",
+    "description": "update old projects to Monaca CLI 3.x structure",
     "longDescription": [
       "Allow user to use old projects, created using Monaca CLI 2.x, with Monaca CLI 3.x.",
       "The dev dependencies and Cordova will be moved into the project and new commands will be injected into package.json to be able to execute some commands such as monaca preview or monaca debug."

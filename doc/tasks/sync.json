@@ -123,7 +123,7 @@
       "cordova": true,
       "react-native": false
     },
-    "description": "run app on device using Monaca Debugger",
+    "description": "run app on device using Monaca Debugger (execute `npm run monaca:debug` defined in package.json)",
     "longDescription": [
       "Debug one or more applications on a device and receive code changes instantly.",
       "",
