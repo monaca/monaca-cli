@@ -4,7 +4,7 @@ const Monaca = require('monaca-lib').Monaca;
 const common = require('monaca-lib').common;
 const inquirer = require('monaca-inquirer');
 
-const CLI_MIGRATION_DOC_URL = common.CLI_MIGRATION_DOC_URL;
+const CLI_MIGRATION_DOC_URL = common.migrationDocUrl();
 
 let printInitInfo = (commands) => {
   // Main steps to keep in mind
@@ -33,7 +33,7 @@ let printInitInfo = (commands) => {
   // plugins
   util.print(`F. Cordova plugins are managed by ${'package.json'.commands} file. If your plugin information is defined in ${'config.xml'.commands} file, you will need to import them again into Monaca.`);
   // monaca documentation url
-  util.print(`G. More information about how to initialize other kind of projects at ${CLI_MIGRATION_DOC_URL.url}`);
+  util.print(`G. For more details about the changes, please refer to ${CLI_MIGRATION_DOC_URL.url}`);
 }
 
 /**
@@ -104,7 +104,7 @@ module.exports = {
         printInitInfo(commands);
         return projectDir;
       })
-      .then(info => util.success(`${taskName} process finished. Please visit ${info.doc} for more info.`))
+      .then(info => util.success(`${taskName} process finished.`))
       .catch(err => util.fail(`Project ${taskName} failed. ${err}`))
   }
 }
