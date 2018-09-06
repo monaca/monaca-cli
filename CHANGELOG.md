@@ -23,6 +23,28 @@ v3.0.0
   * `'monaca:debug'`
 * Modified `cordova` commands to execute Cordova from project dependency instead of using global Cordova.
 
+v2.7.14
+----
+* Fixed bugs in `monaca remote build`, `monaca remote config`, `monaca upload` and `monaca download` (with `monaca-lib@2.7.13`).
+
+v2.7.13
+----
+* Revert changes made in `2.7.12` due to Monaca proxy server. It only applies to `Monaca Cloud IDE`.
+
+v2.7.12
+----
+* fixed the hot reloading for transpile project templates in Monaca Cloud IDE.
+
+v2.7.11
+----
+* appended `path` to the `upload` and `download` request url (with `monaca-lib@2.7.11`)
+* return `upload` and `download` progress to `localkit` (with `monaca-lib@2.7.11`)
+* remove `platforms` from default `.monacaignore` for project with lower cordova version (with `monaca-lib@2.7.11`)
+
+v2.7.10
+----
+* Modified `monaca preview` to include `loader.js` and `loader.css` to `index.html` (with `monaca-lib@2.7.10`)
+
 v2.7.9
 ----
 * Modified `monaca remote build` to ask users providing the build directory if it is not specified. In addition, the default build directory is changed to `Desktop` directory.
