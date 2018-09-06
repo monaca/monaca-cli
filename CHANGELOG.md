@@ -2,6 +2,10 @@
 CHANGELOG
 ====
 
+v2.7.14
+----
+* Fixed bugs in `monaca remote build`, `monaca remote config`, `monaca upload` and `monaca download` (with `monaca-lib@2.7.13`).
+
 v2.7.13
 ----
 * Revert changes made in `2.7.12` due to Monaca proxy server. It only applies to `Monaca Cloud IDE`.
