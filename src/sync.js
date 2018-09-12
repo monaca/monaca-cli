@@ -65,6 +65,20 @@ SyncTask.load = function(action, arg) {
         lib.needToUpgrade(cwd, monaca);
         if (action === 'upload') {
           return lib.assureMonacaProject(cwd, monaca);
+        } else {
+          // check if it contain projectid
+          monaca.getProjectId(cwd)
+          .then(function(projectId) {
+            if (typeof projectId === 'undefined') {
+              util.fail(null, `This project is not existed in the cloud.\nThe 'project_id' of '.monaca/local_properties.json' is undefined.\nPlease fix it or run 'monaca clone' to clone a project from Cloud again.`);
+              process.exit(1);
+            } else {
+              return true;
+            }
+          })
+          .catch(function(error) {
+            util.fail(null, error);
+          });
         }
       }
     )
