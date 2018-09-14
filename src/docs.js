@@ -32,7 +32,7 @@
         } else if (docsType === 'tutorial') {
           opn('http://tutorial.onsen.io/', {wait: false});
         } else if (docsType === 'usage') {
-          opn('http://docs.monaca.io/en/manual/development/monaca_cli/', {wait: false});
+          opn('https://docs.monaca.io/en/tutorials/monaca_cli/', {wait: false});
         } else {
           return Q.reject(docsType + ' is not a valid argument of monaca docs command.');
         }
