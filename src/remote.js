@@ -2,7 +2,7 @@
 'use strict';
 
 var path = require('path'),
-  open = require('open'),
+  open = require('opn'),
   argv = require('optimist').argv,
   shell = require('shelljs'),
   Monaca = require('monaca-lib').Monaca,
@@ -111,15 +111,18 @@ RemoteTask.remote = function(task) {
             .then(
               function(url) {
                 var deferred = Q.defer();
-                open(url, function(error) {
-                  if (error) {
-                    return deferred.reject(error);
-                  }
+                open(url, {wait: false})
+                .then(() => {
                   if (task === 'config') {
                     util.warn('\nOnce the Cloud configuration has been saved, run `monaca download` to get the changes locally.');
                   }
                   deferred.resolve();
-                });
+                })
+                .catch(error => {
+                  if (error) {
+                    return deferred.reject(error);
+                  }
+                }) ;
                 return deferred.promise;
               }
             )

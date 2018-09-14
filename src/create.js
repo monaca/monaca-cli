@@ -3,7 +3,7 @@
 
 var fs = require('fs'),
   path = require('path'),
-  open = require('open'),
+  open = require('opn'),
   Q = require('q'),
   inquirer = require('monaca-inquirer'),
   argv = require('optimist').argv,
@@ -213,7 +213,7 @@ var inquiry = {
       keyAction: {
         p: function(currentValue) {
           if (this.categories[answerCategory][currentValue].preview) {
-            open(this.categories[answerCategory][currentValue].preview);
+            open(this.categories[answerCategory][currentValue].preview, {wait: false});
           }
         }.bind(this)
       },
@@ -242,7 +242,7 @@ var inquiry = {
       keyAction: {
         p: function(currentValue) {
           if (this.samples[currentValue].preview) {
-            open(this.samples[currentValue].preview);
+            open(this.samples[currentValue].preview, {wait: false});
           }
         }.bind(this)
       },

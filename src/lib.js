@@ -3,7 +3,7 @@
 
 var path = require('path'),
   Q = require('q'),
-  open = require('open'),
+  open = require('opn'),
   inquirer = require('monaca-inquirer'),
   fs = require('fs'),
   util = require(path.join(__dirname, 'util')),
@@ -164,7 +164,7 @@ var loginErrorHandler = function (error) {
         }, function(err, answer) {
           if (answer.toLowerCase().charAt(0) !== 'n') {
             if (error.result.hasOwnProperty('redirect')) {
-              open(error.result.redirect);
+              open(error.result.redirect, {wait: false});
             }
           }
         });
@@ -174,7 +174,7 @@ var loginErrorHandler = function (error) {
           read({
             prompt: 'Press Enter to continue...'
           }, function() {
-            open(error.result.redirect);
+            open(error.result.redirect, {wait: false});
           });
         }
       }
@@ -183,7 +183,7 @@ var loginErrorHandler = function (error) {
       read({
         prompt: 'Press Enter to display upgrade page.'
       }, function(err, answer) {
-        open('https://monaca.mobi/plan/change');
+        open('https://monaca.mobi/plan/change', {wait: false});
       });
     } else {
       util.err();
