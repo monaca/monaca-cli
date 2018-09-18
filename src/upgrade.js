@@ -2,6 +2,8 @@ const util = require('./util');
 const lib = require('./lib');
 const Monaca = require('monaca-lib').Monaca;
 const argv = require('optimist').argv;
+const common = require('monaca-lib').common;
+const CLI_UPDATE_DOC_URL = common.updateDocUrl();
 
 /**
  * Monaca Upgrade commnads.
@@ -45,7 +47,10 @@ module.exports = {
         }
       )
       .then(answer => { if (answer) { opts.overwrite = answer.value; return monaca.upgrade(projectDir, opts); } })
-      .then(() => util.success(`${taskName} process finished.`))
+      .then(() => {
+        util.success(`${taskName} process finished.`);
+        util.print(`For more details about the changes, please refer to ${CLI_MIGRATION_DOC_URL.url}`);
+      })
       .catch(err => util.fail(`Project ${taskName} failed. ${err}`));
   }
 }
