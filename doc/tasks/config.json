@@ -39,39 +39,5 @@
       "monaca config endpoint my.endpoint.com",
       "monaca config endpoint --reset"
     ]
-  },
-  "reconfigure": {
-    "order": 61,
-    "category": "project",
-    "frameworkSupport": {
-      "cordova": true,
-      "react-native": false
-    },
-    "description": "generate default project configurations",
-    "longDescription": [
-      "Generate default project configurations and files.",
-      "Running it without arguments will generate everything."
-    ],
-    "usage": [
-      "monaca configurate"
-    ],
-    "options": [
-      [
-        "--transpile",
-        "Generate transpile configuration files (both dev and prod)"
-      ],
-      [
-        "--dependencies",
-        "Install required build dependencies."
-      ],
-      [
-        "--components",
-        "Generate components folder."
-      ]
-    ],
-    "examples": [
-      "monaca reconfigure",
-      "monaca reconfigure --transpile --components"
-    ]
   }
 }

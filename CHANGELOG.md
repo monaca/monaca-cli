@@ -1,6 +1,27 @@
 
 CHANGELOG
 ====
+v3.0.0
+----
+
+#### Features
+* Added `monaca update` command. This command is used to update project created using Monaca CLI 2.x or lower to Monaca CLI 3.
+* Added `monaca init` command. This command is used to initialize projects created using other CLI tools to the Monaca structure.
+* Added `needToUpgrade` function to check if the user can execute a command or needs to update the project (with [`monaca-lib@3.0.0`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v300)).
+* Modified `isMonacaProject` function (with [`monaca-lib@3.0.0`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v300)).
+
+#### Deprecated
+* Removed `monaca reconfigure` command.
+* Removed `monaca demo` command.
+
+#### Breaking changes
+* Remove `port` and `no-open` option from `monaca preview`.
+* Remove `generate-config` and `install-dependencies` option from `monaca transpile`.
+* Modified `monaca preview`, `monaca transpile` and `monaca debug` to execute the new Monaca Commands (with [`monaca-lib@3.0.0`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v300)):
+  * `'monaca:preview'`
+  * `'monaca:transpile'`
+  * `'monaca:debug'`
+* Modified `cordova` commands to execute Cordova from project dependency instead of using global Cordova.
 
 v2.7.14
 ----

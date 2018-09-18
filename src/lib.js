@@ -3,7 +3,7 @@
 
 var path = require('path'),
   Q = require('q'),
-  open = require('open'),
+  open = require('opn'),
   inquirer = require('monaca-inquirer'),
   fs = require('fs'),
   util = require(path.join(__dirname, 'util')),
@@ -13,12 +13,13 @@ var VERSION = require(path.join(__dirname, '..', 'package.json')).version;
 
 var findProjectDir = function(cwd, monaca) {
   return monaca.isMonacaProject(cwd).then(
-    function() {
+    (type) => {
       return Q.resolve(cwd);
     },
-    function(error) {
-      var newPath = path.join(cwd, '..');
-      return newPath === cwd ? Q.reject("Directory is not a Monaca project: 'config.xml' file or 'www' folder may be missing.\nPlease visit http://docs.monaca.io/en/monaca_cli/manual/troubleshooting/#incomplete-files-and-folder-structure") : findProjectDir(newPath, monaca);
+    (error) => {
+      const errMessage = `Directory is not a Monaca project: 'config.xml' file, 'www' folder or '.monaca' folder may be missing.\nPlease visit http://docs.monaca.io/en/monaca_cli/manual/troubleshooting/#incomplete-files-and-folder-structure.\n\nPlease execute 'monaca init' to initialize your project in case of having been created using another CLI tool.`;
+      let newPath = path.join(cwd, '..');
+      return newPath === cwd ? Q.reject(errMessage) : findProjectDir(newPath, monaca);
     }
   );
 };
@@ -163,7 +164,7 @@ var loginErrorHandler = function (error) {
         }, function(err, answer) {
           if (answer.toLowerCase().charAt(0) !== 'n') {
             if (error.result.hasOwnProperty('redirect')) {
-              open(error.result.redirect);
+              open(error.result.redirect, {wait: false});
             }
           }
         });
@@ -173,7 +174,7 @@ var loginErrorHandler = function (error) {
           read({
             prompt: 'Press Enter to continue...'
           }, function() {
-            open(error.result.redirect);
+            open(error.result.redirect, {wait: false});
           });
         }
       }
@@ -182,7 +183,7 @@ var loginErrorHandler = function (error) {
       read({
         prompt: 'Press Enter to display upgrade page.'
       }, function(err, answer) {
-        open('https://monaca.mobi/plan/change');
+        open('https://monaca.mobi/plan/change', {wait: false});
       });
     } else {
       util.err();
@@ -293,8 +294,6 @@ var printExtendedCommands = function(isOnMonacaTerminal) {
   util.print('---------------------------------\n');
   util.print('  monaca transpile [--generate-config|--install-dependencies]');
   util.print('    transpile project source code.\n');
-  util.print('  monaca reconfigure [--transpile|--dependencies|--components]');
-  util.print('    generate default project configurations\n');
 
   if (!isOnMonacaTerminal) {
     util.print('---------------------------------');
@@ -408,6 +407,38 @@ var printHelp = function(taskList, extended) {
   util.print('');
 };
 
+let confirmMessage = (message, byDefault = false, force = false) => {
+  if (force) return Promise.resolve({value: true});
+  return inquirer.prompt(
+    [
+      {
+        type: 'confirm',
+        name: 'value',
+        message: message,
+        default: byDefault
+      }
+    ]
+  )
+}
+
+let overwriteScriptsUpgrade = (force = false) => {
+  const message = 'We are going to add some new commands into `scripts` in package.json: `dev`, `watch` and `build`.\n\n Are you sure you want to overwrite them?';
+  return confirmMessage(message, true, force);
+}
+
+/**
+ * Test if the project needs to be upgraded
+ *
+ * @param {string} projectDir
+ * @param {Object} monaca Monaca object
+ * @return {boolean | Exception}
+ */
+let needToUpgrade = (projectDir, monaca) => {
+    if (monaca.isOldProject(projectDir)) throw `Your project was created using Monaca CLI 2.x so you need to update your project ('monaca update') or downgrading your Monaca CLI version to 2.x.`;
+    else false;
+}
+
+
 module.exports = {
   findProjectDir: findProjectDir,
   assureMonacaProject: assureMonacaProject,
@@ -416,6 +447,9 @@ module.exports = {
   softlyAssureMonacaProject: softlyAssureMonacaProject,
   loginErrorHandler: loginErrorHandler,
   printVersion: printVersion,
-  printHelp: printHelp
+  printHelp: printHelp,
+  confirmMessage: confirmMessage,
+  overwriteScriptsUpgrade: overwriteScriptsUpgrade,
+  needToUpgrade: needToUpgrade
 };
 })();

@@ -6,7 +6,7 @@
     Monaca = require('monaca-lib').Monaca,
     Q = require('q'),
     util = require(path.join(__dirname, 'util')),
-    opn = require('open');
+    opn = require('opn');
 
   var ConfigTask = {}, monaca;
 
@@ -28,11 +28,11 @@
     var openDocs = function(docsType) {
       try {
         if (docsType === 'onsen') {
-          opn('https://onsen.io/v2/guide/');
+          opn('https://onsen.io/v2/guide/', {wait: false});
         } else if (docsType === 'tutorial') {
-          opn('http://tutorial.onsen.io/');
+          opn('http://tutorial.onsen.io/', {wait: false});
         } else if (docsType === 'usage') {
-          opn('http://docs.monaca.io/en/manual/development/monaca_cli/');
+          opn('https://docs.monaca.io/en/tutorials/monaca_cli/', {wait: false});
         } else {
           return Q.reject(docsType + ' is not a valid argument of monaca docs command.');
         }

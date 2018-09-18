@@ -1,6 +1,6 @@
 {
   "name": "monaca",
-  "version": "2.7.14",
+  "version": "3.0.0-beta.8",
   "description": "Monaca Command Line Tool",
   "bin": {
     "monaca": "bin/monaca"
@@ -29,18 +29,16 @@
   "homepage": "https://monaca.io",
   "preferGlobal": true,
   "dependencies": {
-    "browser-sync": "^2.23.6",
     "colors": "^0.6.2",
     "compare-versions": "3.0.1",
-    "cordova": "7.1.0",
     "extend": "^2.0.0",
     "global-npm": "^0.3.0",
     "hoek": "^5.0.3",
+    "inquirer": "^6.0.0",
     "ip": "^1.1.5",
-    "live-server": "1.2.0",
     "monaca-inquirer": "^1.0.4",
-    "monaca-lib": "^2.7.13",
-    "open": "0.0.5",
+    "monaca-lib": "3.0.0-beta.8",
+    "opn": "^5.3.0",
     "optimist": "^0.6.1",
     "portfinder": "^1.0.7",
     "q": "^1.1.2",

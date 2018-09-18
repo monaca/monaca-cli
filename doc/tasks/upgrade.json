@@ -1,0 +1,33 @@
+{
+  "update": {
+    "order": 10,
+    "category": "project",
+    "frameworkSupport": {
+      "cordova": true,
+      "react-native": false
+    },
+    "description": "update old projects to Monaca CLI 3.x structure",
+    "longDescription": [
+      "Allow user to use old projects, created using Monaca CLI 2.x, with Monaca CLI 3.x.",
+      "The dev dependencies and Cordova will be moved into the project and new commands will be injected into package.json to be able to execute some commands such as monaca preview or monaca debug."
+    ],
+    "usage": [
+      "monaca update"
+    ],
+    "examples": [
+      "monaca update",
+      "monaca update --force --createPackageJson"
+    ],
+    "options": [
+      [
+        "--force",
+        "doesn't ask user, default settings."
+      ],
+      [
+        "--createPackageJson",
+        "creates a basic package.json file with name and description."
+      ]
+    ],
+    "aliases": ["upgrade"]
+  }
+}

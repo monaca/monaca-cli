@@ -17,8 +17,9 @@
     'serve',
     'transpile',
     'demo',
-    'reconfigure',
     'info',
+    'update',
+    'init'
   ];
 
   /**

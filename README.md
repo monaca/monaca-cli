@@ -44,11 +44,11 @@ signing ........  manage signing configurations
 remote build  ..  build a project on Monaca Cloud
 remote config  ..  open the project configuration on Monaca Cloud
 preview  .......  run a local web server for preview
-demo  ..........  display the app appereance on iOS and Android
 debug  .........  run app on device using Monaca Debugger
 transpile  .....  transpile project source code
+update .........  update projects created with CLI 2.x to the latest Monaca project structure.
+init ...........  initialize projects created using other CLI tools to be able to execute with Monaca.
 config  ........  manage Monaca configuration
-reconfigure  ...  generate default project configurations
 plugin  ........  manage Cordova Plugin
 docs  ..........  display docs for Monaca CLI, Onsen UI and Tutorials
 info  ..........  display project and environment info

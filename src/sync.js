@@ -62,19 +62,30 @@ SyncTask.load = function(action, arg) {
         error = 'Unable to create monaca project: ';
         cwd = directory;
 
+        lib.needToUpgrade(cwd, monaca);
         if (action === 'upload') {
           return lib.assureMonacaProject(cwd, monaca);
+        } else {
+          // check if it contain projectid
+          monaca.getProjectId(cwd)
+          .then(function(projectId) {
+            if (typeof projectId === 'undefined') {
+              util.fail(null, `This project is not existed in the cloud.\nThe 'project_id' of '.monaca/local_properties.json' is undefined.\nPlease fix it or run 'monaca clone' to clone a project from Cloud again.`);
+              process.exit(1);
+            } else {
+              return true;
+            }
+          })
+          .catch(function(error) {
+            util.fail(null, error);
+          });
         }
       }
     )
     // Assuring this is a Monaca-like project (if uploading).
     .then(
       function() {
-        var isTranspileEnabled = monaca.isTranspileEnabled(cwd);
-
-        if (isTranspileEnabled) {
-          util.checkNodeRequirement();
-        }
+        if (monaca.hasTranspileScript(cwd)) util.checkNodeRequirement();
 
         error = action.toUpperCase() + ' failed: ';
         return monaca[action + 'Project'](cwd, options)
@@ -162,7 +173,7 @@ SyncTask.clone = function(saveCloudProjectID) {
 };
 
 SyncTask.livesync = function() {
-  var localkit, nwError = false;
+  var localkit, nwError = false, projectDir;
 
   try {
     localkit = new Localkit(monaca, false);
@@ -232,9 +243,14 @@ SyncTask.livesync = function() {
   } catch (error) { }
 
   lib.findProjectDir(process.cwd(), monaca)
+  // Checking if the user needs to upgrade the project
   .then(
-    function(dir) {
-      var projectDir = dir;
+    (dir) => {
+      projectDir= dir;
+      lib.needToUpgrade(projectDir, monaca);
+
+      // if it is transpile project but doesn't has the watch script, it should be failed
+      if (monaca.hasTranspileScript(projectDir) && !monaca.hasDebugScript(projectDir)) util.fail('Please create \'monaca:debug\' script to transpile and watch the file changes in \'package.json\' ');
 
       try {
         var nw = path.join(projectDir, 'node_modules', 'nw');
@@ -325,18 +341,7 @@ SyncTask.livesync = function() {
 
             var promises = [];
             projects.forEach(function(project) {
-              var cb = function(data) {
-                if (data.type == 'lifecycle') {
-                  if (data.action == 'start-compile') {
-                    localkit.stopWatchProject(project);
-                    // console.log('------------- stopWatchProject');
-                  } else if (data.action == 'end-compile') {
-                    localkit.startWatchProject(project);
-                    // console.log('------------- startWatchProject');
-                  }
-                }
-              };
-              promises.push(monaca.transpile(project, options,cb))
+              promises.push(monaca.transpile(project, options));
             });
 
             return Q.all(promises);
