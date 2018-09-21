@@ -162,6 +162,16 @@ SyncTask.clone = function(saveCloudProjectID) {
       function() {
         util.success('\nProject successfully ' + (saveCloudProjectID ? 'cloned' : 'imported') + ' from Monaca Cloud!');
 
+        let message = [
+            '',
+            'Type "cd ' + project.destPath + '" and run monaca command again.',
+            '  > ' + 'monaca preview'.info + '      => Run app in the browser',
+            '  > ' + 'monaca debug'.info + '        => Run app in the device using Monaca Debugger',
+            '  > ' + 'monaca remote build'.info + ' => Start remote build for iOS/Android/Windows',
+            '  > ' + 'monaca upload'.info + '       => Upload this project to Monaca Cloud IDE\n'
+          ].join("\n");
+        util.print(message);
+
         if (saveCloudProjectID) {
           return monaca.setProjectId(project.absolutePath, project.projectId).catch(function(error) {
             util.err('\nProject is cloned to given location but Cloud project ID for this project could not be saved. \nThis project is not linked with corresponding project on Monaca Cloud.');
