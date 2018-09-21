@@ -2,6 +2,13 @@
 CHANGELOG
 ====
 
+v3.0.2
+----
+* `monaca update`: fixed not to stringify `package.backup.json`.
+* `monaca clone`: fixed not to download `node_modules` folder and automatically run `npm install` afterward.
+* Fixed `monaca download` and `monaca upload` dealing with large project files.
+* `monaca upload`: fixed to upload symlinked (physical) files/directories.
+
 v3.0.1
 ----
 
