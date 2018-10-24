@@ -140,7 +140,7 @@
       ],
       [
         "--port",
-        "http port to listen on. default is 8080."
+        "http port to listen on. default is 8001."
       ]
     ],
     "usage": "monaca debug [<paths>]",

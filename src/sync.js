@@ -9,6 +9,7 @@ var inquirer = require('monaca-inquirer'),
   Monaca = require('monaca-lib').Monaca,
   Localkit = require('monaca-lib').Localkit,
   lib = require(path.join(__dirname, 'lib')),
+  portfinder = require('portfinder'),
   util = require(path.join(__dirname, 'util'));
 
 var SyncTask = {}, monaca;
@@ -252,6 +253,26 @@ SyncTask.livesync = function() {
     });
   } catch (error) { }
 
+  // Assign the next available port
+  let port = 8001; // default port
+  if (argv && argv.port) port = argv.port;
+  portfinder.basePort = port;
+
+  portfinder.getPort(function(err, p) {
+    if (err || !p) {
+      if (err) console.log(err);
+      util.fail('Could not get the available port');
+      return;
+    }
+    else {
+      if (p && p !== port) {
+        util.warn(`\nThe port ${port} is not available. Use ${p} instead.`);
+        port = p;
+      }
+    }
+  });
+
+
   lib.findProjectDir(process.cwd(), monaca)
   // Checking if the user needs to upgrade the project
   .then(
@@ -312,7 +333,7 @@ SyncTask.livesync = function() {
           function() {
             // Starting HTTP server
             error = 'Unable to start HTTP server: ';
-            return localkit.startHttpServer({ httpPort: argv.port });
+            return localkit.startHttpServer({ httpPort: port });
           }
         )
         // Starting HTTP server.
