@@ -207,19 +207,19 @@ SyncTask.livesync = function() {
     util.print('and it will find this computer for pairing.')
     util.print('')
     util.print('Debugging Guide (JavaScript Dev Tools)')
-    util.print('  https://docs.monaca.io/en/manual/debugger/debug/#debugger-with-local-tools')
+    util.print('  ' + lib.DEBUGGER_USAGE_DOC_URL)
     util.print('')
     util.print('Troubleshooting Guide:')
-    util.print('  https://docs.monaca.io/en/manual/debugger/troubleshooting')
+    util.print('  ' + lib.DEBUGGER_TROUBLESHOOTING_DOC_URL)
     util.print('')
   } else {
     util.print('Please run Monaca Debugger on your device.');
     util.print('')
     util.print('Debugging Guide (JavaScript Dev Tools)')
-    util.print('  https://docs.monaca.io/en/manual/debugger/debug/#debugger-with-local-tools')
+    util.print('  ' + lib.DEBUGGER_USAGE_DOC_URL)
     util.print('')
     util.print('Troubleshooting Guide:')
-    util.print('  https://docs.monaca.io/en/manual/debugger/troubleshooting')
+    util.print('  ' + lib.DEBUGGER_TROUBLESHOOTING_DOC_URL)
     util.print('')
   }
 
@@ -247,7 +247,7 @@ SyncTask.livesync = function() {
         break;
       default:
         util.err('Error launching inspector. Please check the connection to the device. ERRNO=' + error);
-        util.print('Troubleshooting Guide: https://docs.monaca.io/en/manual/debugger/troubleshooting/');
+        util.print('Troubleshooting Guide: ' + lib.DEBUGGER_TROUBLESHOOTING_DOC_URL);
         break;
       }
     });
