@@ -438,6 +438,8 @@ let needToUpgrade = (projectDir, monaca) => {
     else false;
 }
 
+const DEBUGGER_TROUBLESHOOTING_DOC_URL = 'https://docs.monaca.io/en/products_guide/debugger/troubleshooting/';
+const DEBUGGER_USAGE_DOC_URL = 'https://docs.monaca.io/en/products_guide/debugger/debug/#monaca-debugger-with-monaca-local-development-tools';
 
 module.exports = {
   findProjectDir: findProjectDir,
@@ -450,6 +452,8 @@ module.exports = {
   printHelp: printHelp,
   confirmMessage: confirmMessage,
   overwriteScriptsUpgrade: overwriteScriptsUpgrade,
-  needToUpgrade: needToUpgrade
+  needToUpgrade: needToUpgrade,
+  DEBUGGER_TROUBLESHOOTING_DOC_URL: DEBUGGER_TROUBLESHOOTING_DOC_URL,
+  DEBUGGER_USAGE_DOC_URL: DEBUGGER_USAGE_DOC_URL,
 };
 })();

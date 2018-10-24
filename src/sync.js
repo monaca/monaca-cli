@@ -9,6 +9,7 @@ var inquirer = require('monaca-inquirer'),
   Monaca = require('monaca-lib').Monaca,
   Localkit = require('monaca-lib').Localkit,
   lib = require(path.join(__dirname, 'lib')),
+  portfinder = require('portfinder'),
   util = require(path.join(__dirname, 'util'));
 
 var SyncTask = {}, monaca;
@@ -206,19 +207,19 @@ SyncTask.livesync = function() {
     util.print('and it will find this computer for pairing.')
     util.print('')
     util.print('Debugging Guide (JavaScript Dev Tools)')
-    util.print('  https://docs.monaca.io/en/manual/debugger/debug/#debugger-with-local-tools')
+    util.print('  ' + lib.DEBUGGER_USAGE_DOC_URL)
     util.print('')
     util.print('Troubleshooting Guide:')
-    util.print('  https://docs.monaca.io/en/manual/debugger/troubleshooting')
+    util.print('  ' + lib.DEBUGGER_TROUBLESHOOTING_DOC_URL)
     util.print('')
   } else {
     util.print('Please run Monaca Debugger on your device.');
     util.print('')
     util.print('Debugging Guide (JavaScript Dev Tools)')
-    util.print('  https://docs.monaca.io/en/manual/debugger/debug/#debugger-with-local-tools')
+    util.print('  ' + lib.DEBUGGER_USAGE_DOC_URL)
     util.print('')
     util.print('Troubleshooting Guide:')
-    util.print('  https://docs.monaca.io/en/manual/debugger/troubleshooting')
+    util.print('  ' + lib.DEBUGGER_TROUBLESHOOTING_DOC_URL)
     util.print('')
   }
 
@@ -246,11 +247,31 @@ SyncTask.livesync = function() {
         break;
       default:
         util.err('Error launching inspector. Please check the connection to the device. ERRNO=' + error);
-        util.print('Troubleshooting Guide: https://docs.monaca.io/en/manual/debugger/troubleshooting/');
+        util.print('Troubleshooting Guide: ' + lib.DEBUGGER_TROUBLESHOOTING_DOC_URL);
         break;
       }
     });
   } catch (error) { }
+
+  // Assign the next available port
+  let port = 8001; // default port
+  if (argv && argv.port) port = argv.port;
+  portfinder.basePort = port;
+
+  portfinder.getPort(function(err, p) {
+    if (err || !p) {
+      if (err) console.log(err);
+      util.fail('Could not get the available port');
+      return;
+    }
+    else {
+      if (p && p !== port) {
+        util.warn(`\nThe port ${port} is not available. Use ${p} instead.`);
+        port = p;
+      }
+    }
+  });
+
 
   lib.findProjectDir(process.cwd(), monaca)
   // Checking if the user needs to upgrade the project
@@ -312,7 +333,7 @@ SyncTask.livesync = function() {
           function() {
             // Starting HTTP server
             error = 'Unable to start HTTP server: ';
-            return localkit.startHttpServer({ httpPort: argv.port });
+            return localkit.startHttpServer({ httpPort: port });
           }
         )
         // Starting HTTP server.
