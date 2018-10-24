@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v3.0.3
+----
+* Fix broken document link.
+* `monaca debug`: connect to the next available port if the default port `8001` is being used.
+
 v3.0.2
 ----
 * `monaca update`: fixed not to stringify `package.backup.json`.
