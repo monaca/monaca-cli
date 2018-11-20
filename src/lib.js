@@ -87,12 +87,12 @@ var assureMonacaProject = function(cwd, monaca) {
                 type: 'input',
                 name: 'projectName',
                 message: 'Project Name:',
-                default: info.name
+                default: info.name || 'monaca-project'
               },{
                 type: 'input',
                 name: 'description',
                 message: 'Project Description:',
-                default: info.description
+                default: info.description || 'monaca-project'
               }]).then(function(answers) {
                 return answers;
               });
@@ -164,7 +164,7 @@ var printSuccessMessage = function(options, files) {
   } else {
 
     if (files && Object.keys(files[dict.files]).length > 0) {
-      util.success('\nProject successfully ' + dict.verb + ' ' + dict.direction + ' Monaca Cloud!');
+      util.success('\nProject is successfully ' + dict.verb + ' ' + dict.direction + ' Monaca Cloud!');
     } else {
       util.print('\nNo files ' + dict.verb + ' since project is already in sync.');
     }
