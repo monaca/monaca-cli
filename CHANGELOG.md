@@ -2,6 +2,12 @@
 CHANGELOG
 ====
 
+v3.0.4
+----
+* Prompt users for project name and description when creating new project in cloud.
+* Remove unused resources.
+* Fix some wording.
+
 v3.0.3
 ----
 * Fix broken document link.
