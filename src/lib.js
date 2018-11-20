@@ -80,9 +80,29 @@ var assureMonacaProject = function(cwd, monaca) {
         return monaca.getProjectInfo(cwd, framework)
           .then(
             function(info) {
+              // ask user they wanna change the project name
+              util.info('\nCreating a new project in cloud...')
+              return inquirer.prompt([
+              {
+                type: 'input',
+                name: 'projectName',
+                message: 'Project Name:',
+                default: info.name || 'monaca-project'
+              },{
+                type: 'input',
+                name: 'description',
+                message: 'Project Description:',
+                default: info.description || 'monaca-project'
+              }]).then(function(answers) {
+                return answers;
+              });
+            }
+          )
+          .then(
+            function(answers) {
               return monaca.createProject({
-                name: info.name,
-                description: info.description,
+                name: answers.projectName,
+                description: answers.description,
                 templateId: 'minimum',
                 framework: framework
               });
@@ -144,7 +164,7 @@ var printSuccessMessage = function(options, files) {
   } else {
 
     if (files && Object.keys(files[dict.files]).length > 0) {
-      util.success('\nProject successfully ' + dict.verb + ' ' + dict.direction + ' Monaca Cloud!');
+      util.success('\nProject is successfully ' + dict.verb + ' ' + dict.direction + ' Monaca Cloud!');
     } else {
       util.print('\nNo files ' + dict.verb + ' since project is already in sync.');
     }

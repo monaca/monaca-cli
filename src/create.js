@@ -69,7 +69,7 @@ CreateTask.createApp = function(template) {
     )
     .then(
       function() {
-        util.success('\nProject created successfully.')
+        util.success('\nProject is created successfully.')
         var message = [
             '',
             'Type "cd ' + dirName + '" and run monaca command again.',

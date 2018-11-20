@@ -161,7 +161,7 @@ SyncTask.clone = function(saveCloudProjectID) {
     // Reporting analytics
     .then(
       function() {
-        util.success('\nProject successfully ' + (saveCloudProjectID ? 'cloned' : 'imported') + ' from Monaca Cloud!');
+        util.success('\nProject is successfully ' + (saveCloudProjectID ? 'cloned' : 'imported') + ' from Monaca Cloud!');
 
         let message = [
             '',
