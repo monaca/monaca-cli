@@ -1,7 +1,7 @@
 {
   "init": {
     "order": 15,
-    "category": "general",
+    "category": "project",
     "description": "Initialize projects created using other CLI tools to be able to execute with Monaca",
     "longDescription": [
       "Initialize projects created using other CLI tools to be able to execute with Monaca (Monaca CLI, Monaca Cloud IDE, Monaca Localkit) adding Monaca Loaders (JS/CSS Component), icons and splashes, creating config.xml and package.json file in case of not having them and installing Cordova as a dependency."
