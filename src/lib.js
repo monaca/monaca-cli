@@ -80,9 +80,29 @@ var assureMonacaProject = function(cwd, monaca) {
         return monaca.getProjectInfo(cwd, framework)
           .then(
             function(info) {
+              // ask user they wanna change the project name
+              util.info('\nCreating a new project in cloud...')
+              return inquirer.prompt([
+              {
+                type: 'input',
+                name: 'projectName',
+                message: 'Project Name:',
+                default: info.name
+              },{
+                type: 'input',
+                name: 'description',
+                message: 'Project Description:',
+                default: info.description
+              }]).then(function(answers) {
+                return answers;
+              });
+            }
+          )
+          .then(
+            function(answers) {
               return monaca.createProject({
-                name: info.name,
-                description: info.description,
+                name: answers.projectName,
+                description: answers.description,
                 templateId: 'minimum',
                 framework: framework
               });
