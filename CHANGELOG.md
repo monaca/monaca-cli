@@ -10,6 +10,9 @@ v3.1.0
 * `monaca remote config` and `monaca remote build`: added `--skipUpload` to skip uploading local project to cloud when building project.
 * `monaca remote config` and `monaca remote build`: added `--skipTranspile` to skip transpile process when uploading project to cloud during building.
 
+#### Bug Fixes
+* Exit the program when `SIGINT` signal is sent to the console.
+
 v3.0.4
 ----
 * Prompt users for project name and description when creating new project in cloud.

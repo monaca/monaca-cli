@@ -142,5 +142,10 @@ process.on('exit', function() {
   util.updateCheck(data);
 });
 
+process.on('SIGINT', function() {
+  console.log('\n\nExiting Program...');
+  process.exit();
+});
+
 exports.Monaca = Monaca;
 })();
