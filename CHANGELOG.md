@@ -2,6 +2,14 @@
 CHANGELOG
 ====
 
+v3.1.0
+----
+
+#### Features
+* Show spinner and file information during file comparision.
+* `monaca remote config` and `monaca remote build`: added `--skipUpload` to skip uploading local project to cloud when building project.
+* `monaca remote config` and `monaca remote build`: added `--skipTranspile` to skip transpile process when uploading project to cloud during building.
+
 v3.0.4
 ----
 * Prompt users for project name and description when creating new project in cloud.

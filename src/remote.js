@@ -8,11 +8,12 @@ var path = require('path'),
   Monaca = require('monaca-lib').Monaca,
   Q = require('q'),
   inquirer = require('monaca-inquirer'),
-  colors  = require('colors'),
   lib = require(path.join(__dirname, 'lib')),
   util = require(path.join(__dirname, 'util'));
 
 var RemoteTask = {}, monaca;
+
+const skipUpload = argv.skipUpload || false;
 
 RemoteTask.run = function(taskName, info) {
   monaca = new Monaca(info);
@@ -64,7 +65,9 @@ RemoteTask.remote = function(task) {
       function(projectDir) {
         cwd = projectDir;
 
-        if (!params['build-list']) {
+        if (skipUpload) {
+          return true;
+        } else if (!params['build-list']) {
          return lib.confirmOverwrite({action: 'upload'});
        }
       }
@@ -73,7 +76,6 @@ RemoteTask.remote = function(task) {
     .then(
       function() {
         if (!params['build-list']) {
-          util.print('Uploading project to Monaca Cloud...');
           error = 'Unable to create monaca project: ';
         }
         return lib.assureMonacaProject(cwd, monaca);
@@ -85,9 +87,19 @@ RemoteTask.remote = function(task) {
         projectInfo = info;
         lib.needToUpgrade(cwd, monaca);
 
+        let options = {};
+        options.showSpinner = true;
+        options.skipTranspile = argv.skipTranspile || false;
+
         error = 'Upload failed: ';
-        if (!params['build-list']) {
-          return monaca.uploadProject(cwd)
+
+        if (skipUpload) {
+          util.warn('\nSkip uploading local changes to the cloud.');
+          return null;
+        } else if (!params['build-list']) {
+          util.print('Uploading project to Monaca Cloud...');
+          if (options.skipTranspile) util.warn('\nSkip transpile process.');
+          return monaca.uploadProject(cwd, options)
             .progress(util.displayProgress);
         }
       }

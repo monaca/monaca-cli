@@ -45,6 +45,14 @@
       [
         "--build-list",
         "Display all the available remote builds and allow their download"
+      ],
+      [
+        "--skipUpload",
+        "DO NOT upload local file changes to cloud"
+      ],
+      [
+        "--skipTranspile",
+        "DO NOT transpile/build project before uploading"
       ]
     ],
     "examples": [
@@ -52,7 +60,9 @@
       "monaca remote build ios --build-type=debug",
       "monaca remote build android --build-type=debug --android_webview=crosswalk --android_arch=arm",
       "monaca remote build --browser",
-      "monaca remote build --build-list"
+      "monaca remote build --build-list",
+      "monaca remote build android --skipUpload",
+      "monaca remote build --browser --skipTranspile"
     ]
   },
   "remote config": {
@@ -70,8 +80,20 @@
     "usage": [
       "monaca remote config"
     ],
+    "options": [
+      [
+        "--skipUpload",
+        "DO NOT upload local file changes to cloud"
+      ],
+      [
+        "--skipTranspile",
+        "DO NOT transpile/build project before uploading"
+      ]
+    ],
     "examples": [
       "monaca remote config",
+      "monaca remote config --noUpload",
+      "monaca remote config --skipTranspile",
       "monaca download"
     ]
   }
