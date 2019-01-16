@@ -43,6 +43,7 @@ SyncTask.load = function(action, arg) {
   options.force = argv.force || (arg && arg.force);
   options.skipTranspile = argv.skipTranspile || (arg && arg.skipTranspile);
   options.action = action;
+  options.showSpinner = true;
 
   var report = {
     event: action

@@ -165,8 +165,10 @@ var printSuccessMessage = function(options, files) {
 
     if (files && Object.keys(files[dict.files]).length > 0) {
       util.success('\nProject is successfully ' + dict.verb + ' ' + dict.direction + ' Monaca Cloud!');
-    } else {
+    } else if (files) {
       util.print('\nNo files ' + dict.verb + ' since project is already in sync.');
+    } else {
+      // DO NOTHING
     }
   }
 };

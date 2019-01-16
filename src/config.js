@@ -4,8 +4,6 @@
 var path = require('path'),
   argv = require('optimist').argv,
   Monaca = require('monaca-lib').Monaca,
-  Q = require('q'),
-  lib = require(path.join(__dirname, 'lib')),
   util = require(path.join(__dirname, 'util'));
 
 var ConfigTask = {}, monaca;
