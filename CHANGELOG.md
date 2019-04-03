@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v3.1.1
+----
+#### Bug Fixes
+* Fixed to encode the file path param
+
 v3.1.0
 ----
 
