@@ -5,7 +5,7 @@ var fs = require('fs'),
   path = require('path'),
   open = require('opn'),
   Q = require('q'),
-  inquirer = require('monaca-inquirer'),
+  inquirer = null,
   argv = require('optimist').argv,
   XMLDom = require('xmldom').DOMParser,
   XMLSerializer = require('xmldom').XMLSerializer,
@@ -13,6 +13,17 @@ var fs = require('fs'),
   Monaca = require('monaca-lib').Monaca,
   util = require(path.join(__dirname, 'util')),
   sync = require(path.join(__dirname, 'sync'));
+
+var isWindowsPlatform = process.platform === 'win32';
+
+if (isWindowsPlatform) {
+  // use inquirer
+  inquirer = require('inquirer');
+} else {
+  // TODO: to use inquirer when inquirer implemented cancelable and customKeyAction features
+  // use monaca-inquirer
+  inquirer = require('monaca-inquirer');
+}
 
 var CreateTask = {}, monaca, report = { event: 'create' },
   dirName = argv._[argv._.indexOf('create') + 1],
@@ -205,10 +216,12 @@ var inquiry = {
   },
 
   template: function(answerCategory) {
+    let message = 'Select a template - Press ' + 'P'.info + ' to see a preview';
+    if (isWindowsPlatform) message = null;
     inquirer.prompt({
       type: 'list',
       name: 'template',
-      message: 'Select a template - Press ' + 'P'.info + ' to see a preview',
+      message: message,
       cancelable: true,
       keyAction: {
         p: function(currentValue) {
@@ -234,10 +247,12 @@ var inquiry = {
   },
 
   samples: function() {
+    let message = 'Select a template - Press ' + 'P'.info + ' to see a preview';
+    if (isWindowsPlatform) message = null;
     inquirer.prompt({
       type: 'list',
       name: 'sample',
-      message: 'Select a sample app - Press ' + 'P'.info + ' to see a preview',
+      message: message,
       cancelable: true,
       keyAction: {
         p: function(currentValue) {

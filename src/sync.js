@@ -1,7 +1,7 @@
 (function() {
 'use strict';
 
-var inquirer = require('monaca-inquirer'),
+var inquirer = require('inquirer'),
   argv = require('optimist').argv,
   path = require('path'),
   Q = require('q'),

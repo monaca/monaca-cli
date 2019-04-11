@@ -7,7 +7,7 @@ var path = require('path'),
   shell = require('shelljs'),
   Monaca = require('monaca-lib').Monaca,
   Q = require('q'),
-  inquirer = require('monaca-inquirer'),
+  inquirer = require('inquirer'),
   lib = require(path.join(__dirname, 'lib')),
   util = require(path.join(__dirname, 'util'));
 
