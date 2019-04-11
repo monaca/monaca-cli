@@ -2,7 +2,7 @@ const util = require('./util');
 const lib = require('./lib');
 const Monaca = require('monaca-lib').Monaca;
 const common = require('monaca-lib').common;
-const inquirer = require('monaca-inquirer');
+const inquirer = require('inquirer');
 
 const CLI_MIGRATION_DOC_URL = common.migrationDocUrl();
 

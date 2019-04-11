@@ -4,7 +4,7 @@
 var path = require('path'),
   Q = require('q'),
   open = require('opn'),
-  inquirer = require('monaca-inquirer'),
+  inquirer = require('inquirer'),
   fs = require('fs'),
   util = require(path.join(__dirname, 'util')),
   terminal = require(path.join(__dirname, 'terminal'));

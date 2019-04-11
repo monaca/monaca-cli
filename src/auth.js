@@ -1,7 +1,7 @@
 (function() {
 'use strict';
 
-var inquirer = require('monaca-inquirer'),
+var inquirer = require('inquirer'),
   path = require('path'),
   Q = require('q'),
   Monaca = require('monaca-lib').Monaca,
@@ -40,6 +40,7 @@ AuthTask.getCredentials = function(doubleCheck) {
     {
       type: 'password',
       name: 'password',
+      mask: true,
       message: 'Enter your password:',
       validate: function(password) {
         passwordCheck = password;
@@ -49,6 +50,7 @@ AuthTask.getCredentials = function(doubleCheck) {
     {
       type: 'password',
       name: 'confirmPassword',
+      mask: true,
       message: 'Confirm your password:',
       when: !!doubleCheck,
       validate: function(confirmPassword) {

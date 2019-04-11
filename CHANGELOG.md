@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v3.1.2
+----
+#### Bug Fixes
+* Fixed to support interactive commands usage on Windows (for Node 10.x) by using `inquirer` package on Windows platform platform
+
 v3.1.1
 ----
 #### Bug Fixes

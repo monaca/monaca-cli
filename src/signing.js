@@ -2,7 +2,7 @@ let path = require('path');
 let argv = require('optimist').argv;
 let Monaca = require('monaca-lib').Monaca;
 let Q = require('q');
-let inquirer = require('monaca-inquirer');
+let inquirer = require('inquirer');
 let lib = require(path.join(__dirname, 'lib'));
 let util = require(path.join(__dirname, 'util'));
 
@@ -34,6 +34,7 @@ let _methods = {
             },
             {
               type: 'password',
+              mask: true,
               name: 'alias_password',
               message: 'Enter alias password:',
               validate: function(alias_password) {
@@ -43,6 +44,7 @@ let _methods = {
             },
             {
               type: 'password',
+              mask: true,
               name: 'alias_password_confirm',
               message: 'Confirm alias password:',
               validate: function(alias_password_confirm) {
@@ -51,6 +53,7 @@ let _methods = {
             },
             {
               type: 'password',
+              mask: true,
               name: 'keystore_password',
               message: 'Enter KeyStore password:',
               validate: function(keystore_password) {
@@ -60,6 +63,7 @@ let _methods = {
             },
             {
               type: 'password',
+              mask: true,
               name: 'keystore_password_confirm',
               message: 'Confirm KeyStore password:',
               validate: function(keystore_password_confirm) {
@@ -132,6 +136,7 @@ let _methods = {
             },
             {
               type: 'password',
+              mask: true,
               name: 'password',
               message: 'Enter KeyStore password:',
               validate: function(password) {
@@ -200,6 +205,7 @@ let _methods = {
             },
             {
               type: 'password',
+              mask: true,
               name: 'password',
               message: 'Enter P12 password:'
             }
@@ -232,6 +238,7 @@ let _methods = {
             },
             {
               type: 'password',
+              mask: true,
               name: 'alias_password',
               message: 'Enter alias password:',
               validate: function(alias_password) {
@@ -241,6 +248,7 @@ let _methods = {
             },
             {
               type: 'password',
+              mask: true,
               name: 'alias_password_confirm',
               message: 'Confirm alias password:',
               validate: function(alias_password_confirm) {
