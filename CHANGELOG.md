@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v3.1.3
+----
+#### Bug Fixes
+* Minor fixed to the `monaca --help` command
+
 v3.1.2
 ----
 #### Bug Fixes
