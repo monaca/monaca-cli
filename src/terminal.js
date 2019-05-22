@@ -16,7 +16,6 @@
     'preview',
     'serve',
     'transpile',
-    'demo',
     'info',
     'update',
     'init'

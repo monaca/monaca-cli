@@ -302,8 +302,6 @@ var printExtendedCommands = function(isOnMonacaTerminal) {
   util.print('---------------------------------\n');
   util.print('  monaca preview | serve');
   util.print('    run a local web server for preview\n');
-  util.print('  monaca demo');
-  util.print('    run a local web server and displays the iOS/Android version of view, when supported\n');
 
   if (!isOnMonacaTerminal) {
     util.print('  monaca debug [--port <port>|--no-open]');
@@ -314,7 +312,7 @@ var printExtendedCommands = function(isOnMonacaTerminal) {
   util.print('---------------------------------');
   util.print(('Local Build and Configuration').bold.info);
   util.print('---------------------------------\n');
-  util.print('  monaca transpile [--generate-config|--install-dependencies]');
+  util.print('  monaca transpile');
   util.print('    transpile project source code.\n');
 
   if (!isOnMonacaTerminal) {
@@ -347,7 +345,7 @@ var printExtendedCommands = function(isOnMonacaTerminal) {
     util.print('    clone from Monaca cloud project\n');
     util.print('  monaca download [--delete|--force|--dry-run]');
     util.print('    download project from Monaca Cloud\n');
-    util.print('  monaca upload [--delete|--force|--dry-run]');
+    util.print('  monaca upload [--delete|--force|--dry-run|--skipTranspile]');
     util.print('    upload project to Monaca Cloud\n');
     util.print('---------------------------------');
     util.print(('Using Monaca Cloud - Import').bold.info);
