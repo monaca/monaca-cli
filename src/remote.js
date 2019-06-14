@@ -126,7 +126,7 @@ RemoteTask.remote = function(task) {
                 open(url, {wait: false})
                 .then(() => {
                   if (task === 'config') {
-                    util.warn('\nOnce the Cloud configuration has been saved, run `monaca download` to get the changes locally.');
+                    util.warn('\nOnce the Cloud configuration has been saved, run `monaca download --delete` to get the changes locally.');
                   }
                   deferred.resolve();
                 })
