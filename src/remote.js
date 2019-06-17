@@ -206,7 +206,20 @@ RemoteTask.remote = function(task) {
             return path.resolve(params.output); //filepath specified by --path
           }
 
-          var filename = 'output.bin';
+          // default output filename
+          var filename = '';
+          if (params.platform === 'android') {
+            filename = 'app.apk';
+          } else if (params.platform === 'ios') {
+            filename = 'app.ipa';
+          } else {
+            filename = 'output.bin';
+          }
+
+          if (!response || !response.headers['content-disposition']) {
+            util.fail('Could not download the build file. Please run `monaca remote build --build-list` to get all the remote builds. ');
+          }
+
           if (typeof response.headers['content-disposition'] === 'string') {
             var regexMatch = response.headers['content-disposition'].match(/filename="?([^"]+)"?/);
             if (regexMatch) {
