@@ -2,6 +2,15 @@
 CHANGELOG
 ====
 
+v3.1.4
+----
+
+#### Bug Fixes
+* Generate default build filename for android and ios
+* Return a proper error message if could not download the build file
+* Inform user to run `monaca download --delete` after running `monaca remote config`
+* Fix bugs in [`monaca-lib@3.2.2`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v322)
+
 v3.1.3
 ----
 #### Bug Fixes
