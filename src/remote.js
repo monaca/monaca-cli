@@ -212,6 +212,8 @@ RemoteTask.remote = function(task) {
             filename = 'app.apk';
           } else if (params.platform === 'ios') {
             filename = 'app.ipa';
+          } else if (parms.platform.includes('electron')) {
+            filename = 'app.zip';
           } else {
             filename = 'output.bin';
           }
@@ -300,6 +302,9 @@ RemoteTask.remote = function(task) {
     var validBuilds = [],
       allAndroidBuilds = body.result.android.items,
       allIosBuilds = body.result.ios.items,
+      allElectronWindowsBuilds = body.result.electron_windows.items,
+      allElectronMacOSBuilds = body.result.electron_macos.items,
+      allElectronLinuxBuilds = body.result.electron_linux.items,
       index = 1;
 
     for (var build in allAndroidBuilds) {
@@ -316,6 +321,35 @@ RemoteTask.remote = function(task) {
       if (currentBuild.status === 'finish' && currentBuild['is_download_active']) {
         validBuilds.push(currentBuild);
         util.print(index.toString().green.bold + ' | iOS ' + currentBuild.type + ' build created at ' + currentBuild['created_text'] + ', expires at ' + currentBuild['download_expire_text']);
+        index++;
+      }
+    }
+
+    // All electron builds
+    // Windows
+    for (var build in allElectronWindowsBuilds) {
+      var currentBuild = allElectronWindowsBuilds[build];
+      if (currentBuild.status === 'finish' && currentBuild['is_download_active']) {
+        validBuilds.push(currentBuild);
+        util.print(index.toString().green.bold + ' | Windows ' + currentBuild.type + ' build created at ' + currentBuild['created_text'] + ', expires at ' + currentBuild['download_expire_text']);
+        index++;
+      }
+    }
+    // Mac
+    for (var build in allElectronMacOSBuilds) {
+      var currentBuild = allElectronMacOSBuilds[build];
+      if (currentBuild.status === 'finish' && currentBuild['is_download_active']) {
+        validBuilds.push(currentBuild);
+        util.print(index.toString().green.bold + ' | Mac ' + currentBuild.type + ' build created at ' + currentBuild['created_text'] + ', expires at ' + currentBuild['download_expire_text']);
+        index++;
+      }
+    }
+    // Linux
+    for (var build in allElectronLinuxBuilds) {
+      var currentBuild = allElectronLinuxBuilds[build];
+      if (currentBuild.status === 'finish' && currentBuild['is_download_active']) {
+        validBuilds.push(currentBuild);
+        util.print(index.toString().green.bold + ' | Linux ' + currentBuild.type + ' build created at ' + currentBuild['created_text'] + ', expires at ' + currentBuild['download_expire_text']);
         index++;
       }
     }

@@ -2,6 +2,12 @@
 CHANGELOG
 ====
 
+v3.2.0
+----
+
+#### Feature
+* Added support for electron build.
+
 v3.1.4
 ----
 
