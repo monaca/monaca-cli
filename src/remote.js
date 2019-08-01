@@ -309,11 +309,13 @@ RemoteTask.remote = function(task) {
     var validBuilds = [],
       allAndroidBuilds = body.result.android.items,
       allIosBuilds = body.result.ios.items,
+      allPwaBuilds = body.result.pwa.items,
       allElectronWindowsBuilds = body.result.electron_windows.items,
       allElectronMacOSBuilds = body.result.electron_macos.items,
       allElectronLinuxBuilds = body.result.electron_linux.items,
       index = 1;
 
+    // android builds
     for (var build in allAndroidBuilds) {
       var currentBuild = allAndroidBuilds[build];
       if (currentBuild.status === 'finish' && currentBuild['is_download_active']) {
@@ -323,11 +325,22 @@ RemoteTask.remote = function(task) {
       }
     }
 
+    // ios builds
     for (var build in allIosBuilds) {
       var currentBuild = allIosBuilds[build];
       if (currentBuild.status === 'finish' && currentBuild['is_download_active']) {
         validBuilds.push(currentBuild);
         util.print(index.toString().green.bold + ' | iOS ' + currentBuild.type + ' build created at ' + currentBuild['created_text'] + ', expires at ' + currentBuild['download_expire_text']);
+        index++;
+      }
+    }
+
+    // pwa builds
+    for (var build in allPwaBuilds) {
+      var currentBuild = allPwaBuilds[build];
+      if (currentBuild.status === 'finish' && currentBuild['is_download_active']) {
+        validBuilds.push(currentBuild);
+        util.print(index.toString().green.bold + ' | PWA ' + currentBuild.type + ' build created at ' + currentBuild['created_text'] + ', expires at ' + currentBuild['download_expire_text']);
         index++;
       }
     }
