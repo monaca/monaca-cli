@@ -5,7 +5,7 @@ CHANGELOG
 v3.2.0
 ----
 #### Feature
-* Added support for electron build.
+* Added support for electron (windows, macos, and linux) and pwa builds.
 
 v3.1.4
 ----
