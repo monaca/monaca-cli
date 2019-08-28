@@ -7,7 +7,7 @@ const getPluginNameFromXml = require('./get-plugin-name-from-xml');
 const copyPluginToResources = require('./copy-plugin-to-resources');
 
 const isUrl = str => /^(git\+)*(http:\/\/|https:\/\/)/.test(str);
-const isFile = str => /^file:/.test(str);
+const isFile = str => /^file:/.test(str) || str.startsWith('/') || str.startsWith('~');
 
 const installTypes = {
   file: 'file',
