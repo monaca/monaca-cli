@@ -5,6 +5,7 @@ const path = require('path');
 const loadJson = require('./load-json');
 const getPluginNameFromXml = require('./get-plugin-name-from-xml');
 const copyPluginToResources = require('./copy-plugin-to-resources');
+const normalizeFolderPath = require('./normalize-folder-path');
 
 const isUrl = str => /^(git\+)*(http:\/\/|https:\/\/)/.test(str);
 const isFile = str => /^file:/.test(str) || str.startsWith('/') || str.startsWith('~');
@@ -35,10 +36,11 @@ const addPlugin = async (argv, projectDir) => {
 
     switch (getInstallType(argv)) {
       case installTypes.file:
-        folder = pluginArg.replace('file:///', '').replace('file://', '').replace('file:/', '');
+        const folder = normalizeFolderPath(pluginArg);
         pluginName = getPluginNameFromLocalFolder(folder);
         copyPluginToResources(projectDir, folder, pluginName);
-        const relativeFolderPath = path.relative(projectDir, folder).replace(/\\/g, "/");
+        // we need normal slashes in package.json instead of backslashes
+        const relativeFolderPath = path.relative(projectDir, folder).replace(/\\/g, "/"); 
         pkgJsonDependencyValue = `file:${relativeFolderPath}`;
         fetchJsonId = pluginArg;
         break;
