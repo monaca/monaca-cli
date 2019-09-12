@@ -1,6 +1,6 @@
 {
   "name": "monaca",
-  "version": "3.1.4",
+  "version": "3.2.0",
   "description": "Monaca Command Line Tool",
   "bin": {
     "monaca": "bin/monaca"
@@ -16,7 +16,7 @@
   "keywords": [
     "monaca"
   ],
-  "author": "Andreas Argelius <andreas@asial.co.jp>",
+  "author": "Monaca <info@asial.co.jp>",
   "licenses": [
     {
       "type": "Apache-2.0",

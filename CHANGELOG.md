@@ -2,9 +2,13 @@
 CHANGELOG
 ====
 
+v3.2.0
+----
+#### Feature
+* Added support for electron (windows, macos, and linux) and pwa builds.
+
 v3.1.4
 ----
-
 #### Bug Fixes
 * Generate default build filename for android and ios
 * Return a proper error message if could not download the build file
