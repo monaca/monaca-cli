@@ -8,9 +8,11 @@ jest.mock('request', () => ({
 
 jest.mock('fs-extra', () => ({
   existsSync: (path) => [
-    'temp\\',
+    '~\\package.json',
     'temp\\package.json',
-    'temp\\plugin.xml',
+    '\\temp\\package.json',
+    'temp\\localPath\\plugin.xml',
+    '\\temp\\localPath\\plugin.xml',
     'temp\\plugins\\fetch.json',
     `localPath\\plugin.xml`,
     `\\localPath\\plugin.xml`,
@@ -37,6 +39,7 @@ const getPluginNameFromXml = require('../get-plugin-name-from-xml');
 const request = require('request');
 const fsExtra = require('fs-extra');
 const path = require('path');
+const loadJson = require('../load-json');
 
 test('Works', () => {
   expect(true).toBeTruthy();
@@ -62,6 +65,7 @@ describe('Add plugin from local folder', () => {
     const pluginName = "cordova-plugin-camera";
     const projectDir = 'temp';
     const folder = "localPath"
+    const pluginPath = path.join(projectDir, folder);
     const expectedPkgJsonPath = path.join(projectDir, 'package.json');
     const expectedFetchJsonPath = path.join(projectDir, 'plugins', 'fetch.json');
     getPluginNameFromXml.mockReturnValue(pluginName);
@@ -73,15 +77,15 @@ describe('Add plugin from local folder', () => {
         "monaca",
         "plugin",
         "add",
-        `file:/${folder}`
+        `file:/${pluginPath}`
       ],
         projectDir
       );
 
-      expect(copy).toHaveBeenCalledWith(projectDir, folder, pluginName);
+      expect(copy).toHaveBeenCalledWith(projectDir, path.normalize(pluginPath), pluginName);
 
       expect(fsExtra.writeFileSync.mock.calls[0][0]).toBe(expectedPkgJsonPath);
-      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:../${folder}`);
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:${folder}`);
       expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).cordova.plugins).toHaveProperty(pluginName, {});
     });
 
@@ -109,6 +113,7 @@ describe('Add plugin from local folder', () => {
     const pluginName = "cordova-plugin-camera";
     const projectDir = 'temp';
     const folder = "localPath"
+    const pluginPath = path.join(projectDir, folder);
     const expectedPkgJsonPath = path.join(projectDir, 'package.json');
     const expectedFetchJsonPath = path.join(projectDir, 'plugins', 'fetch.json');
     getPluginNameFromXml.mockReturnValue(pluginName);
@@ -119,15 +124,15 @@ describe('Add plugin from local folder', () => {
         "monaca",
         "plugin",
         "add",
-        `file://${folder}`
+        `file://${pluginPath}`
       ],
         projectDir
       );
 
-      expect(copy).toHaveBeenCalledWith(projectDir, folder, pluginName);
+      expect(copy).toHaveBeenCalledWith(projectDir, pluginPath, pluginName);
 
       expect(fsExtra.writeFileSync.mock.calls[0][0]).toBe(expectedPkgJsonPath);
-      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:../${folder}`);
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:${folder}`);
       expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).cordova.plugins).toHaveProperty(pluginName, {});
     });
 
@@ -155,6 +160,7 @@ describe('Add plugin from local folder', () => {
     const pluginName = "cordova-plugin-camera";
     const projectDir = 'temp';
     const folder = "localPath"
+    const pluginPath = path.join(projectDir, folder);
     const expectedPkgJsonPath = path.join(projectDir, 'package.json');
     const expectedFetchJsonPath = path.join(projectDir, 'plugins', 'fetch.json');
     getPluginNameFromXml.mockReturnValue(pluginName);
@@ -165,15 +171,15 @@ describe('Add plugin from local folder', () => {
         "monaca",
         "plugin",
         "add",
-        `file:///${folder}`
+        `file:///${pluginPath}`
       ],
         projectDir
       );
 
-      expect(copy).toHaveBeenCalledWith(projectDir, folder, pluginName);
+      expect(copy).toHaveBeenCalledWith(projectDir, path.normalize(pluginPath), pluginName);
 
       expect(fsExtra.writeFileSync.mock.calls[0][0]).toBe(expectedPkgJsonPath);
-      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:../${folder}`);
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:${folder}`);
       expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).cordova.plugins).toHaveProperty(pluginName, {});
     });
 
@@ -199,56 +205,59 @@ describe('Add plugin from local folder', () => {
 
   describe('Argument starts with /', () => {
     const pluginName = "cordova-plugin-camera";
-    const projectDir = 'temp';
-    const folder = "/localPath"
+    const projectDir = '/temp';
+    const folder = "localPath"
+
     const expectedPkgJsonPath = path.join(projectDir, 'package.json');
     const expectedFetchJsonPath = path.join(projectDir, 'plugins', 'fetch.json');
     getPluginNameFromXml.mockReturnValue(pluginName);
 
-      test('Copy has been called and Pakcage.json has been updated correctly', async () => {
+    test('Copy has been called and Package.json has been updated correctly', async () => {
 
-        await addPlugin([
-          "node",
-          "monaca",
-          "plugin",
-          "add",
-          `${folder}`
-        ],
-          projectDir
-        );
+      await addPlugin([
+        "node",
+        "monaca",
+        "plugin",
+        "add",
+        `${projectDir}/${folder}`
+      ],
+        projectDir
+      );
 
-        expect(copy).toHaveBeenCalledWith(projectDir, path.normalize(folder), pluginName);
+      expect(copy).toHaveBeenCalledWith(projectDir, path.normalize(`${projectDir}/${folder}`), pluginName);
 
-        expect(fsExtra.writeFileSync.mock.calls[0][0]).toBe(expectedPkgJsonPath);
-        expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:../../../..${folder}`);
-        expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).cordova.plugins).toHaveProperty(pluginName, {});
-      });
+      expect(fsExtra.writeFileSync.mock.calls[0][0]).toBe(expectedPkgJsonPath);
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:${folder}`);
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).cordova.plugins).toHaveProperty(pluginName, {});
+    });
 
-      test.skip('fetch.json has been updated correctly', async () => {
+    test.skip('fetch.json has been updated correctly', async () => {
 
-        await addPlugin([
-          "node",
-          "monaca",
-          "plugin",
-          "add",
-          `file://${folder}`
-        ],
-          projectDir
-        );
+      await addPlugin([
+        "node",
+        "monaca",
+        "plugin",
+        "add",
+        `file://${folder}`
+      ],
+        projectDir
+      );
 
-        expect(fsExtra.writeFileSync.mock.calls[1][0]).toBe(expectedFetchJsonPath);
-        expect(JSON.parse(fsExtra.writeFileSync.mock.calls[1][1])).toHaveProperty(pluginName, 'source.type', 'registry');
-        expect(JSON.parse(fsExtra.writeFileSync.mock.calls[1][1])).toHaveProperty(pluginName, 'source.id', `file://${folder}`);
-        expect(JSON.parse(fsExtra.writeFileSync.mock.calls[1][1])).toHaveProperty(pluginName, 'variables', {});
-        expect(JSON.parse(fsExtra.writeFileSync.mock.calls[1][1])).toHaveProperty(pluginName, 'isTopLevel', true);
-      });
-   
+      expect(fsExtra.writeFileSync.mock.calls[1][0]).toBe(expectedFetchJsonPath);
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[1][1])).toHaveProperty(pluginName, 'source.type', 'registry');
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[1][1])).toHaveProperty(pluginName, 'source.id', `file://${folder}`);
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[1][1])).toHaveProperty(pluginName, 'variables', {});
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[1][1])).toHaveProperty(pluginName, 'isTopLevel', true);
+    });
+
   });
 
   describe('Argument starts with ~', () => {
     const pluginName = "cordova-plugin-camera";
-    const projectDir = 'temp';
-    const folder = "~/localPath"
+    const projectDir = '~';
+    const folder = "localPath"
+    const pluginPath = path.join(projectDir, folder);
+
     const expectedPkgJsonPath = path.join(projectDir, 'package.json');
     const expectedFetchJsonPath = path.join(projectDir, 'plugins', 'fetch.json');
     getPluginNameFromXml.mockReturnValue(pluginName);
@@ -259,15 +268,15 @@ describe('Add plugin from local folder', () => {
         "monaca",
         "plugin",
         "add",
-        `${folder}`
+        `${pluginPath}`
       ],
         projectDir
       );
 
-      expect(copy).toHaveBeenCalledWith(projectDir, path.normalize(folder), pluginName);
+      expect(copy).toHaveBeenCalledWith(projectDir, path.normalize(pluginPath), pluginName);
 
       expect(fsExtra.writeFileSync.mock.calls[0][0]).toBe(expectedPkgJsonPath);
-      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:../${folder}`);
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:${folder}`);
       expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).cordova.plugins).toHaveProperty(pluginName, {});
     });
   });
@@ -468,4 +477,59 @@ describe('Error cases', () => {
     }
   });
 
+  test('Plugin already exists', async () => {
+    const pluginName = "cordova-plugin-camera";
+    const projectDir = 'temp';
+    const folder = "localPath"
+    const pluginPath = path.join(projectDir, folder);
+    const expectedPkgJsonPath = path.join(projectDir, 'package.json');
+    const expectedFetchJsonPath = path.join(projectDir, 'plugins', 'fetch.json');
+    getPluginNameFromXml.mockReturnValue(pluginName);
+
+    loadJson.mockDeps = {
+      'cordova-plugin-camera': '1'
+    }
+
+    try {
+      await addPlugin([
+        "node",
+        "monaca",
+        "plugin",
+        "add",
+        `file:/${pluginPath}`
+      ],
+        projectDir
+      );
+    }
+    catch (e) {
+      expect(e.message).toEqual('Plugin has been added already: cordova-plugin-camera');
+    }
+
+    loadJson.mockDeps = {}
+
+  });
+
+  test('Plugin is outside the root folder', async () => {
+    const pluginName = "cordova-plugin-camera";
+    const projectDir = 'temp';
+    const folder = "localPath"
+    const pluginPath = path.join(folder);
+    const expectedPkgJsonPath = path.join(projectDir, 'package.json');
+    const expectedFetchJsonPath = path.join(projectDir, 'plugins', 'fetch.json');
+    getPluginNameFromXml.mockReturnValue(pluginName);
+
+    try {
+      await addPlugin([
+        "node",
+        "monaca",
+        "plugin",
+        "add",
+        `file:/${pluginPath}`
+      ], projectDir);
+    }
+    catch (e) {
+      expect(e.message).toEqual('Plugin must be under the project root.');
+    }
+
+  });
 });

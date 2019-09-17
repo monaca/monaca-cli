@@ -24,6 +24,17 @@ const supportedGitRepoTypes = {
 const isGitHubRepo = url => url && url.startsWith && url.startsWith('https://github.com/');
 const isGitLabRepo = url => url && url.startsWith && url.startsWith('https://gitlab.com/');
 
+const pluginAlreadyExists = (pkgJsonPath, pluginName) => {
+  const packageJson = loadJson(pkgJsonPath);
+  return packageJson.dependencies[pluginName] !== undefined;    
+}
+
+const isPluginUnderTheProjectRoot = (projectDir, folder) => {
+  const normalizedAbsProjectPath = path.resolve(projectDir);
+  const normalizedFolderPath = path.resolve(folder);
+  return !normalizedFolderPath.startsWith(normalizedAbsProjectPath);
+}
+
 const addPlugin = async (argv, projectDir) => {
   const pluginArg = argv[4];
   const pkgJsonPath = path.join(projectDir, 'package.json');
@@ -38,9 +49,15 @@ const addPlugin = async (argv, projectDir) => {
       case installTypes.file:
         const folder = normalizeFolderPath(pluginArg);
         pluginName = getPluginNameFromLocalFolder(folder);
+        if (pluginAlreadyExists(pkgJsonPath, pluginName)) {
+          throw new Error('Plugin has been added already: ' + pluginName);
+        }
+        if (isPluginUnderTheProjectRoot(projectDir, folder)) {
+          throw new Error('Plugin must be under the project root.');
+        }
         copyPluginToResources(projectDir, folder, pluginName);
         // we need normal slashes in package.json instead of backslashes
-        const relativeFolderPath = path.relative(projectDir, folder).replace(/\\/g, "/"); 
+        const relativeFolderPath = path.relative(projectDir, folder).replace(/\\/g, "/");
         pkgJsonDependencyValue = `file:${relativeFolderPath}`;
         fetchJsonId = pluginArg;
         break;
@@ -51,12 +68,18 @@ const addPlugin = async (argv, projectDir) => {
         const hash = getHashFromUrl(repoUrl);
         const repoUrlWithoutHash = getUrlWithoutHash(repoUrl);
         pluginName = await getPluginNameFromGitRepo(repoUrlWithoutHash, hash);
+        if (pluginAlreadyExists(pkgJsonPath, pluginName)) {
+          throw new Error('Plugin has been added already: ' + pluginName);
+        }
         pkgJsonDependencyValue = `git+${repoUrlWithoutHash}` + (hash ? `#${hash}` : '');
         fetchJsonId = pluginArg;
         break;
       default:
         const pluginVersion = getPluginVersionFromNpm(pluginArg);
         pluginName = pluginArg;
+        if (pluginAlreadyExists(pkgJsonPath, pluginName)) {
+          throw new Error('Plugin has been added already: ' + pluginName);
+        }
         pkgJsonDependencyValue = `^${pluginVersion}`;
         fetchJsonId = `${pluginName}@${pluginVersion}`;
         break;

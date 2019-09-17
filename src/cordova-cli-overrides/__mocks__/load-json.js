@@ -1,10 +1,14 @@
-module.exports = (path) => {
+const loadJson = (path) => {
   if (path.includes('package.json')) {
     return {
-      dependencies: {},
+      dependencies: { ...loadJson.mockDeps },
       cordova: { plugins: {} }
     }
   } else if (path.includes('fetch.json')) {
     return {};
   }
-}; 
+};
+
+loadJson.mockDeps = {}
+
+module.exports = loadJson;

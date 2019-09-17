@@ -14,80 +14,79 @@ let CordovaTask = {}; let monaca;
 const isAddCMD = args => args[3] === 'add' && args[4];
 const isRmCMD = args => (args[3] === 'rm' || args[3] === 'remove') && args[4];
 
-CordovaTask.run = function (taskName, info) {
+CordovaTask.run = async function (taskName, info) {
 
   monaca = new Monaca(info);
 
-  lib.findProjectDir(process.cwd(), monaca)
-    .then((projectDir) => {
-      try { lib.needToUpgrade(projectDir, monaca); } catch (err) { util.fail(`${err}`); }
+  const projectDir = await lib.findProjectDir(process.cwd(), monaca);
 
-      let cordovaJson;
+  try { lib.needToUpgrade(projectDir, monaca); } catch (err) { util.fail(`${err}`); }
 
-      try {
-        cordovaJson = require(path.join(projectDir, 'node_modules', 'cordova', 'package.json'));
-      } catch (err) {
-        util.fail(`${err}\n`);
-      }
+  let cordovaJson;
 
-      util.warn('Attention, the requested command is a Cordova CLI ' + (cordovaJson.version ? cordovaJson.version : '') + ' command.');
-      util.warn('In case of issue, refer to the official Cordova CLI documentation.\n');
+  try {
+    cordovaJson = require(path.join(projectDir, 'node_modules', 'cordova', 'package.json'));
+  } catch (err) {
+    util.fail(`${err}\n`);
+  }
 
-      if (isAddCMD(process.argv)) {
-        try {
-          return addPlugin(process.argv, projectDir);
-        }
-        catch (e) {
-          console.log(`Can't add plugin: ${pluginArg}. Reason: ${e.message}`);
-        }
-      } else if (isRmCMD(process.argv)) {
-        try {
-          return removePlugin(process.argv, projectDir);
-        } catch (e) {
-          console.log(`Can't remove plugin: ${pluginArg}. Reason: ${e.message}`);
-        }
-      } else {
+  util.warn('Attention, the requested command is a Cordova CLI ' + (cordovaJson.version ? cordovaJson.version : '') + ' command.');
+  util.warn('In case of issue, refer to the official Cordova CLI documentation.\n');
 
-        let args = process.argv.length > 3 ? process.argv.slice(3).join(' ') : '';
-        let cmd = path.join(projectDir, 'node_modules', '.bin', 'cordova') + ' ' + taskName + ' ' + args;
+  if (isAddCMD(process.argv)) {
+    try {
+      return await addPlugin(process.argv, projectDir);
+    }
+    catch (e) {
+      console.log(`Can't add plugin: ${pluginArg}. Reason: ${e.message}`);
+    }
+  } else if (isRmCMD(process.argv)) {
+    try {
+      return removePlugin(process.argv, projectDir);
+    } catch (e) {
+      console.log(`Can't remove plugin: ${pluginArg}. Reason: ${e.message}`);
+    }
+  } else {
 
-        let needReport = taskName === 'plugin' && process.argv[3], reportErrors = '';
-        let report = {
-          event: 'plugin',
-          arg1: args
-        };
+    let args = process.argv.length > 3 ? process.argv.slice(3).join(' ') : '';
+    let cmd = path.join(projectDir, 'node_modules', '.bin', 'cordova') + ' ' + taskName + ' ' + args;
 
-        if (needReport) {
-          monaca.reportAnalytics(report);
-        }
+    let needReport = taskName === 'plugin' && process.argv[3], reportErrors = '';
+    let report = {
+      event: 'plugin',
+      arg1: args
+    };
 
-        let childProcess = exec(cmd);
+    if (needReport) {
+      monaca.reportAnalytics(report);
+    }
 
-        childProcess.stdout.on('data', function (data) {
-          process.stdout.write(data.toString());
-        });
+    let childProcess = exec(cmd);
 
-        childProcess.stderr.on('data', function (data) {
-          if (data) {
-            reportErrors += data.toString();
-            process.stderr.write(data.toString().error);
-          }
-        });
+    childProcess.stdout.on('data', function (data) {
+      process.stdout.write(data.toString());
+    });
 
-        childProcess.on('exit', function (code, qwe) {
-          if (needReport) {
-            monaca[code ? 'reportFail' : 'reportFinish'](report, reportErrors).then(
-              process.exit.bind(process, code),
-              process.exit.bind(process, code)
-            );
-          } else {
-            if (code) {
-              process.exit(code);
-            }
-          }
-        });
+    childProcess.stderr.on('data', function (data) {
+      if (data) {
+        reportErrors += data.toString();
+        process.stderr.write(data.toString().error);
       }
     });
+
+    childProcess.on('exit', function (code, qwe) {
+      if (needReport) {
+        monaca[code ? 'reportFail' : 'reportFinish'](report, reportErrors).then(
+          process.exit.bind(process, code),
+          process.exit.bind(process, code)
+        );
+      } else {
+        if (code) {
+          process.exit(code);
+        }
+      }
+    });
+  }
 };
 
 module.exports = CordovaTask;
