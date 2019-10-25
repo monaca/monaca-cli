@@ -42,5 +42,8 @@
     "q": "^1.1.2",
     "shelljs": "^0.3.0",
     "xmldom": "^0.1.19"
+  },
+  "devDependencies": {
+    "jest": "^24.8.0"
   }
 }
