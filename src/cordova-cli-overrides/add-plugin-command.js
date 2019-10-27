@@ -10,6 +10,8 @@ const normalizeFolderPath = require('./normalize-folder-path');
 const isUrl = str => /^(git\+)*(http:\/\/|https:\/\/)/.test(str);
 const isFile = str => /^file:/.test(str) || str.startsWith('/') || str.startsWith('~');
 
+const isFileByFs = (str) => fsExtra.existsSync(str);
+
 const installTypes = {
   file: 'file',
   url: 'url',
@@ -29,6 +31,7 @@ const pluginAlreadyExists = (pkgJsonPath, pluginName) => {
   return packageJson.dependencies[pluginName] !== undefined;    
 }
 
+// Because the plugin is copied to plugins directory, this check is not necessary now.
 const isPluginUnderTheProjectRoot = (projectDir, folder) => {
   const normalizedAbsProjectPath = path.resolve(projectDir);
   const normalizedFolderPath = path.resolve(folder);
@@ -52,12 +55,13 @@ const addPlugin = async (argv, projectDir) => {
         if (pluginAlreadyExists(pkgJsonPath, pluginName)) {
           throw new Error('Plugin has been added already: ' + pluginName);
         }
-        if (isPluginUnderTheProjectRoot(projectDir, folder)) {
-          throw new Error('Plugin must be under the project root.');
-        }
+        // if (isPluginUnderTheProjectRoot(projectDir, folder)) {
+        //   throw new Error('Plugin must be under the project root.');
+        // }
         copyPluginToResources(projectDir, folder, pluginName);
+
         // we need normal slashes in package.json instead of backslashes
-        const relativeFolderPath = path.relative(projectDir, folder).replace(/\\/g, "/");
+        const relativeFolderPath = path.join('res', 'custom_plugins', pluginName).replace(/\\/g, "/");
         pkgJsonDependencyValue = `file:${relativeFolderPath}`;
         fetchJsonId = pluginArg;
         break;
@@ -97,6 +101,8 @@ const getInstallType = argv => {
     throw new Error('No plugin is specified.');
   }
   else if (isFile(pluginToInstall)) {
+    return installTypes.file;
+  } else if (isFileByFs(pluginToInstall)) {
     return installTypes.file;
   } else if (isUrl(pluginToInstall)) {
     return installTypes.url;

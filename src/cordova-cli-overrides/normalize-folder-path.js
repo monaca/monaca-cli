@@ -8,14 +8,14 @@ const platforms = {
 }
 
 const normalizeFolderPath = (folderPath) => {
-  folderPath = folderPath.replace('file:///', '').replace('file://', '').replace('file:/', '');
+  folderPath = folderPath.replace('file:///', '/').replace('file://', '/').replace('file:/', '/');
 
   const currentPlatform = os.platform();
-  if (currentPlatform === platforms.mac || currentPlatform === platforms.linux) {
-    folderPath = !folderPath.startsWith('/') && !folderPath.startsWith('~') && !folderPath.startsWith('.')
-      ? ('/' + folderPath)
-      : folderPath;
-  }
+  // if (currentPlatform === platforms.mac || currentPlatform === platforms.linux) {
+  //   folderPath = !folderPath.startsWith('/') && !folderPath.startsWith('~') && !folderPath.startsWith('.')
+  //     ? ('/' + folderPath)
+  //     : folderPath;
+  // }
   return path.normalize(folderPath);
 }
 
