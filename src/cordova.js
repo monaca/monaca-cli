@@ -8,11 +8,13 @@ let Monaca = require('monaca-lib').Monaca;
 
 const addPlugin = require('./cordova-cli-overrides/add-plugin-command');
 const removePlugin = require('./cordova-cli-overrides/remove-plugin-command');
+const listPlugins = require('./cordova-cli-overrides/list-plugins-command');
 
 let CordovaTask = {}; let monaca;
 
 const isAddCMD = args => args[3] === 'add' && args[4];
 const isRmCMD = args => (args[3] === 'rm' || args[3] === 'remove') && args[4];
+const isListCMD = args => args[3] === 'list';
 
 CordovaTask.run = async function (taskName, info) {
 
@@ -30,9 +32,6 @@ CordovaTask.run = async function (taskName, info) {
     util.fail(`${err}\n`);
   }
 
-  util.warn('Attention, the requested command is a Cordova CLI ' + (cordovaJson.version ? cordovaJson.version : '') + ' command.');
-  util.warn('In case of issue, refer to the official Cordova CLI documentation.\n');
-
   if (isAddCMD(process.argv)) {
     try {
       return await addPlugin(process.argv, projectDir);
@@ -46,9 +45,19 @@ CordovaTask.run = async function (taskName, info) {
     } catch (e) {
       console.log(`Can't remove plugin: ${pluginArg}. Reason: ${e.message}`);
     }
+  } else if (isListCMD(process.argv)) {
+    try {
+      return listPlugins(process.argv, projectDir);
+    }
+    catch (e) {
+      console.log(`Can't list plugins: ${pluginArg}. Reason: ${e.message}`);
+    }
   } else {
 
-    let args = process.argv.length > 3 ? process.argv.slice(3).join(' ') : '';
+    util.warn('Attention, the requested command is a Cordova CLI ' + (cordovaJson.version ? cordovaJson.version : '') + ' command.');
+    util.warn('In case of issue, refer to the official Cordova CLI documentation.\n');
+  
+      let args = process.argv.length > 3 ? process.argv.slice(3).join(' ') : '';
     let cmd = path.join(projectDir, 'node_modules', '.bin', 'cordova') + ' ' + taskName + ' ' + args;
 
     let needReport = taskName === 'plugin' && process.argv[3], reportErrors = '';
