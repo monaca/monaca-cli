@@ -8,15 +8,12 @@ const platforms = {
 }
 
 const normalizeFolderPath = (folderPath) => {
-  folderPath = folderPath.replace('file:///', '/').replace('file://', '/').replace('file:/', '/');
 
   const currentPlatform = os.platform();
-  // if (currentPlatform === platforms.mac || currentPlatform === platforms.linux) {
-  //   folderPath = !folderPath.startsWith('/') && !folderPath.startsWith('~') && !folderPath.startsWith('.')
-  //     ? ('/' + folderPath)
-  //     : folderPath;
-  // }
-  return path.normalize(folderPath);
+  const pathPrefix = (currentPlatform === platforms.mac || currentPlatform === platforms.linux) ? '/' : '';
+
+  const simplePath = folderPath.replace('file:///', pathPrefix).replace('file://', pathPrefix).replace('file:/', pathPrefix);
+  return path.normalize(simplePath);
 }
 
 module.exports = normalizeFolderPath;
