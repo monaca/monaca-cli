@@ -1,3 +1,6 @@
+
+
+
 jest.mock('../copy-plugin-to-resources');
 jest.mock('request', () => ({
   get: jest.fn((url, cb) => {
@@ -6,8 +9,27 @@ jest.mock('request', () => ({
   }),
 }));
 
-jest.mock('fs-extra', () => ({
-  existsSync: (path) => [
+jest.mock('fs-extra', () => {
+  const os = require('os');
+  const platforms = {
+    win32: 'win32',
+    mac: 'darwin',
+    linux: 'linux'
+  };
+  const currentPlatform = os.platform();
+  const testFiles = (currentPlatform === platforms.mac || currentPlatform === platforms.linux) ?
+  [
+    '~/package.json',
+    'temp/package.json',
+    '/temp/package.json',
+    'temp/localPath/plugin.xml',
+    '/temp/localPath/plugin.xml',
+    'temp/plugins/fetch.json',
+    `localPath/plugin.xml`,
+    `/localPath/plugin.xml`,
+    `~/localPath/plugin.xml`
+  ]:
+  [
     '~\\package.json',
     'temp\\package.json',
     '\\temp\\package.json',
@@ -16,22 +38,21 @@ jest.mock('fs-extra', () => ({
     'temp\\plugins\\fetch.json',
     `localPath\\plugin.xml`,
     `\\localPath\\plugin.xml`,
-    `~\\localPath\\plugin.xml`,
-  ].includes(path),
-  mkdirpSync: jest.fn(),
-  writeJSONSync: jest.fn(),
-  writeFileSync: jest.fn(),
-  readFileSync: () => jest.fn(),
-}));
+    `~\\localPath\\plugin.xml`
+  ];
+  return {
+    existsSync: (path) => testFiles.includes(path)
+    ,
+    mkdirpSync: jest.fn(),
+    writeJSONSync: jest.fn(),
+    writeFileSync: jest.fn(),
+    readFileSync: () => jest.fn(),
+  }
+});
 
 jest.mock('../get-plugin-name-from-xml', () => jest.fn());
 jest.mock('../load-json');
 
-jest.mock('os', () => ({
-  currentPlatform: 'win32',
-  platform: () => this.currentPlatform,
-  setCurrentPlatform: (p) => { this.currentPlatform = p; }
-}))
 
 const copy = require('../copy-plugin-to-resources');
 const addPlugin = require('../add-plugin-command');
@@ -40,6 +61,17 @@ const request = require('request');
 const fsExtra = require('fs-extra');
 const path = require('path');
 const loadJson = require('../load-json');
+
+const platforms = {
+  win32: 'win32',
+  mac: 'darwin',
+  linux: 'linux'
+};
+
+const os = require('os');
+const currentPlatform = os.platform();
+const rootPathPrefix = (currentPlatform === platforms.linux || currentPlatform === platforms.mac) ? '/' : '';
+
 
 test('Works', () => {
   expect(true).toBeTruthy();
@@ -64,7 +96,7 @@ describe('Add plugin from local folder', () => {
   describe('Argument starts with file:/', () => {
     const pluginName = "cordova-plugin-camera";
     const projectDir = 'temp';
-    const folder = "localPath"
+    const folder = "localPath";
     const pluginPath = path.join(projectDir, folder);
     const expectedPkgJsonPath = path.join(projectDir, 'package.json');
     const expectedFetchJsonPath = path.join(projectDir, 'plugins', 'fetch.json');
@@ -82,10 +114,10 @@ describe('Add plugin from local folder', () => {
         projectDir
       );
 
-      expect(copy).toHaveBeenCalledWith(projectDir, path.normalize(pluginPath), pluginName);
+      expect(copy).toHaveBeenCalledWith(projectDir, rootPathPrefix + path.normalize(pluginPath), pluginName);
 
       expect(fsExtra.writeFileSync.mock.calls[0][0]).toBe(expectedPkgJsonPath);
-      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:${folder}`);
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, 'file:res/custom_plugins/' + pluginName);
       expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).cordova.plugins).toHaveProperty(pluginName, {});
     });
 
@@ -129,10 +161,10 @@ describe('Add plugin from local folder', () => {
         projectDir
       );
 
-      expect(copy).toHaveBeenCalledWith(projectDir, pluginPath, pluginName);
+      expect(copy).toHaveBeenCalledWith(projectDir, rootPathPrefix + pluginPath, pluginName);
 
       expect(fsExtra.writeFileSync.mock.calls[0][0]).toBe(expectedPkgJsonPath);
-      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:${folder}`);
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, 'file:res/custom_plugins/' + pluginName);
       expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).cordova.plugins).toHaveProperty(pluginName, {});
     });
 
@@ -176,10 +208,10 @@ describe('Add plugin from local folder', () => {
         projectDir
       );
 
-      expect(copy).toHaveBeenCalledWith(projectDir, path.normalize(pluginPath), pluginName);
+      expect(copy).toHaveBeenCalledWith(projectDir, rootPathPrefix + path.normalize(pluginPath), pluginName);
 
       expect(fsExtra.writeFileSync.mock.calls[0][0]).toBe(expectedPkgJsonPath);
-      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:${folder}`);
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, 'file:res/custom_plugins/' + pluginName);
       expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).cordova.plugins).toHaveProperty(pluginName, {});
     });
 
@@ -227,7 +259,7 @@ describe('Add plugin from local folder', () => {
       expect(copy).toHaveBeenCalledWith(projectDir, path.normalize(`${projectDir}/${folder}`), pluginName);
 
       expect(fsExtra.writeFileSync.mock.calls[0][0]).toBe(expectedPkgJsonPath);
-      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:${folder}`);
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, 'file:res/custom_plugins/' + pluginName);
       expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).cordova.plugins).toHaveProperty(pluginName, {});
     });
 
@@ -276,7 +308,7 @@ describe('Add plugin from local folder', () => {
       expect(copy).toHaveBeenCalledWith(projectDir, path.normalize(pluginPath), pluginName);
 
       expect(fsExtra.writeFileSync.mock.calls[0][0]).toBe(expectedPkgJsonPath);
-      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, `file:${folder}`);
+      expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).dependencies).toHaveProperty(pluginName, 'file:res/custom_plugins/' + pluginName);
       expect(JSON.parse(fsExtra.writeFileSync.mock.calls[0][1]).cordova.plugins).toHaveProperty(pluginName, {});
     });
   });

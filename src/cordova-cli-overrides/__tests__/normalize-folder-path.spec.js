@@ -1,16 +1,29 @@
 
-jest.mock('os', () => ({
-  currentPlatform: 'win32',
-  platform: () => this.currentPlatform,
-  setCurrentPlatform: (p) => { this.currentPlatform = p; }
-}))
+// jest.mock('os', () => ({
+//   currentPlatform: 'win32',
+//   platform: () => this.currentPlatform,
+//   setCurrentPlatform: (p) => { this.currentPlatform = p; }
+// }))
 
 const path = require('path');
 const normalizeFolderPath = require('../normalize-folder-path');
 const os = require('os');
 
+const platforms = {
+  win32: 'win32',
+  mac: 'darwin',
+  linux: 'linux'
+};
+
+const currentPlatform = os.platform();
+
+
 
 describe('Tests for windows platform', () => {
+  if (os.platform() != platforms.win32) {
+    return;
+  }
+
   test('Folder path starts with file:/', () => {
     const folderPath = 'file:/c:\\src\\localFile.txt';
     const normalizedPath = normalizeFolderPath(folderPath);
@@ -63,9 +76,9 @@ describe('Tests for windows platform', () => {
 
 describe('Tests for linux platform', () => {
 
-  beforeAll(() => {
-    os.setCurrentPlatform('linux');
-  });
+  // beforeAll(() => {
+  //   os.setCurrentPlatform('linux');
+  // });
 
   test('Folder path starts with file:/', () => {
     const folderPath = 'file://dev/src/localFile.txt';
@@ -119,9 +132,9 @@ describe('Tests for linux platform', () => {
 
 describe('Tests for mac platform', () => {
 
-  beforeAll(() => {
-    os.setCurrentPlatform('darwin');
-  });
+  // beforeAll(() => {
+  //   os.setCurrentPlatform('darwin');
+  // });
 
   test('Folder path starts with file:/', () => {
     const folderPath = 'file://dev/src/localFile.txt';
