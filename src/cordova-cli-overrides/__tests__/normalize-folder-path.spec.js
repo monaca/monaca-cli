@@ -75,10 +75,9 @@ describe('Tests for windows platform', () => {
 });
 
 describe('Tests for linux platform', () => {
-
-  // beforeAll(() => {
-  //   os.setCurrentPlatform('linux');
-  // });
+  if (os.platform() != platforms.linux) {
+    return;
+  }
 
   test('Folder path starts with file:/', () => {
     const folderPath = 'file://dev/src/localFile.txt';
@@ -131,10 +130,9 @@ describe('Tests for linux platform', () => {
 });
 
 describe('Tests for mac platform', () => {
-
-  // beforeAll(() => {
-  //   os.setCurrentPlatform('darwin');
-  // });
+  if (os.platform() != platforms.mac) {
+    return;
+  }
 
   test('Folder path starts with file:/', () => {
     const folderPath = 'file://dev/src/localFile.txt';
