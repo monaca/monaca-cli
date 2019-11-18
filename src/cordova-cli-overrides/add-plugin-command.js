@@ -6,6 +6,7 @@ const loadJson = require('./load-json');
 const getPluginNameFromXml = require('./get-plugin-name-from-xml');
 const copyPluginToResources = require('./copy-plugin-to-resources');
 const normalizeFolderPath = require('./normalize-folder-path');
+const npmUtils = require('./npm-utils.js');
 
 const isUrl = str => /^(git\+)*(http:\/\/|https:\/\/)/.test(str);
 const isFile = str => /^file:/.test(str) || str.startsWith('/') || str.startsWith('~');
@@ -80,7 +81,8 @@ const addPlugin = async (argv, projectDir) => {
         break;
       default:
         const pluginVersion = getPluginVersionFromNpm(pluginArg);
-        pluginName = pluginArg;
+        // pluginName = pluginArg;
+        pluginName = await npmUtils.getPluginId(pluginArg);
         if (pluginAlreadyExists(pkgJsonPath, pluginName)) {
           throw new Error('Plugin has been added already: ' + pluginName);
         }

@@ -41,6 +41,7 @@
     "portfinder": "^1.0.7",
     "q": "^1.1.2",
     "shelljs": "^0.3.0",
+    "tar": "^5.0.5",
     "xmldom": "^0.1.19"
   },
   "devDependencies": {

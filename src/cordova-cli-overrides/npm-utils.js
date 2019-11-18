@@ -20,15 +20,25 @@ const getPluginXml = async (pkgname) => {
     throw 'Invalid package name'
   }
   const tarballUrl = await getTarballUrl(pkgname);
-  const pluginxml = getFileFromTarballUrl(tarballUrl, 'package/plugin.xml');
+  const pluginxml = await getFileFromTarballUrl(tarballUrl, 'package/plugin.xml');
   return pluginxml;
 
 };
 
 const getFileFromTarballUrl = async (url, filepath) => {
   return new Promise((resolve, reject) => {
-    let called = false;
-    let result = null;
+    let countCalled = 0;
+    let results = [];
+    let isFinished = false;
+    const checkComplete = (_isFinished, _countCalled, _results) => {
+      if (_isFinished && _countCalled === _results.length) {
+        if (_results.length > 0) {
+          resolve(results[0]);
+        } else {
+          reject('Can\'t find or extract file ' + filepath);
+        }
+      }
+    };
     request.get(url)
     .on('response', (res) => {
       // console.log('status code = ' + res.statusCode);
@@ -37,22 +47,23 @@ const getFileFromTarballUrl = async (url, filepath) => {
       reject('Can\'t connect to the url ' + url);
     })
     .pipe(
-      tar.x({
-        filter: (path, entry) => (path === filepath)
+      new tar.Parse({
+        filter: (path, entry) => (path === filepath),
+        noMtime: true
       })
       .on('entry', (entry) => {
-        // console.log('entry is ok');
+        countCalled += 1;
         entry.pipe(new TextStream((text) => {
-          called = true;
-          result = text;
+          results.push(text);
+          checkComplete(isFinished, countCalled, results);
         }));
       })
-      .on('end', () => {
-        if (called) {
-          resolve(result);
-        } else {
-          reject('Can\'t find or extract file ' + filepath);
-        }
+      .on('finish', () => {
+        isFinished = true;
+        checkComplete(isFinished, countCalled, results);
+        // if (!isCalled) {
+        //   reject('Can\'t find or extract file ' + filepath);
+        // }
       })
     );
   });
@@ -87,7 +98,7 @@ class TextStream extends stream.Writable {
     this.cb = cb;
   }
 
-  _write(chunk, encoding, callback) {
+  _write (chunk, encoding, callback) {
     this.buf.push(chunk.toString());
     callback();
   }
