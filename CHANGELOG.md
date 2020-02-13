@@ -1,6 +1,10 @@
 
 CHANGELOG
 ====
+v3.3.0
+----
+#### Feature 
+* improve monaca plugin add commands to update package.json according to the plugin's plugin.xml file instead of using cordova plugin add commands. For the remote repository, currently support only https://github.com/ and https://gitlab.com/
 
 v3.2.1
 ----
