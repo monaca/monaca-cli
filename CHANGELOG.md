@@ -1,6 +1,12 @@
 
 CHANGELOG
 ====
+
+v3.3.1
+----
+#### Bug Fix
+* Fix bugs in [`monaca-lib@3.2.4¥5`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v325)
+
 v3.3.0
 ----
 #### Feature 
