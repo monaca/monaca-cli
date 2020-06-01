@@ -5,6 +5,15 @@ CHANGELOG
 v3.3.2
 ----
 #### Bug Fix
+* Fixes to support older version of Nodejs (CERT_HAS_EXPIRED).
+
+## Announcement
+* We will drop support of Node `8.x` in the future. Please upgrade Node to `10.x` or higher.
+
+
+v3.3.2
+----
+#### Bug Fix
 * Fix bugs in [`monaca-lib@3.2.6`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v326)
 
 v3.3.1
