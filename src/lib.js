@@ -173,7 +173,7 @@ var printSuccessMessage = function(options, files) {
   }
 };
 
-var loginErrorHandler = function (error) {
+var loginErrorHandler = function (error, taskName = null) {
   if (error === 'ECONNRESET') {
     util.print('Unable to connect to Monaca Cloud. Are you connected to the internet?').warn;
     util.print('If you need to use a proxy, please configure it with "monaca proxy".');
@@ -208,6 +208,11 @@ var loginErrorHandler = function (error) {
         open('https://monaca.mobi/plan/change', {wait: false});
       });
     } else {
+      // check if the error is 401 and operation is login or signup
+      if (taskName && (taskName === 'login' || taskName === 'signup') && error.message.startsWith('Failed to authenticate.')) {
+        util.err('Failed to authenticate: 401 Unauthorized. Please check your network and credential again');
+        return false;
+      }
       util.err();
       util.err('Unable to sign in: ', error);
       return {

@@ -7,12 +7,14 @@ var inquirer = require('inquirer'),
   Monaca = require('monaca-lib').Monaca,
   Localkit = require('monaca-lib').Localkit,
   lib = require(path.join(__dirname, 'lib')),
+  gTaskName = null,
   util = require(path.join(__dirname, 'util'));
 
 var AuthTask = {}, monaca;
 
 AuthTask.run = function(taskName, info) {
   monaca = new Monaca(info)
+  gTaskName = taskName;
   if (taskName == 'login') {
     return this.login();
   } else if (taskName === 'signup') {
@@ -105,7 +107,7 @@ AuthTask._performLogin = function() {
       util.success('\nSuccessfully signed in as ' + user.username + '.');
     },
     function(error) {
-      return lib.loginErrorHandler(error);
+      return lib.loginErrorHandler(error, gTaskName);
     }
   );
 }
@@ -219,7 +221,9 @@ AuthTask.signup = function() {
           var user = monaca.loginBody;
           util.success('You are now logged in as ' + user.username + '.');
         },
-        lib.loginErrorHandler
+        function(error) {
+          return lib.loginErrorHandler(error, gTaskName);
+        }
       )
       ;
     }.bind(this)
