@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v3.3.5
+----
+#### Bug Fix
+* Return proper 401 unauthorized access from the server for login and signup operation
+
 v3.3.4
 ----
 #### Feature
