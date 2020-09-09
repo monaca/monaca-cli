@@ -209,7 +209,7 @@ var loginErrorHandler = function (error, taskName = null) {
       });
     } else {
       // check if the error is 401 and operation is login or signup
-      if (taskName && (taskName === 'login' || taskName === 'signup') && error.message.startsWith('Failed to authenticate.')) {
+      if (taskName && (taskName === 'login' || taskName === 'signup') && (error.message.startsWith('Unable to sign in') || error.message.startsWith('Error in user authentication') || error.message.startsWith('Failed to authenticate.'))) {
         util.err('Failed to authenticate: 401 Unauthorized. Please check your network and credential again');
         return false;
       }
