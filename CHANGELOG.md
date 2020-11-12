@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v3.3.6
+----
+#### Bug Fix
+* Fixed running `monaca preview` on windows.
+
 v3.3.5
 ----
 #### Bug Fix

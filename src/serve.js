@@ -19,7 +19,20 @@ ServeTask.run = function (taskName, info) {
   lib.findProjectDir(process.cwd(), monaca)
     .then( dir => {
       lib.needToUpgrade(dir, monaca);
-      try { spawn('npm', ['run', 'monaca:preview'], {stdio: 'inherit'}); } catch(ex) { throw ex; }
+      try {
+        if (process.platform !== 'win32') {
+          spawn('npm', ['run', 'monaca:preview'], {stdio: 'inherit'});
+        } else {
+          console.log('Running "monaca preview" on a separate terminal console. To exit this main process, please close the opened terminal windows.');
+          const childProcess = spawn('npm.cmd', ['run', 'monaca:preview'], {stdio: 'ignore', detached: true});
+          childProcess.on('close', (data) => {
+            console.log('\n\nExiting Program...');
+            process.exit(data);
+          });
+        }
+      } catch(ex) {
+        throw ex;
+      }
     })
     .catch( util.fail.bind(null, 'Project ' + taskName + ' failed: ') );
 };
