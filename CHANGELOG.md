@@ -1,6 +1,10 @@
 
 CHANGELOG
 ====
+v3.3.8
+----
+#### Bug Fix
+* Update dependencies to resolve circular dependency warnings
 
 v3.3.7
 ----
