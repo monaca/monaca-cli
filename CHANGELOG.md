@@ -6,6 +6,7 @@ v4.0.0
 ----
 #### Updates
 * Detail Changelog in [`monaca-lib@4.0.0`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v400)
+* Run `monaca signup` command will open the registration page if the user is not logged in
 * Synchronize version with other Monaca Development Kits (Monaca Localkit and Lib)
 
 v3.3.8

@@ -324,7 +324,7 @@ var printExtendedCommands = function(isOnMonacaTerminal) {
     util.print('---------------------------------');
     util.print(('Using Monaca Cloud - Setup').bold.info);
     util.print('---------------------------------\n');
-    util.print('  monaca signup <email>');
+    util.print('  monaca signup');
     util.print('    register a new Monaca account\n');
     util.print('  monaca login <email>');
     util.print('    sign in to Monaca Cloud\n');

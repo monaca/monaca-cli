@@ -8,6 +8,7 @@ var inquirer = require('inquirer'),
   Localkit = require('monaca-lib').Localkit,
   lib = require(path.join(__dirname, 'lib')),
   gTaskName = null,
+  open = require('opn'),
   util = require(path.join(__dirname, 'util'));
 
 var AuthTask = {}, monaca;
@@ -150,82 +151,8 @@ AuthTask.signup = function() {
       util.print('You are signed in. Please sign out with \'monaca logout\' before creating a new account.');
     },
     function() {
-      var report = {
-        event: 'signup'
-      };
-      monaca.reportAnalytics(report);
-
-      var credentials;
-      this.getCredentials(true)
-      .then(
-        function(result) {
-          credentials = result;
-          var pkg = require(path.join(__dirname, '..', 'package.json'));
-
-          return monaca.signup(credentials.email, credentials.password, credentials.confirmPassword, {
-            version: 'monaca-cli ' + pkg.version
-          });
-        }
-      )
-      .then(
-        monaca.reportFinish.bind(monaca, report),
-        monaca.reportFail.bind(monaca, report)
-      )
-      .then(
-        function(token) {
-          util.print('\nThanks for sign up!');
-          util.print('You should get a confirmation email in your inbox. Please open the email and click the link inside.');
-          util.print('Waiting for the sign up to complete...'.help);
-
-          var deferred = Q.defer();
-
-          var intervalHandle = setInterval(function() {
-            monaca.isActivatedUser(token)
-              .then(function() {
-                if (deferred.promise.inspect().state === 'pending') {
-                  clearInterval(intervalHandle);
-                  monaca.reportAnalytics({
-                    event: 'signup-complete'
-                  })
-                  .then(deferred.resolve.bind(deferred))
-                }
-              }, function(error) {
-                if (error) {
-                  clearInterval(intervalHandle);
-                  deferred.reject(util.parseError(error) + '\nLooks like something went wrong. Plase try again later.');
-                }
-              });
-          }, 3000);
-
-          // Send "exit" event when program is terminated.
-          process.on('SIGINT', function() {
-            clearInterval(intervalHandle);
-            process.exit(0);
-          });
-
-          return deferred.promise;
-        }
-      )
-      .then(
-        function() {
-          util.success('Activation confirmed.');
-          var pkg = require(path.join(__dirname, '..', 'package.json'));
-          return monaca.login(credentials.email, credentials.password, {
-            version: 'monaca-cli ' + pkg.version
-          });
-        },
-        monaca.reportFail.bind(monaca, report)
-      )
-      .then(
-        function() {
-          var user = monaca.loginBody;
-          util.success('You are now logged in as ' + user.username + '.');
-        },
-        function(error) {
-          return lib.loginErrorHandler(error, gTaskName);
-        }
-      )
-      ;
+      util.warn('\nPlease finish the registration process and try login with command \'monaca login\'.');
+      open('https://monaca.mobi/en/signup', {wait: false});
     }.bind(this)
   );
 };
