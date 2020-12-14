@@ -1,6 +1,13 @@
 
 CHANGELOG
 ====
+
+v4.0.0
+----
+#### Updates
+* Detail Changelog in [`monaca-lib@4.0.0`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v400)
+* Synchronize version with other Monaca Development Kits (Monaca Localkit and Lib)
+
 v3.3.8
 ----
 #### Bug Fix
