@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v4.0.2
+----
+#### Updates
+* Detail Changelog in [`monaca-lib@4.0.2`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v402)
+
 v4.0.1
 ----
 #### Updates
