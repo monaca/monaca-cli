@@ -24,7 +24,15 @@
       ],
       [
         "",
-        "test (for iOS only), release (for iOS, Android, PWA and Electron Apps)"
+        "test, adhoc (for iOS only)"
+      ],
+      [
+        "",
+        "debugger, inapp_updater (for iOS and Android)"
+      ],
+      [
+        "",
+        "and release (for iOS, Android, PWA and Electron Apps)"
       ],
       [
         "--output",
