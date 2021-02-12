@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v4.1.0
+----
+#### Updates
+* Support `debugger` build for `ios` and `android` platforms. Example: `monaca remote build ios --build-type=debugger` and `monaca remote build ios --build-type=debugger`
+
 v4.0.2
 ----
 #### Updates
