@@ -1,6 +1,6 @@
 {
   "name": "monaca",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "Monaca Command Line Tool",
   "bin": {
     "monaca": "bin/monaca"
@@ -35,14 +35,14 @@
     "inquirer": "^6.2.2",
     "ip": "^1.1.5",
     "monaca-inquirer": "^1.0.4",
-    "monaca-lib": "^4.0.2",
+    "monaca-lib": "^4.0.6",
     "opn": "^5.3.0",
     "optimist": "^0.6.1",
     "portfinder": "^1.0.7",
     "q": "^1.1.2",
     "shelljs": "^0.8.4",
     "tar": "^5.0.5",
-    "xmldom": "^0.1.19"
+    "xmldom": "^0.6.0"
   },
   "devDependencies": {
     "jest": "^24.9.0"

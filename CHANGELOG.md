@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v4.1.1
+----
+#### Updates
+* Update Monaca document url
+
 v4.1.0
 ----
 #### Updates

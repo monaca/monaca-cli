@@ -17,7 +17,7 @@ var findProjectDir = function(cwd, monaca) {
       return Q.resolve(cwd);
     },
     (error) => {
-      const errMessage = `Directory is not a Monaca project: 'config.xml' file, 'www' folder or '.monaca' folder may be missing.\nPlease visit http://docs.monaca.io/en/monaca_cli/manual/troubleshooting/#incomplete-files-and-folder-structure.\n\nPlease execute 'monaca init' to initialize your project in case of having been created using another CLI tool.`;
+      const errMessage = `Directory is not a Monaca project: 'config.xml' file, 'www' folder or '.monaca' folder may be missing.\nPlease visit https://en.docs.monaca.io/products_guide/monaca_cli/troubleshooting#incomplete-files-and-folder-structure.\n\nPlease execute 'monaca init' to initialize your project in case of having been created using another CLI tool.`;
       let newPath = path.join(cwd, '..');
       return newPath === cwd ? Q.reject(errMessage) : findProjectDir(newPath, monaca);
     }
@@ -463,8 +463,8 @@ let needToUpgrade = (projectDir, monaca) => {
     else false;
 }
 
-const DEBUGGER_TROUBLESHOOTING_DOC_URL = 'https://docs.monaca.io/en/products_guide/debugger/troubleshooting/';
-const DEBUGGER_USAGE_DOC_URL = 'https://docs.monaca.io/en/products_guide/debugger/debug/#monaca-debugger-with-monaca-local-development-tools';
+const DEBUGGER_TROUBLESHOOTING_DOC_URL = 'https://en.docs.monaca.io/products_guide/debugger/troubleshooting/';
+const DEBUGGER_USAGE_DOC_URL = 'https://en.docs.monaca.io/products_guide/debugger/debug/#monaca-debugger-with-monaca-local-development-tools';
 
 module.exports = {
   findProjectDir: findProjectDir,
