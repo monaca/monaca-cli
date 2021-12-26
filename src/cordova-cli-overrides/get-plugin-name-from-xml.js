@@ -1,4 +1,4 @@
-const XMLDom = require('xmldom').DOMParser;
+const XMLDom = require('@xmldom/xmldom').DOMParser;
 
 const getPluginNameFromXml = xml => {
  const doc = new XMLDom().parseFromString(xml, 'application/xml');
