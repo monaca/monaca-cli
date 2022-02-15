@@ -6,6 +6,7 @@ v4.2.0
 ----
 #### Updates
 * Update `monaca info` to use `child_process` to get NPM version
+* Detail Changelog in [`monaca-lib@4.1.0`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v410)
 
 v4.1.1
 ----
