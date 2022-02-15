@@ -8,9 +8,10 @@
     os = require('os'),
     compareVersions = require('compare-versions'),
     ip = require('ip'),
-    npm = require('global-npm'),
     fs = require('fs'),
     Q = require('q');
+
+  const execSync = require('child_process').execSync;
 
   var ConfigTask = {}, monaca;
 
@@ -109,8 +110,9 @@
       util.success('System\n');
       try {
         var os = getOperatingSystem(),
-          nodeVersion = process.versions.node,
-          npmVersion = npm.version;
+          nodeVersion = process.versions.node;
+
+        const npmVersion = execSync('npm -v', { encoding: 'utf8' }).trim();
 
         if (os) {
           util.print(util.alignContent('os') + os);

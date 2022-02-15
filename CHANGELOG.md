@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v4.2.0
+----
+#### Updates
+* Update `monaca info` to use `child_process` to get NPM version
+
 v4.1.1
 ----
 #### Updates
