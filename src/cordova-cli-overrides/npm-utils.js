@@ -1,7 +1,7 @@
 const exec = require('child_process').exec;
 const request = require('request');
 const tar = require('tar');
-const XMLDom = require('xmldom').DOMParser;
+const XMLDom = require('@xmldom/xmldom').DOMParser;
 
 
 const getPluginId = async (pkgname) => {
