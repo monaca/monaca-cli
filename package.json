@@ -29,6 +29,7 @@
   "homepage": "https://monaca.io",
   "preferGlobal": true,
   "dependencies": {
+    "@xmldom/xmldom": "^0.8.0",
     "colors": "^0.6.2",
     "compare-versions": "3.0.1",
     "inquirer": "^6.2.2",
@@ -40,8 +41,7 @@
     "portfinder": "^1.0.7",
     "q": "^1.1.2",
     "shelljs": "^0.8.4",
-    "tar": "^5.0.5",
-    "xmldom": "^0.6.0"
+    "tar": "^5.0.5"
   },
   "devDependencies": {
     "jest": "^24.9.0"
