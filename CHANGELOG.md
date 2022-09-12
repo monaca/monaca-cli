@@ -6,6 +6,7 @@ v4.2.1
 ----
 #### Updates
 * Detail Changelog in [`monaca-lib@4.1.2`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v412)
+* Update dependencies
 
 v4.2.0
 ----
