@@ -2,6 +2,12 @@
 CHANGELOG
 ====
 
+v4.2.2
+----
+#### Updates
+* Support iOS Simulator Build.
+* Detail Changelog in [`monaca-lib@4.1.5`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v415)
+
 v4.2.1
 ----
 #### Updates
