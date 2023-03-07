@@ -209,7 +209,7 @@ RemoteTask.remote = function(task) {
           var filename = '';
 
           if (!response || !response.headers['content-disposition']) {
-            util.fail('Could not download the build file. Please run `monaca remote build --build-list` to get all the remote builds. ');
+            util.fail("Unfortunately, it appears that your download has expired.\nWe kindly request that you run `monaca remote build --build-list` in order to obtain a list of all remote builds.");
           }
 
           if (typeof response.headers['content-disposition'] === 'string') {
