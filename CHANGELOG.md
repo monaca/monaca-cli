@@ -2,6 +2,11 @@
 CHANGELOG
 ====
 
+v4.2.3
+----
+#### Updates
+* Improve error message when download session has expired after running `monaca remote build`.
+
 v4.2.2
 ----
 #### Updates
