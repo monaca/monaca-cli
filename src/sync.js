@@ -234,24 +234,6 @@ SyncTask.livesync = function() {
     localkit.on('httpResponse', function(response) {
       util.print(' ' + response.message + ' > ' + response.code);
     })
-    localkit.on('inspectorError', function(error) {
-      switch (error) {
-      case 'ERROR_ADB':
-        util.print();
-        util.err('Error running ADB command.');
-        util.err('Make sure you installed Android SDK and adb is in your PATH.');
-        util.print('Download site: http://developer.android.com/sdk/index.html')
-        util.print();
-        break;
-      case 'ERROR_START_PROXY':
-        util.err('Failed starting the proxy. Check if iOS device is properly connected and authorized.');
-        break;
-      default:
-        util.err('Error launching inspector. Please check the connection to the device. ERRNO=' + error);
-        util.print('Troubleshooting Guide: ' + lib.DEBUGGER_TROUBLESHOOTING_DOC_URL);
-        break;
-      }
-    });
   } catch (error) { }
 
   // Assign the next available port
@@ -283,23 +265,6 @@ SyncTask.livesync = function() {
 
       // if it is transpile project but doesn't has the watch script, it should be failed
       if (monaca.hasTranspileScript(projectDir) && !monaca.hasDebugScript(projectDir)) util.fail('Please create \'monaca:debug\' script to transpile and watch the file changes in \'package.json\' ');
-
-      try {
-        var nw = path.join(projectDir, 'node_modules', 'nw');
-        var nwBin = require(nw).findpath();
-        var adbPath =  path.join(__dirname, '..', 'bin', process.platform, (process.platform == "win32") ? 'adb.exe' : 'adb');
-
-        localkit.initInspector({
-          inspectorCallback: function(result) {
-            child_process.spawn(nwBin, [result.app, result.webSocketUrl]);
-          },
-          adbPath: adbPath
-        });
-      } catch (error) {
-        if ( error.code === 'MODULE_NOT_FOUND' ) {
-          nwError = true;
-        }
-      }
 
       var projects = argv._.slice(1);
 
@@ -354,11 +319,7 @@ SyncTask.livesync = function() {
         )
         // Starting beacon transmiter.
         .then(
-          function() {
-            if (nwError) {
-              util.warn('\nNode Webkit is not installed, so inspector capabilities will be disabled.\nPlease run "npm install nw@0.26.6" and restart the debug.\n');
-            }
-          }
+          function() {}
         )
         .then(
           monaca.reportFinish.bind(monaca, report),
