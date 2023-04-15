@@ -2,8 +2,8 @@
 'use strict';
 
 var path = require('path'),
-  argv = require('optimist').argv,
-  Monaca = require('monaca-lib').Monaca,
+    argv = minimist(process.argv.slice(2)),
+    Monaca = require('monaca-lib').Monaca,
   util = require(path.join(__dirname, 'util'));
 
 var ConfigTask = {}, monaca;

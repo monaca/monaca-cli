@@ -2,10 +2,9 @@
 'use strict';
 
 var inquirer = require('inquirer'),
-  argv = require('optimist').argv,
+  argv = minimist(process.argv.slice(2)),
   path = require('path'),
   Q = require('q'),
-  child_process = require('child_process'),
   Monaca = require('monaca-lib').Monaca,
   Localkit = require('monaca-lib').Localkit,
   lib = require(path.join(__dirname, 'lib')),

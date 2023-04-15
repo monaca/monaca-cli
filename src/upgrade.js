@@ -1,7 +1,7 @@
 const util = require('./util');
 const lib = require('./lib');
 const Monaca = require('monaca-lib').Monaca;
-const argv = require('optimist').argv;
+const argv = minimist(process.argv.slice(2));
 const common = require('monaca-lib').common;
 const CLI_UPDATE_DOC_URL = common.updateDocUrl();
 

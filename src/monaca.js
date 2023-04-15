@@ -1,7 +1,7 @@
 (function() {
 'use strict';
 
-var argv = require('optimist').argv,
+var argv = minimist(process.argv.slice(2)),
   colors = require('colors'),
   fs = require('fs'),
   path = require('path'),
