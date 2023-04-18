@@ -1,5 +1,5 @@
 let path = require('path');
-let argv = minimist(process.argv.slice(2));
+let argv = require('minimist')(process.argv.slice(2));
 let Monaca = require('monaca-lib').Monaca;
 let Q = require('q');
 let inquirer = require('inquirer');

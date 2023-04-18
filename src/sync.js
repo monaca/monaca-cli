@@ -2,7 +2,7 @@
 'use strict';
 
 var inquirer = require('inquirer'),
-  argv = minimist(process.argv.slice(2)),
+  argv = require('minimist')(process.argv.slice(2)),
   path = require('path'),
   Q = require('q'),
   Monaca = require('monaca-lib').Monaca,
