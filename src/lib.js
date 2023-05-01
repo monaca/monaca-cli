@@ -388,8 +388,8 @@ var printExtendedCommands = function(isOnMonacaTerminal) {
     util.print('---------------------------------');
     util.print(('Docs').bold.info);
     util.print('---------------------------------\n');
-    util.print('  monaca docs [onsen|tutorial|usage]');
-    util.print('    display docs for Monaca CLI, Onsen UI and Tutorials\n');
+    util.print('  monaca docs [onsen|usage]');
+    util.print('    display docs for Monaca CLI and Onsen UI\n');
   }
 
   util.print('---------------------------------');
