@@ -29,8 +29,6 @@
       try {
         if (docsType === 'onsen') {
           opn('https://onsen.io/v2/guide/', {wait: false});
-        } else if (docsType === 'tutorial') {
-          opn('http://tutorial.onsen.io/', {wait: false});
         } else if (docsType === 'usage') {
           opn('https://en.docs.monaca.io/tutorials/monaca_cli/', {wait: false});
         } else {
