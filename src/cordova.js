@@ -10,11 +10,12 @@ const addPlugin = require('./cordova-cli-overrides/add-plugin-command');
 const removePlugin = require('./cordova-cli-overrides/remove-plugin-command');
 const listPlugins = require('./cordova-cli-overrides/list-plugins-command');
 
-let CordovaTask = {}; let monaca;
+let CordovaTask = {};
+let monaca;
 
 const isAddCMD = args => args[3] === 'add' && args[4];
 const isRmCMD = args => (args[3] === 'rm' || args[3] === 'remove') && args[4];
-const isListCMD = args => args[3] === 'list';
+const isListCMD = args => args[3] === 'ls' || args[3] === 'list';
 
 CordovaTask.run = async function (taskName, info) {
 
