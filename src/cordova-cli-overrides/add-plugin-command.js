@@ -29,7 +29,7 @@ const isGitLabRepo = url => url && url.startsWith && url.startsWith('https://git
 
 const pluginAlreadyExists = (pkgJsonPath, pluginName) => {
   const packageJson = loadJson(pkgJsonPath);
-  return packageJson.dependencies[pluginName] !== undefined;    
+  return packageJson.dependencies[pluginName] !== undefined;
 }
 
 // Because the plugin is copied to plugins directory, this check is not necessary now.
@@ -39,61 +39,51 @@ const isPluginUnderTheProjectRoot = (projectDir, folder) => {
   return !normalizedFolderPath.startsWith(normalizedAbsProjectPath);
 }
 
+const getPluginInfo = async (installType, pluginArg) => {
+  let pluginName, pkgJsonDependencyValue;
+
+  switch (installType) {
+    case installTypes.file:
+      const folder = normalizeFolderPath(pluginArg);
+      pluginName = getPluginNameFromLocalFolder(folder);
+      const relativeFolderPath = path.join('res', 'custom_plugins', pluginName).replace(/\\/g, "/");
+      pkgJsonDependencyValue = `file:${relativeFolderPath}`;
+      break;
+    case installTypes.url:
+      const repoUrl = pluginArg.endsWith('/') ? pluginArg.slice(0, -1) : pluginArg;
+      const hash = getHashFromUrl(repoUrl);
+      const repoUrlWithoutHash = getUrlWithoutHash(repoUrl);
+      pluginName = await getPluginNameFromGitRepo(repoUrlWithoutHash, hash);
+      pkgJsonDependencyValue = `git+${repoUrlWithoutHash}` + (hash ? `#${hash}` : '');
+      break;
+    default:
+      const pluginVersion = getPluginVersionFromNpm(pluginArg);
+      pluginName = await npmUtils.getPluginId(pluginArg);
+      pkgJsonDependencyValue = `^${pluginVersion}`;
+      break;
+  }
+
+  return { pluginName, pkgJsonDependencyValue };
+}
+
 const addPlugin = async (argv, projectDir) => {
   const pluginArg = argv[4];
   const pkgJsonPath = path.join(projectDir, 'package.json');
 
   if (canAddPlugin(pluginArg, pkgJsonPath)) {
+    const installType = getInstallType(argv);
+    const { pluginName, pkgJsonDependencyValue } = await getPluginInfo(installType, pluginArg);
 
-    let pluginName;
-    let pkgJsonDependencyValue;
-    let fetchJsonId;
+    if (pluginAlreadyExists(pkgJsonPath, pluginName)) {
+      throw new Error('Plugin has been added already: ' + pluginName);
+    }
 
-    switch (getInstallType(argv)) {
-      case installTypes.file:
-        const folder = normalizeFolderPath(pluginArg);
-        pluginName = getPluginNameFromLocalFolder(folder);
-        if (pluginAlreadyExists(pkgJsonPath, pluginName)) {
-          throw new Error('Plugin has been added already: ' + pluginName);
-        }
-        // if (isPluginUnderTheProjectRoot(projectDir, folder)) {
-        //   throw new Error('Plugin must be under the project root.');
-        // }
-        copyPluginToResources(projectDir, folder, pluginName);
-
-        // we need normal slashes in package.json instead of backslashes
-        const relativeFolderPath = path.join('res', 'custom_plugins', pluginName).replace(/\\/g, "/");
-        pkgJsonDependencyValue = `file:${relativeFolderPath}`;
-        fetchJsonId = pluginArg;
-        break;
-      case installTypes.url:
-        const repoUrl = pluginArg.endsWith('/') ?
-          pluginArg.slice(0, -1) :
-          pluginArg;
-        const hash = getHashFromUrl(repoUrl);
-        const repoUrlWithoutHash = getUrlWithoutHash(repoUrl);
-        pluginName = await getPluginNameFromGitRepo(repoUrlWithoutHash, hash);
-        if (pluginAlreadyExists(pkgJsonPath, pluginName)) {
-          throw new Error('Plugin has been added already: ' + pluginName);
-        }
-        pkgJsonDependencyValue = `git+${repoUrlWithoutHash}` + (hash ? `#${hash}` : '');
-        fetchJsonId = pluginArg;
-        break;
-      default:
-        const pluginVersion = getPluginVersionFromNpm(pluginArg);
-        // pluginName = pluginArg;
-        pluginName = await npmUtils.getPluginId(pluginArg);
-        if (pluginAlreadyExists(pkgJsonPath, pluginName)) {
-          throw new Error('Plugin has been added already: ' + pluginName);
-        }
-        pkgJsonDependencyValue = `^${pluginVersion}`;
-        fetchJsonId = `${pluginName}@${pluginVersion}`;
-        break;
+    if (installType === installTypes.file) {
+      const srcFolder = normalizeFolderPath(pluginArg);
+      copyPluginToResources(projectDir, srcFolder, pluginName);
     }
 
     addPluginToPackageJson(projectDir, pluginName, pkgJsonDependencyValue);
-    // uncomment this if plugins/fetch.json also has to be updated
-    // addPluginToFetchJson(projectDir, pluginName, fetchJsonId); 
   }
 }
 
