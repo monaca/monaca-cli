@@ -44,6 +44,6 @@
     "tar": "^5.0.5"
   },
   "devDependencies": {
-    "jest": "^24.9.0"
+    "jest": "^29.5.0"
   }
 }
