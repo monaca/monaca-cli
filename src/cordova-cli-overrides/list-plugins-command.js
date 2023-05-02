@@ -10,6 +10,12 @@ const listPlugins = (argv, projectDir) => {
     console.log(name + ':' + deps[name]);
   });
 }
+const isPluginInPackageJson = (pluginName, projectDir) => {
+  const pkgJsonPath = path.join(projectDir, 'package.json');
+  const packageJson = require(pkgJsonPath);
+  return packageJson.cordova && packageJson.cordova.plugins && pluginName in packageJson.cordova.plugins;
+};
 
-module.exports = listPlugins;
+
+module.exports = { listPlugins, isPluginInPackageJson };
 

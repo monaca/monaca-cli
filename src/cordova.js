@@ -8,7 +8,7 @@ let Monaca = require('monaca-lib').Monaca;
 
 const addPlugin = require('./cordova-cli-overrides/add-plugin-command');
 const removePlugin = require('./cordova-cli-overrides/remove-plugin-command');
-const listPlugins = require('./cordova-cli-overrides/list-plugins-command');
+const {listPlugins, isPluginInPackageJson} = require('./cordova-cli-overrides/list-plugins-command');
 
 let CordovaTask = {};
 let monaca;
@@ -35,10 +35,22 @@ CordovaTask.run = async function (taskName, info) {
 
   try {
     const argv = process.argv;
+    const pluginName = argv[4];
+
     if (isAddCMD(argv)) {
-      return await addPlugin(argv, projectDir);
+      if (isPluginInPackageJson(pluginName, projectDir)) {
+        util.warn(`${pluginName}　is already installed`);
+      } else {
+        await addPlugin(argv, projectDir);
+        util.success(`Added ${pluginName}`);
+      }
     } else if (isRmCMD(argv)) {
-      return removePlugin(argv, projectDir);
+      if (isPluginInPackageJson(pluginName, projectDir)) {
+        removePlugin(argv, projectDir);
+        util.success(`Removed ${pluginName}`);
+      } else {
+        util.warn(`${pluginName} is not installed`);
+      }
     } else if (isListCMD(argv)) {
       return listPlugins(argv, projectDir);
     } else {
