@@ -3,7 +3,7 @@
 
 var path = require('path'),
   open = require('opn'),
-  argv = require('optimist').argv,
+  argv = require('minimist')(process.argv.slice(2)),
   shell = require('shelljs'),
   Monaca = require('monaca-lib').Monaca,
   Q = require('q'),

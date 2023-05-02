@@ -2,7 +2,7 @@
 'use strict';
 
   var path = require('path'),
-    argv = require('optimist').argv,
+    argv = require('minimist')(process.argv.slice(2)),
     Monaca = require('monaca-lib').Monaca,
     Q = require('q'),
     util = require(path.join(__dirname, 'util')),

@@ -1,5 +1,5 @@
 let path = require('path');
-let argv = require('optimist').argv;
+let argv = require('minimist')(process.argv.slice(2));
 let Monaca = require('monaca-lib').Monaca;
 let Q = require('q');
 let inquirer = require('inquirer');
@@ -111,13 +111,13 @@ let _methods = {
         .then(
           (answers) => {
             return monaca.generateSigningPKCSR(answers.email, answers.name, answers.country);
-          }  
+          }
         );
       break;
-      
+
       default:
         return Q.reject(_generateErrorMessage);
-      break; 
+      break;
     }
   },
 
@@ -148,7 +148,7 @@ let _methods = {
         .then(
           (answers) => {
             return monaca.uploadSigningKeyStore(_project_id, answers.filePath, answers.password);
-          }  
+          }
         );
       break;
 
@@ -160,7 +160,7 @@ let _methods = {
               name: 'filePath',
               message: 'Enter Certificate file path:',
               validate: function(filePath) {
-                return util.validateRequireField(filePath); 
+                return util.validateRequireField(filePath);
               }
             }
           ]
@@ -168,10 +168,10 @@ let _methods = {
         .then(
           (answers) => {
             return monaca.uploadSigningCertificate(answers.filePath);
-          }  
+          }
         );
       break;
-      
+
       case 'provisioning':
         return inquirer.prompt(
           [
@@ -180,7 +180,7 @@ let _methods = {
               name: 'filePath',
               message: 'Enter Provisioning Profile file path:',
               validate: function(filePath) {
-                return util.validateRequireField(filePath); 
+                return util.validateRequireField(filePath);
               }
             }
           ]
@@ -188,10 +188,10 @@ let _methods = {
         .then(
           (answers) => {
             return monaca.uploadSigningProvisioningProfile(answers.filePath);
-          }  
+          }
         );
       break;
-      
+
       case 'pkcs12':
         return inquirer.prompt(
           [
@@ -200,7 +200,7 @@ let _methods = {
               name: 'filePath',
               message: 'Enter P12 file path:',
               validate: function(filePath) {
-                return util.validateRequireField(filePath); 
+                return util.validateRequireField(filePath);
               }
             },
             {
@@ -214,13 +214,13 @@ let _methods = {
         .then(
           (answers) => {
             return monaca.uploadSigningPKCS12(answers.filePath, answers.password);
-          }  
+          }
         );
       break;
-      
+
       default:
         return Q.reject(_uploadErrorMessage);
-      break; 
+      break;
     }
   },
 
@@ -260,16 +260,16 @@ let _methods = {
         .then(
           (answers) => {
             return monaca.addSigningAlias(_project_id, answers.alias_name, answers.alias_password);
-          }  
+          }
         );
       break;
-      
+
       default:
         return Q.reject(_addErrorMessage);
-      break; 
+      break;
     }
   },
-  
+
   remove: (target) => {
     switch(target) {
       case 'alias':
@@ -300,7 +300,7 @@ let _methods = {
               (answers) => {
                 if (!answers || !answers.profile) return NO_ACTION;
                 return monaca.removeSigningAlias(_project_id, answers.profile);
-              }  
+              }
             );
           }
         );
@@ -334,12 +334,12 @@ let _methods = {
               (answers) => {
                 if (!answers || !answers.profile) return NO_ACTION;
                 return monaca.removeSigningCertificate(answers.profile);
-              }  
+              }
             );
           }
         );
       break;
-      
+
       case 'provisioning':
         return monaca.fetchSigningProvisioningProfileCollection().then(
           (profiles) => {
@@ -368,7 +368,7 @@ let _methods = {
               (answers) => {
                 if (!answers || !answers.profile) return NO_ACTION;
                 return monaca.removeSigningProvisioningProfile(answers.profile);
-              }  
+              }
             );
           }
         );
@@ -402,15 +402,15 @@ let _methods = {
               (answers) => {
                 if (!answers || !answers.profile) return NO_ACTION;
                 return monaca.removeSigningPrivateKey(answers.profile);
-              }  
+              }
             );
           }
         );
       break;
-      
+
       default:
         return Q.reject(_removeErrorMessage);
-      break; 
+      break;
     }
   },
 
@@ -429,7 +429,7 @@ let _methods = {
         .then(
           (answers) => {
             return monaca.exportSigningKeyStore(_project_id, answers.downloadToDir);
-          }  
+          }
         );
       break;
 
@@ -475,18 +475,18 @@ let _methods = {
                 .then(
                   (answers) => {
                     return monaca.exportSigningPKCSR(key, answers.downloadToDir);
-                  }  
+                  }
                 );
 
-              }  
+              }
             );
           }
         );
       break;
-      
+
       default:
         return Q.reject(_exportErrorMessage);
-      break; 
+      break;
     }
   }
 };
@@ -546,7 +546,7 @@ module.exports = {
           if (message === NO_ACTION) {
             util.print(_noActionMessage);
           } else {
-            util.success(`${action} ${target}: success`);            
+            util.success(`${action} ${target}: success`);
           }
         },
         (err) => {
