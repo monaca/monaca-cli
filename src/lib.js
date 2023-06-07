@@ -13,11 +13,14 @@ var VERSION = require(path.join(__dirname, '..', 'package.json')).version;
 
 var findProjectDir = function(cwd, monaca) {
   return monaca.isMonacaProject(cwd).then(
-    (type) => {
+    () => {
       return Q.resolve(cwd);
     },
-    (error) => {
-      const errMessage = `Directory is not a Monaca project: 'config.xml' file, 'www' folder or '.monaca' folder may be missing.\nPlease visit https://en.docs.monaca.io/products_guide/monaca_cli/troubleshooting#incomplete-files-and-folder-structure.\n\nPlease execute 'monaca init' to initialize your project in case of having been created using another CLI tool.`;
+    () => {
+
+      const errMessage = `\n\nThis does not appear to be a Monaca project.
+      \nPlease visit https://en.docs.monaca.io/products_guide/monaca_cli/troubleshooting#incomplete-files-and-folder-structure for more information on incomplete files and folder structure.
+      \nTo initialize your project with Monaca, please execute 'monaca init'. Monaca currently supports Cordova and Capacitor projects`;
       let newPath = path.join(cwd, '..');
       return newPath === cwd ? Q.reject(errMessage) : findProjectDir(newPath, monaca);
     }

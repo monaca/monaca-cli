@@ -1,6 +1,6 @@
 {
   "name": "monaca",
-  "version": "4.2.5",
+  "version": "5.0.0",
   "description": "Monaca Command Line Tool",
   "bin": {
     "monaca": "bin/monaca"
