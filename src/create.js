@@ -62,12 +62,18 @@ CreateTask.run = function(taskName, info) {
 };
 
 CreateTask.createApp = function(template) {
-  var error = 'Error occurred while creating project: ';
+  let error = 'Error occurred while creating project: ';
   report.arg1 = template.name;
 
   monaca.downloadTemplate(template.resource, path.resolve(dirName))
     .then(
       function() {
+        // if it is capacitor project, skip checking config.xml
+        const projectConfig = require(path.resolve(dirName, 'package.json'));
+        if (projectConfig?.dependencies && projectConfig.dependencies['@capacitor/core']) {
+          return Promise.resolve();
+        }
+
         // Extract the project name if nested path is given before project name.
         // E.g. if command is 'create project Apps/Finance/myFinanceApp', then myFinanceApp will be taken as project name.
         error = 'An error occurred while injecting project name in config.xml: ';
@@ -81,7 +87,7 @@ CreateTask.createApp = function(template) {
     .then(
       function() {
         util.success('\nProject is created successfully.')
-        var message = [
+        let message = [
             '',
             'Type "cd ' + dirName + '" and run monaca command again.',
             '  > ' + 'monaca preview'.info + '      => Run app in the browser',

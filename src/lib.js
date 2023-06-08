@@ -34,8 +34,10 @@ var softlyAssureMonacaProject = function(cwd) {
      projectConfig = require(path.resolve(cwd, 'package.json'));
   } catch (err) {}
 
-  if (projectConfig && projectConfig.dependencies && projectConfig.dependencies['react-native']) {
+  if (projectConfig?.dependencies && projectConfig.dependencies['react-native']) {
     return 'react-native';
+  } else if (projectConfig?.dependencies && projectConfig.dependencies['@capacitor/core']) {
+    return 'capacitor';
   } else if (fs.existsSync(path.resolve(cwd, 'www')) && fs.existsSync(path.join(cwd, 'config.xml'))) {
     return 'cordova';
   } else {
