@@ -44,7 +44,7 @@ ConfigTask.showProxy = function() {
   monaca.getConfig('http_proxy').then(
     function(proxyServer) {
       if (!proxyServer) {
-        util.print('No proxy server configured. Set a proxy server with "monaca proxy set http://my.proxy.com:8080".');
+        util.print('No proxy server configured. Set a proxy server with "monaca config proxy http://my.proxy.com:8080".');
       } else {
         util.print('Current proxy server is "' + proxyServer + '".');
       }
