@@ -147,5 +147,10 @@ process.on('SIGINT', function() {
   process.exit();
 });
 
+process.on('uncaughtException', function(err) {
+  console.error(('Uncaught exception: ' + err.message).red);
+  console.error(('Error details: ' + err.stack).grey);
+});
+
 exports.Monaca = Monaca;
 })();
