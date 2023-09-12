@@ -34,7 +34,9 @@ https.get('https://ide.monaca.mobi/api/public/versions', function(res) {
      data = JSON.parse(data);
      latestVersion = data.result.monacaCli.replace(/"/g,'').split('/').pop();
    });
-});
+}).on('error', function (){
+
+})
 
 var docsPath = '../doc/tasks/';
 fs.readdirSync(path.join(__dirname, docsPath)).forEach(function(filename) {
