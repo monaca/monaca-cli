@@ -1,6 +1,31 @@
 
 CHANGELOG
 ====
+v4.2.8
+----
+#### Bug Fix
+* Fix HTTPS request error handling in monaca.js
+
+v4.2.7
+----
+#### Bug Fix
+* Handle uncaught exceptions in monaca.js
+* Fix incorrect usage of util.print in loginErrorHandler
+
+v4.2.6
+----
+#### Updates
+* Changed the command message to set a proxy server from "monaca proxy set" to "monaca config proxy"
+
+v4.2.5
+----
+#### Updates
+* Remove tutorial option from docs command
+
+v4.2.4
+----
+#### Updates
+* Switch from optimist to minimist
 
 v4.2.3
 ----
