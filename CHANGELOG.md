@@ -1,6 +1,12 @@
 
 CHANGELOG
 ====
+v4.2.9
+----
+#### Updates
+* Add retry option when there is a problem in downloading from the cloud server
+* Detail Changelog in [`monaca-lib@4.1.8`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v418)
+
 v4.2.8
 ----
 #### Bug Fix
