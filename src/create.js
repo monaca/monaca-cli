@@ -12,6 +12,7 @@ var fs = require('fs'),
   serializer = new XMLSerializer(),
   Monaca = require('monaca-lib').Monaca,
   util = require(path.join(__dirname, 'util')),
+  lib = require(path.join(__dirname, 'lib')),
   sync = require(path.join(__dirname, 'sync'));
 
 var isWindowsPlatform = process.platform === 'win32';
@@ -69,8 +70,7 @@ CreateTask.createApp = function(template) {
     .then(
       function() {
         // if it is capacitor project, skip checking config.xml
-        const projectConfig = require(path.resolve(dirName, 'package.json'));
-        if (projectConfig?.dependencies && projectConfig.dependencies['@capacitor/core']) {
+        if (lib.isCapacitorProject(dirName)) {
           return Promise.resolve();
         }
 

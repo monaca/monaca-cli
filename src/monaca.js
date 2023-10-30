@@ -7,6 +7,7 @@ var argv = require('minimist')(process.argv.slice(2)),
   path = require('path'),
   https = require('https'),
   lib = require(path.join(__dirname, 'lib')),
+  capacitor = require(path.join(__dirname, 'capacitor')),
   util = require(path.join(__dirname, 'util')),
   terminal = require(path.join(__dirname, 'terminal'));
 
@@ -106,6 +107,11 @@ var Monaca = {
     if (!terminal.isValidTask(task.name)) {
       util.fail(terminal.getInvalidCommandErrorMessage(task.name));
       process.exit(0);
+    }
+
+    // Check command not-supported for Capacitor project
+    if (lib.isCapacitorProject() && capacitor.isNotSupportedTask(task.set)) {
+      util.fail('This command is not supported yet for Capacitor project. Please use Monaca Cloud IDE to perform the task.');
     }
 
     if (argv.help || argv.h
