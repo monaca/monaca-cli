@@ -4,6 +4,7 @@
     "category": "project",
     "frameworkSupport": {
       "cordova": true,
+      "capacitor": false,
       "react-native": true
     },
     "description": "manage signing configurations",

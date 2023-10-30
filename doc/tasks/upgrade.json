@@ -4,6 +4,7 @@
     "category": "project",
     "frameworkSupport": {
       "cordova": true,
+      "capacitor": false,
       "react-native": false
     },
     "description": "update old projects to Monaca CLI 3.x structure",
