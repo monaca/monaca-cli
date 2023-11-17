@@ -27,6 +27,22 @@ var findProjectDir = function(cwd, monaca) {
   );
 };
 
+const isCapacitorProject = (cwd = null) => {
+  if (!cwd) {
+    cwd = process.cwd();
+  }
+  let projectConfig;
+
+  try {
+    projectConfig = require(path.resolve(cwd, 'package.json'));
+    if (projectConfig?.dependencies && projectConfig.dependencies['@capacitor/core']) {
+      return true;
+    }
+  } catch (err) {}
+
+  return false;
+};
+
 var softlyAssureMonacaProject = function(cwd) {
   var projectConfig;
 
@@ -36,7 +52,7 @@ var softlyAssureMonacaProject = function(cwd) {
 
   if (projectConfig?.dependencies && projectConfig.dependencies['react-native']) {
     return 'react-native';
-  } else if (projectConfig?.dependencies && projectConfig.dependencies['@capacitor/core']) {
+  } else if (isCapacitorProject(cwd)) {
     return 'capacitor';
   } else if (fs.existsSync(path.resolve(cwd, 'www')) && fs.existsSync(path.join(cwd, 'config.xml'))) {
     return 'cordova';
@@ -472,6 +488,7 @@ const DEBUGGER_TROUBLESHOOTING_DOC_URL = 'https://en.docs.monaca.io/products_gui
 const DEBUGGER_USAGE_DOC_URL = 'https://en.docs.monaca.io/products_guide/debugger/debug/#monaca-debugger-with-monaca-local-development-tools';
 
 module.exports = {
+  isCapacitorProject: isCapacitorProject,
   findProjectDir: findProjectDir,
   assureMonacaProject: assureMonacaProject,
   confirmOverwrite: confirmOverwrite,

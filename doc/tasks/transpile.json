@@ -4,6 +4,7 @@
     "category": "project",
     "frameworkSupport": {
       "cordova": true,
+      "capacitor": true,
       "react-native": false
     },
     "description": "transpile project source code (execute `npm run monaca:transpile` defined in package.json)",

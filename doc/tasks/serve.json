@@ -4,6 +4,7 @@
     "category": "project",
     "frameworkSupport": {
       "cordova": true,
+      "capacitor": true,
       "react-native": false
     },
     "description": "run a local web server for preview (execute `npm run monaca:preview` defined in package.json)",
