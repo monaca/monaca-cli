@@ -6,23 +6,30 @@
    * Not-supported command names.
    */
   Capacitor.notSupportedTask = [
-    'cordova', // plugin, platform, ...
-    'remote',
+    'remote config',
+    'remote build',
     'signing',
     'init',
     'upgrade',
+    'update',
+    'debug',
     'plugin',
     'platform',
+    'prepare',
+    'compile',
+    'run',
+    'build',
+    'emulate',
   ];
 
   /**
    * Is not supported for Capacitor.
    *
-   * @param {string} taskSet
+   * @param {string} taskName
    * @return {boolean}
    */
-  Capacitor.isNotSupportedTask = function (taskSet) {
-    return Capacitor.notSupportedTask.includes(taskSet);
+  Capacitor.isNotSupportedTask = function (taskName) {
+    return Capacitor.notSupportedTask.includes(taskName);
   };
 
   module.exports = Capacitor;

@@ -110,7 +110,7 @@ var Monaca = {
     }
 
     // Check command not-supported for Capacitor project
-    if (lib.isCapacitorProject() && capacitor.isNotSupportedTask(task.set)) {
+    if (lib.isCapacitorProject() && capacitor.isNotSupportedTask(task.name)) {
       util.fail('This command is not supported yet for Capacitor project. Please use Monaca Cloud IDE to perform the task.');
     }
 
