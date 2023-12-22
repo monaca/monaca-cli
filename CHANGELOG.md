@@ -1,6 +1,17 @@
 
 CHANGELOG
 ====
+v4.2.11
+----
+#### Bug Fix
+* Fix a bug where the template was missing
+* Detail Changelog in [`monaca-lib@4.1.10`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md)
+
+v4.2.10
+----
+#### Updates
+* Detail Changelog in [`monaca-lib@4.1.9`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md)
+
 v4.2.9
 ----
 #### Updates
