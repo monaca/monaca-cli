@@ -20,11 +20,15 @@ ServeTask.run = function (taskName, info) {
     .then( dir => {
       lib.needToUpgrade(dir, monaca);
       try {
+        let command = 'npm';
+        if (util.isUsingYarn(dir)) {
+          command = 'yarn';
+        }
         if (process.platform !== 'win32') {
-          spawn('npm', ['run', 'monaca:preview'], {stdio: 'inherit'});
+          spawn(command, ['run', 'monaca:preview'], {stdio: 'inherit'});
         } else {
           console.log('Running "monaca preview" on a separate terminal console. To exit this main process, please close the opened terminal windows.');
-          const childProcess = spawn('npm.cmd', ['run', 'monaca:preview'], {stdio: 'ignore', detached: true});
+          const childProcess = spawn(command + '.cmd', ['run', 'monaca:preview'], {stdio: 'ignore', detached: true});
           childProcess.on('close', (data) => {
             console.log('\n\nExiting Program...');
             process.exit(data);
