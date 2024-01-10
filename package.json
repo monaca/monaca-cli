@@ -36,7 +36,7 @@
     "ip": "^1.1.5",
     "minimist": "^1.2.8",
     "monaca-inquirer": "^1.0.4",
-    "monaca-lib": "^4.1.6",
+    "monaca-lib": "^4.1.10",
     "opn": "^5.3.0",
     "portfinder": "^1.0.7",
     "q": "^1.1.2",

@@ -35,7 +35,9 @@ https.get('https://ide.monaca.mobi/api/public/versions', function(res) {
      data = JSON.parse(data);
      latestVersion = data.result.monacaCli.replace(/"/g,'').split('/').pop();
    });
-});
+}).on('error', function (){
+
+})
 
 var docsPath = '../doc/tasks/';
 fs.readdirSync(path.join(__dirname, docsPath)).forEach(function(filename) {
@@ -151,6 +153,11 @@ process.on('exit', function() {
 process.on('SIGINT', function() {
   console.log('\n\nExiting Program...');
   process.exit();
+});
+
+process.on('uncaughtException', function(err) {
+  console.error(('Uncaught exception: ' + err.message).red);
+  console.error(('Error details: ' + err.stack).grey);
 });
 
 exports.Monaca = Monaca;

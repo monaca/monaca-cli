@@ -1,6 +1,48 @@
 
 CHANGELOG
 ====
+v4.2.11
+----
+#### Bug Fix
+* Fix a bug where the template was missing
+* Detail Changelog in [`monaca-lib@4.1.10`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md)
+
+v4.2.10
+----
+#### Updates
+* Detail Changelog in [`monaca-lib@4.1.9`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md)
+
+v4.2.9
+----
+#### Updates
+* Add retry option when there is a problem in downloading from the cloud server
+* Detail Changelog in [`monaca-lib@4.1.8`](https://github.com/monaca/monaca-lib/blob/master/CHANGELOG.md#v418)
+
+v4.2.8
+----
+#### Bug Fix
+* Fix HTTPS request error handling in monaca.js
+
+v4.2.7
+----
+#### Bug Fix
+* Handle uncaught exceptions in monaca.js
+* Fix incorrect usage of util.print in loginErrorHandler
+
+v4.2.6
+----
+#### Updates
+* Changed the command message to set a proxy server from "monaca proxy set" to "monaca config proxy"
+
+v4.2.5
+----
+#### Updates
+* Remove tutorial option from docs command
+
+v4.2.4
+----
+#### Updates
+* Switch from optimist to minimist
 
 v5.0.0
 ----
