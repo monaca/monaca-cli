@@ -5,6 +5,7 @@ CHANGELOG
 v5.0.0
 ----
 * Support Capacitor Projects (Beta).
+* Support Yarn Projects (Beta).
 
 v4.2.3
 ----
