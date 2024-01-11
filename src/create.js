@@ -12,6 +12,7 @@ var fs = require('fs'),
   serializer = new XMLSerializer(),
   Monaca = require('monaca-lib').Monaca,
   util = require(path.join(__dirname, 'util')),
+  lib = require(path.join(__dirname, 'lib')),
   sync = require(path.join(__dirname, 'sync'));
 
 var isWindowsPlatform = process.platform === 'win32';
@@ -62,12 +63,17 @@ CreateTask.run = function(taskName, info) {
 };
 
 CreateTask.createApp = function(template) {
-  var error = 'Error occurred while creating project: ';
+  let error = 'Error occurred while creating project: ';
   report.arg1 = template.name;
 
   monaca.downloadTemplate(template.resource, path.resolve(dirName))
     .then(
       function() {
+        // if it is capacitor project, skip checking config.xml
+        if (lib.isCapacitorProject(dirName)) {
+          return Promise.resolve();
+        }
+
         // Extract the project name if nested path is given before project name.
         // E.g. if command is 'create project Apps/Finance/myFinanceApp', then myFinanceApp will be taken as project name.
         error = 'An error occurred while injecting project name in config.xml: ';
@@ -81,7 +87,7 @@ CreateTask.createApp = function(template) {
     .then(
       function() {
         util.success('\nProject is created successfully.')
-        var message = [
+        let message = [
             '',
             'Type "cd ' + dirName + '" and run monaca command again.',
             '  > ' + 'monaca preview'.info + '      => Run app in the browser',

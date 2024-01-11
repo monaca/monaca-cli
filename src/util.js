@@ -3,6 +3,7 @@
 
 var Q = require('q'),
   fs = require('fs'),
+  path = require('path'),
   colors  =require('colors');
 
 var UPDATE_INTERVAL = 21600; //6 hours
@@ -248,6 +249,23 @@ var getFormatExpirationDate = (timestamp) => {
   }
 }
 
+/**
+ * Checks if a project is using Yarn as its package manager.
+ *
+ * @param {string} projectDir - The directory path of the project.
+ * @returns {boolean} - Returns true if the project uses Yarn, false otherwise.
+ */
+const isUsingYarn = (projectDir) => {
+  try {
+    const projectConfig = require(path.join(projectDir, 'package.json'));
+    const monacaPreviewScript = projectConfig.scripts && projectConfig.scripts['monaca:preview'];
+    if (monacaPreviewScript && monacaPreviewScript.indexOf('yarn') >= 0) {
+      return true;
+    }
+  } catch (err) {}
+  return false;
+};
+
 module.exports = {
   print: println,
   info: printinfo,
@@ -268,5 +286,6 @@ module.exports = {
   validateCountryCode: validateCountryCode,
   validateRequireField: validateRequireField,
   getFormatExpirationDate: getFormatExpirationDate,
+  isUsingYarn: isUsingYarn,
 };
 })();

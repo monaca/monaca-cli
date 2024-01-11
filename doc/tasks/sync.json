@@ -42,6 +42,7 @@
     "category": "project",
     "frameworkSupport": {
       "cordova": true,
+      "capacitor": true,
       "react-native": false
     },
     "description": "upload a project to Monaca Cloud",
@@ -84,6 +85,7 @@
     "category": "project",
     "frameworkSupport": {
       "cordova": true,
+      "capacitor": true,
       "react-native": false
     },
     "description": "download a project from Monaca Cloud",
@@ -121,6 +123,7 @@
     "category": "project",
     "frameworkSupport": {
       "cordova": true,
+      "capacitor": true,
       "react-native": false
     },
     "description": "run app on device using Monaca Debugger (execute `npm run monaca:debug` defined in package.json)",

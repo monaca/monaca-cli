@@ -4,6 +4,7 @@
     "category": "project",
     "frameworkSupport": {
       "cordova": true,
+      "capacitor": false,
       "react-native": true
     },
     "description": "build a project on Monaca Cloud",
@@ -82,6 +83,7 @@
     "category": "project",
     "frameworkSupport": {
       "cordova": true,
+      "capacitor": false,
       "react-native": true
     },
     "description": "open the project configuration on Monaca Cloud",

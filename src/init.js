@@ -12,7 +12,7 @@ let printInitInfo = (commands) => {
   // www folder
   util.print(`A. Change the output folder to ${'www'.commands}.`);
   // config.xml
-  util.print(`B. In case of not having a ${'config.xml'.commands} file, a new one has been created with Monaca's default settings.`); 
+  util.print(`B. For Cordova project, a new ${'config.xml'.commands} file has been created with Monaca's default settings.`); 
   // monaca commands
   util.print(`C. Some new commands have been added:\n`
     + `\t${'monaca:preview'.commands}: ${commands.serve.commands}\n`
@@ -31,7 +31,7 @@ let printInitInfo = (commands) => {
     + `\t<!--Load selected CSS libraries-->\n`
     + `\t<link rel="stylesheet" href="components/loader.css”>`);
   // plugins
-  util.print(`F. Cordova plugins are managed by ${'package.json'.commands} file. If your plugin information is defined in ${'config.xml'.commands} file, you will need to import them again into Monaca.`);
+  util.print(`F. Cordova/Capacitor plugins are managed by ${'package.json'.commands} file. If your plugin information is defined in ${'config.xml'.commands} file, you will need to import them again into Monaca.`);
   // monaca documentation url
   util.print(`G. For more details about the changes, please refer to ${CLI_MIGRATION_DOC_URL.url}`);
 }
