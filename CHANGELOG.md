@@ -2,6 +2,13 @@
 CHANGELOG
 ====
 
+v5.0.1
+----
+
+#### Bug Fix
+
+* Fixed `monaca import` and `monaca clone` to resolve directory path.
+
 v5.0.0
 ----
 
