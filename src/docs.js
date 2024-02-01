@@ -19,10 +19,10 @@
   };
 
   ConfigTask.openDocs = function(docsType) {
-    var rawArgv = process.argv.slice(3);
-    var report = {
+    const args = process.argv.length > 3 ? process.argv.slice(3).join(' ') : '';
+    const report = {
       event: 'docs',
-      arg1: rawArgv
+      params: { args }
     };
 
     var openDocs = function(docsType) {

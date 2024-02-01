@@ -50,6 +50,11 @@ module.exports = {
     let monaca = new Monaca(info);
     let commands = {}, isTranspile;
 
+    const report = {
+      event: taskName
+    };
+    monaca.reportAnalytics(report);
+
     util.warn(`Before trying to initialize your project, please take a look at ${CLI_MIGRATION_DOC_URL} to get the basic information about how to do this process.`);
     return lib.confirmMessage(confirmMessage, true)
     .then(
@@ -104,6 +109,10 @@ module.exports = {
         printInitInfo(commands);
         return projectDir;
       })
+      .then(
+        monaca.reportFinish.bind(monaca, report),
+        monaca.reportFail.bind(monaca, report)
+      )
       .then(info => util.success(`${taskName} process finished.`))
       .catch(err => util.fail(`Project ${taskName} failed. ${err}`))
   }

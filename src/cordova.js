@@ -19,6 +19,13 @@ const isListCMD = args => args[3] === 'list';
 CordovaTask.run = async function (taskName, info) {
 
   monaca = new Monaca(info);
+  const args = process.argv.length > 3 ? process.argv.slice(3).join(' ') : '';
+
+  const report = {
+    event: 'plugin',
+    params: { args }
+  };
+  monaca.reportAnalytics(report);
 
   const projectDir = await lib.findProjectDir(process.cwd(), monaca);
 
@@ -32,6 +39,7 @@ CordovaTask.run = async function (taskName, info) {
     util.fail(`${err}\n`);
   }
 
+  const pluginArg = process.argv;
   if (isAddCMD(process.argv)) {
     try {
       return await addPlugin(process.argv, projectDir);
@@ -56,19 +64,10 @@ CordovaTask.run = async function (taskName, info) {
 
     util.warn('Attention, the requested command is a Cordova CLI ' + (cordovaJson.version ? cordovaJson.version : '') + ' command.');
     util.warn('In case of issue, refer to the official Cordova CLI documentation.\n');
-  
-      let args = process.argv.length > 3 ? process.argv.slice(3).join(' ') : '';
+
     let cmd = path.join(projectDir, 'node_modules', '.bin', 'cordova') + ' ' + taskName + ' ' + args;
 
     let needReport = taskName === 'plugin' && process.argv[3], reportErrors = '';
-    let report = {
-      event: 'plugin',
-      arg1: args
-    };
-
-    if (needReport) {
-      monaca.reportAnalytics(report);
-    }
 
     let childProcess = exec(cmd);
 

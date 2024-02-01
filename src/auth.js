@@ -80,7 +80,7 @@ AuthTask.login = function() {
 };
 
 AuthTask._performLogin = function() {
-  var report = {
+  const report = {
     event: 'login'
   };
   monaca.reportAnalytics(report);
@@ -151,6 +151,10 @@ AuthTask.signup = function() {
       util.print('You are signed in. Please sign out with \'monaca logout\' before creating a new account.');
     },
     function() {
+      var report = {
+        event: 'signup'
+      };
+      monaca.reportAnalytics(report);
       util.warn('\nPlease finish the registration process and try login with command \'monaca login\'.');
       open('https://monaca.mobi/en/signup', {wait: false});
     }.bind(this)

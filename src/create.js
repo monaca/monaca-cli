@@ -64,7 +64,7 @@ CreateTask.run = function(taskName, info) {
 
 CreateTask.createApp = function(template) {
   let error = 'Error occurred while creating project: ';
-  report.arg1 = template.name;
+  report.params = { template: template.name };
 
   monaca.downloadTemplate(template.resource, path.resolve(dirName))
     .then(

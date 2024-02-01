@@ -16,6 +16,11 @@ let ServeTask = {}; let monaca;
  */
 ServeTask.run = function (taskName, info) {
   monaca = new Monaca(info);
+  const report = {
+    event: taskName
+  };
+  monaca.reportAnalytics(report);
+
   lib.findProjectDir(process.cwd(), monaca)
     .then( dir => {
       lib.needToUpgrade(dir, monaca);
