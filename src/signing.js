@@ -499,6 +499,14 @@ module.exports = {
     let action = '';
     let target = '';
 
+    const args = process.argv.length > 3 ? process.argv.slice(3).join(' ') : '';
+    const report = {
+      event: task,
+      params: { args }
+    };
+
+    monaca.reportAnalytics(report);
+
     lib.findProjectDir(process.cwd(), monaca)
       .then(
         (cwd) => {
