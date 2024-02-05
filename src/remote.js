@@ -202,40 +202,48 @@ RemoteTask.remote = function(task) {
         let sessionUrl = result.sessionUrl;
         let buildDir = result.buildDir;
         return monaca.download(sessionUrl, {}, function(response) {
-          if (params.output) {
-            return path.resolve(params.output); //filepath specified by --path
-          }
-
-          var filename = '';
-
-          if (!response || !response.headers['content-disposition']) {
-            util.fail("Unfortunately, it appears that your download has expired.\nWe kindly request that you run `monaca remote build --build-list` in order to obtain a list of all remote builds.");
-          }
-
-          if (typeof response.headers['content-disposition'] === 'string') {
-            var regexMatch = response.headers['content-disposition'].match(/filename="?([^"]+)"?/);
-            if (regexMatch) {
-              filename = regexMatch[1];
+          const getFileNameFromResponse = (response) => {
+            let filename = '';
+            if (!response || !response.headers['content-disposition']) {
+              util.fail("Unfortunately, it appears that your download has expired.\nWe kindly request that you run `monaca remote build --build-list` in order to obtain a list of all remote builds.");
             }
-          }
 
-          // generate default filename if filename from backend is null
-          if (!filename) {
-            try {
-              if (params.platform === 'android') {
-                filename = 'app.apk';
-              } else if (params.platform === 'ios') {
-                filename = 'app.ipa';
-              } else if (params.platform && params.platform.includes('electron')) {
-                filename = 'app.zip';
-              } else {
+            if (typeof response.headers['content-disposition'] === 'string') {
+              var regexMatch = response.headers['content-disposition'].match(/filename="?([^"]+)"?/);
+              if (regexMatch) {
+                filename = regexMatch[1];
+              }
+            }
+
+            // generate default filename if filename from backend is null
+            if (!filename) {
+              try {
+                if (params.platform === 'android') {
+                  filename = 'app.apk';
+                } else if (params.platform === 'ios') {
+                  filename = 'app.ipa';
+                } else if (params.platform && params.platform.includes('electron')) {
+                  filename = 'app.zip';
+                } else {
+                  filename = 'output.zip';
+                }
+              } catch (error) {
                 filename = 'output.zip';
               }
-            } catch (error) {
-              filename = 'output.zip';
+            }
+            return filename;
+          };
+
+          let filename = getFileNameFromResponse(response);
+          if (params.output) {
+            const resolvedPath =  path.resolve(params.output);
+            if (util.isDirectory(resolvedPath)) {
+              buildDir = resolvedPath;
+            } else if (path.extname(resolvedPath) !== '') {
+              buildDir = path.dirname(resolvedPath);
+              filename = path.basename(resolvedPath);
             }
           }
-
           shell.mkdir('-p', buildDir);
           return path.join(buildDir, filename);
         });

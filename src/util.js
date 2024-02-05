@@ -266,6 +266,15 @@ const isUsingYarn = (projectDir) => {
   return false;
 };
 
+const isDirectory = (path) =>  {
+  try {
+    const stats = fs.statSync(path);
+    return stats.isDirectory();
+  } catch (err) {
+    return false;
+  }
+};
+
 module.exports = {
   print: println,
   info: printinfo,
@@ -287,5 +296,6 @@ module.exports = {
   validateRequireField: validateRequireField,
   getFormatExpirationDate: getFormatExpirationDate,
   isUsingYarn: isUsingYarn,
+  isDirectory: isDirectory,
 };
 })();
