@@ -1,6 +1,13 @@
 
 CHANGELOG
 ====
+v5.0.2
+----
+
+#### Bug Fix
+
+* Fixed an error when specifying a directory in the `--output` option of `monaca remote build`. 
+* Fixed `monaca debug`.
 
 v5.0.1
 ----
