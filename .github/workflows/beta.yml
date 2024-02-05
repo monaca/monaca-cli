@@ -1,0 +1,57 @@
+name: Publish beta version to npm
+
+on:
+  push:
+    tags:
+      - '*-beta.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: 'recursive'
+
+      - name: Check for Pre-release Version in package.json
+        id: check
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "version=$version" >> $GITHUB_ENV
+          if [[ "$version" == *"-beta"* ]]; then
+            echo "Pre-release version detected in package.json: $version"
+            echo "prerelease=true" >> $GITHUB_ENV
+          else
+            echo "No pre-release version detected in package.json."
+            echo "prerelease=false" >> $GITHUB_ENV
+          fi
+
+      - name: Abort if not a Pre-release
+        if: env.prerelease == 'false'
+        run: |
+          echo "Aborting: No pre-release version detected in package.json despite '-beta' tag."
+          exit 1
+
+      - name: Check if version has been published
+        id: check_version
+        run: |
+          if git rev-parse "v$version" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_ENV
+          else
+            echo "exists=false" >> $GITHUB_ENV
+            echo "new_tag=v$version" >> $GITHUB_ENV
+          fi
+
+      - name: Setup Node.js
+        if: env.exists == 'false'
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Publish to npm
+        if: env.exists == 'false'
+        run: npm publish --tag beta
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
