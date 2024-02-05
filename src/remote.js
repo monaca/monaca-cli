@@ -49,12 +49,12 @@ RemoteTask.remote = function(task) {
   if (!params.browser && !params['build-list'] && task !== 'config' && (!params.platform || !params.purpose)) {
     util.fail('Missing parameters. Please write --help to see the correct usage.');
   }
-
-  var report = {
-    event: 'remote-' + task,
-    arg1: params.platform,
-    otherArgs: JSON.stringify(params)
+  const args = process.argv.length > 3 ? process.argv.slice(3).join(' ') : '';
+  const report = {
+    event: 'remote_' + task,
+    params: { args }
   };
+
   monaca.reportAnalytics(report);
 
   var cwd, projectInfo, error = '';

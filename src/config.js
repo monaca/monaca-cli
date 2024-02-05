@@ -57,10 +57,11 @@ ConfigTask.setProxy = function(proxyServer) {
   var report = {
     event: 'proxy'
   };
+  monaca.reportAnalytics(report);
 
   monaca.setConfig('http_proxy', proxyServer)
   .then(
-    monaca.reportAnalytics.bind(monaca, report),
+    monaca.reportFinish.bind(monaca, report),
     monaca.reportFail.bind(monaca, report)
   )
   .then(
@@ -88,10 +89,11 @@ ConfigTask.setAPIEndpoint = function(APIEndpoint) {
   var report = {
     event: 'api_endpoint'
   };
+  monaca.reportAnalytics(report);
 
   monaca.setConfig('api_endpoint', APIEndpoint)
   .then(
-    monaca.reportAnalytics.bind(monaca, report),
+    monaca.reportFinish.bind(monaca, report),
     monaca.reportFail.bind(monaca, report)
   )
   .then(

@@ -20,6 +20,12 @@ module.exports = {
     opts.overwrite = !!argv.force || (options && options.force) || false;
     opts.createPackageJson = !!argv.createPackageJson || (options && options.createPackageJson) || false;
 
+    const report = {
+      event: taskName
+    };
+
+    monaca.reportAnalytics(report);
+
     process.on('SIGINT', err => util.fail(`Project ${taskName} failed. ${err}`) );
 
     // Checking if the path is under a Monaca Project.
@@ -47,6 +53,10 @@ module.exports = {
         }
       )
       .then(answer => { if (answer) { opts.overwrite = answer.value; return monaca.upgrade(projectDir, opts); } })
+      .then(
+        monaca.reportFinish.bind(monaca, report),
+        monaca.reportFail.bind(monaca, report)
+      )
       .then(() => {
         util.success(`${taskName} process finished.`);
         util.print(`For more details about the changes, please refer to ${CLI_UPDATE_DOC_URL.url}`);

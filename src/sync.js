@@ -22,10 +22,8 @@ SyncTask.run = function(taskName, info, options) {
   } else {
     return monaca.prepareSession().then(
       function() {
-        if (taskName === 'clone') {
-          this.clone(true); // 'true' flag ensures that cloud project id is saved locally.
-        } else if (taskName === 'import') {
-          this.clone(false);
+        if (taskName === 'clone' || taskName === 'import') {
+          this.clone(taskName); // 'true' flag ensures that cloud project id is saved locally.
         } else if (taskName === 'upload' || taskName === 'download') {
           this.load(taskName, options);
         }
@@ -105,12 +103,13 @@ SyncTask.load = function(action, arg) {
     );
 };
 
-SyncTask.clone = function(saveCloudProjectID) {
+SyncTask.clone = function(taskName) {
   util.print('Fetching project list...');
+  var saveCloudProjectID = taskName === 'clone';
   var project;
 
   var report = {
-    event: 'clone'
+    event: taskName
   };
   monaca.reportAnalytics(report);
 
@@ -139,7 +138,7 @@ SyncTask.clone = function(saveCloudProjectID) {
             project.destPath = answers.destPath;
             project.absolutePath = path.resolve(answers.destPath);
 
-            report.arg1 = project.name;
+            report.params = { project: project.name };
             return project;
           }
         );
@@ -271,9 +270,10 @@ SyncTask.livesync = function() {
         projects.push(projectDir);
       }
 
-      var report = {
+      const args = process.argv.length > 3 ? process.argv.slice(3).join(' ') : '';
+      const report = {
         event: 'debug',
-        arg1: JSON.stringify(projects)
+        params: { args }
       };
       monaca.reportAnalytics(report);
 
