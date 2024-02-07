@@ -20,19 +20,7 @@ jobs:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Check if version has been published
-        run: |
-          version=$(node -p "require('./package.json').version")
-          echo "version=$version" >> $GITHUB_ENV
-          if git rev-parse "$version" >/dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_ENV
-          else
-            echo "exists=false" >> $GITHUB_ENV
-            echo "new_tag=$version" >> $GITHUB_ENV
-          fi
-
       - name: Publish to npm
-        if: env.exists == 'false'
         run: npm publish --tag beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
