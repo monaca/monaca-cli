@@ -31,13 +31,21 @@ var taskList = {};
 var latestVersion;
 
 https.get('https://ide.monaca.mobi/api/public/versions', function(res) {
-  res.on('data', function (data) {
-     data = JSON.parse(data);
-     latestVersion = data.result.monacaCli.replace(/"/g,'').split('/').pop();
-   });
-}).on('error', function (){
-
-})
+  let rawData = '';
+  res.on('data', function (chunk) {
+     rawData += chunk;
+  });
+  res.on('end', function() {
+    try {
+      const parsedData = JSON.parse(rawData);
+      latestVersion = parsedData.result.monacaCli.replace(/"/g,'').split('/').pop();
+    } catch (e) {
+      console.error('Error parsing JSON:', e.message);
+    }
+  });
+}).on('error', function(e) {
+  console.log('Error: ' + e);
+});
 
 var docsPath = '../doc/tasks/';
 fs.readdirSync(path.join(__dirname, docsPath)).forEach(function(filename) {

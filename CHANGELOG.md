@@ -1,6 +1,13 @@
 
 CHANGELOG
 ====
+v5.0.3
+----
+
+#### Bug Fix
+* Resolved issue in version checking functionality
+  * Fixed incorrect JSON parsing that could lead to errors
+
 v5.0.2
 ----
 
