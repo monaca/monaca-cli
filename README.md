@@ -118,3 +118,19 @@ The problem might be in the installation of Node.js. If you installed Node.js th
    For more information about managing multiple Node.js versions, refer to this [documentation](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
 4. Install the Monaca CLI again.
 5. The login should be working now.
+
+### GitHub Actions
+
+- submodules are recursively installed by adding the submodules: 'recursive' option.
+
+#### When merged/pushed to master branch
+
+- Get version from package.json
+- If version does not exist in GitHub tags
+  - Tag it
+  - Run npm publish
+
+#### When tagged as -beta.*
+
+- Run npm publish --beta
+

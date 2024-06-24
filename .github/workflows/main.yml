@@ -1,0 +1,54 @@
+name: Publish to npm
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: 'recursive'
+
+      - name: Check if version has been published
+        id: check_version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "VERSION=$version" >> $GITHUB_ENV
+          if git rev-parse "$version" >/dev/null 2>&1; then
+            echo "git_tag_exists=true" >> $GITHUB_ENV
+          else
+            echo "git_tag_exists=false" >> $GITHUB_ENV
+            echo "new_tag=$version" >> $GITHUB_ENV
+          fi
+
+      - name: Create Release
+        if: env.git_tag_exists == 'false'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.new_tag }}
+          release_name: Release ${{ env.new_tag }}
+          draft: false
+          prerelease: false
+
+      - name: Setup Node.js
+        if: env.git_tag_exists == 'false'
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish to npm
+        if: env.git_tag_exists == 'false'
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
