@@ -197,7 +197,7 @@ var printSuccessMessage = function(options, files) {
 var loginErrorHandler = function (error, taskName = null) {
   if (error === 'ECONNRESET') {
     util.print('Unable to connect to Monaca Cloud. Are you connected to the internet?');
-    util.print('If you need to use a proxy, please configure it with "monaca proxy".');
+    util.print('If you need to use a proxy, please configure it with "monaca config proxy".');
   } else {
     if (error.hasOwnProperty('code') && error.code == 503) {
       if (error.hasOwnProperty('result') && error.result.hasOwnProperty('confirm') && error.result.confirm) {

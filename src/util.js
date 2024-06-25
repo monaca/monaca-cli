@@ -84,7 +84,7 @@ var displayLoginErrors = function(error) {
   if (error === 'ECONNRESET') {
     printerr('Unable to connect to Monaca Cloud.');
     println('Are you connected to the Internet?');
-    println('If you need to use a proxy, please configure it with "monaca proxy".');
+    println('If you need to use a proxy, please configure it with "monaca config proxy".');
   } else {
     printerr('Must be signed in to Monaca when using this command.');
     println();

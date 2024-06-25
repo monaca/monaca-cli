@@ -1,6 +1,12 @@
 
 CHANGELOG
 ====
+v5.0.4
+----
+
+#### Updates
+* Update proxy configuration instructions
+
 v5.0.3
 ----
 
