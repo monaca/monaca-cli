@@ -1,6 +1,12 @@
 
 CHANGELOG
 ====
+v5.0.5
+----
+
+#### Updates
+* Update signup docs
+
 v5.0.4
 ----
 
