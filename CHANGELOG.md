@@ -1,6 +1,13 @@
 
 CHANGELOG
 ====
+v5.0.6
+----
+
+#### Updates
+
+* Update Blank template
+
 v5.0.5
 ----
 
