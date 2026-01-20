@@ -5,7 +5,7 @@ var fs = require('fs'),
   path = require('path'),
   open = require('opn'),
   Q = require('q'),
-  inquirer = null,
+  inquirer = require('inquirer'),
   argv = require('minimist')(process.argv.slice(2)),
   XMLDom = require('@xmldom/xmldom').DOMParser,
   XMLSerializer = require('@xmldom/xmldom').XMLSerializer,
@@ -14,17 +14,6 @@ var fs = require('fs'),
   util = require(path.join(__dirname, 'util')),
   lib = require(path.join(__dirname, 'lib')),
   sync = require(path.join(__dirname, 'sync'));
-
-var isWindowsPlatform = process.platform === 'win32';
-
-if (isWindowsPlatform) {
-  // use inquirer
-  inquirer = require('inquirer');
-} else {
-  // TODO: to use inquirer when inquirer implemented cancelable and customKeyAction features
-  // use monaca-inquirer
-  inquirer = require('monaca-inquirer');
-}
 
 var CreateTask = {}, monaca, report = { event: 'create' },
   dirName = argv._[argv._.indexOf('create') + 1],
@@ -212,7 +201,6 @@ var inquiry = {
       type: 'list',
       name: 'category',
       message: 'Choose a category:',
-      cancelable: false,
       choices: Object.keys(this.categories).map(function(key) {
         return this.categories[key].length ? { name: key } : { name: key, disabled: 'Coming soon' };
       }.bind(this)).concat([{ name: 'Sample Apps'}])
@@ -222,29 +210,24 @@ var inquiry = {
   },
 
   template: function(answerCategory) {
-    let message = 'Select a template - Press ' + 'P'.info + ' to see a preview';
-    if (isWindowsPlatform) message = null;
+    var templateChoices = this.categories[answerCategory]
+      .sort(function(a, b) {
+        if (a.name > b.name) return -1;
+        if (a.name < b.name) return 1;
+        return 0;
+      })
+      .map(function(template, index) { return {name: template.name, value: index}; });
+
+    templateChoices.push(new inquirer.Separator());
+    templateChoices.push({name: '← Back to categories', value: -1});
+
     inquirer.prompt({
       type: 'list',
       name: 'template',
-      message: message,
-      cancelable: true,
-      keyAction: {
-        p: function(currentValue) {
-          if (this.categories[answerCategory][currentValue].preview) {
-            open(this.categories[answerCategory][currentValue].preview, {wait: false});
-          }
-        }.bind(this)
-      },
-      choices: this.categories[answerCategory]
-        .sort(function(a, b) {
-          if (a.name > b.name) return -1;
-          if (a.name < b.name) return 1;
-          return 0;
-        })
-        .map(function(template, index) { return {name: template.name, value: index}; })
+      message: 'Select a template:',
+      choices: templateChoices
     }).then(function(answer) {
-      if (answer.template === null) {
+      if (answer.template === -1) {
         inquiry.categories.call(this);
       } else {
         CreateTask.createApp(this.categories[answerCategory][answer.template]);
@@ -253,25 +236,20 @@ var inquiry = {
   },
 
   samples: function() {
-    let message = 'Select a template - Press ' + 'P'.info + ' to see a preview';
-    if (isWindowsPlatform) message = null;
+    var sampleChoices = this.samples.map(function(sample, index) {
+      return { name: sample.name + '   # ' + sample.description, short: sample.name, value: index }
+    }.bind(this));
+
+    sampleChoices.push(new inquirer.Separator());
+    sampleChoices.push({name: '← Back to categories', value: -1});
+
     inquirer.prompt({
       type: 'list',
       name: 'sample',
-      message: message,
-      cancelable: true,
-      keyAction: {
-        p: function(currentValue) {
-          if (this.samples[currentValue].preview) {
-            open(this.samples[currentValue].preview, {wait: false});
-          }
-        }.bind(this)
-      },
-      choices: this.samples.map(function(sample, index) {
-        return { name: sample.name + '   # ' + sample.description, short: sample.name, value: index }
-      }.bind(this))
+      message: 'Select a sample app:',
+      choices: sampleChoices
     }).then(function(answer) {
-      if (answer.sample === null) {
+      if (answer.sample === -1) {
         inquiry.categories.call(this);
       } else {
         CreateTask.createApp(this.samples[answer.sample]);
